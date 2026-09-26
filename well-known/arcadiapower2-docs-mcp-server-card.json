@@ -1,0 +1,1 @@
+{"$schema":"https://static.modelcontextprotocol.io/schemas/v1/server-card.schema.json","name":"com.readme/arcadia","version":"2024-02-21","title":"Arcadia","description":"MCP server for Arcadia. Lets AI agents explore this project's API reference and documentation.","remotes":[{"type":"streamable-http","url":"https://docs.arcadia.com/mcp"}]}

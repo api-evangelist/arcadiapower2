@@ -1,0 +1,66 @@
+generated: '2026-09-25'
+method: searched
+generator: extract-docs-artifacts.py (local)
+source: https://docs.arcadia.com/docs/sandbox-testing.md
+sources:
+- https://docs.arcadia.com/docs/sandbox-testing.md
+- https://docs.arcadia.com/docs/sandbox-testing
+- https://docs.arcadia.com/reference/initiate-mfa-refresh.md
+- https://docs.arcadia.com/reference/list-statements.md
+description: Arcadia Plug API sandbox mode
+modes:
+- name: sandbox
+  base_url: https://sandbox.api.arcadia.com
+  how_to_get_access: Require Dashboard access. Obtain via an existing Dashboard user, Customer Success Manager, Account Manager, or Arcadia Support
+    team. Then toggle "Sandbox mode" in the Dashboard or use the sandbox domain in API calls.
+test_values:
+- kind: username
+  value: ARCADIA_MOCK_RESI_SINGLE_ELEC_SINGLE_METER
+  meaning: One electric account with one electric meter
+- kind: username
+  value: ARCADIA_MOCK_RESI_SINGLE_ELEC_MULTI_METER
+  meaning: One electric account with three electric meters
+- kind: username
+  value: ARCADIA_MOCK_RESI_MULTI_ELEC_SINGLE_METER
+  meaning: Three electric accounts each with one distinct electric meter
+- kind: username
+  value: ARCADIA_MOCK_RESI_SINGLE_GAS_SINGLE_METER
+  meaning: One gas account with one gas meter
+- kind: username
+  value: ARCADIA_MOCK_RESI_SINGLE_GAS_MULTI_METER
+  meaning: One gas account with three gas meters
+- kind: username
+  value: ARCADIA_MOCK_RESI_SINGLE_ELEC_SINGLE_GAS_SINGLE_METERS
+  meaning: One electric account with one electric meter and one gas account with one gas meter
+- kind: username
+  value: ARCADIA_MOCK_RESI_COMBINED_ELEC_GAS_SINGLE_METERS
+  meaning: One combined electric and gas account with one electric meter and one gas meter
+- kind: username
+  value: ARCADIA_MOCK_RESI_SINGLE_WATER_SINGLE_METER
+  meaning: One water account with one water meter
+- kind: username
+  value: ARCADIA_MOCK_RESI_SINGLE_WATER_MULTI_METER
+  meaning: One water account with three water meters
+- kind: username
+  value: ARCADIA_MOCK_RESI_SINGLE_ELEC_SINGLE_GAS_SINGLE_WATER_SINGLE_METERS
+  meaning: One electric account with one electric meter, one gas account with one gas meter, and one water account with one water meter
+- kind: username
+  value: ARCADIA_MOCK_RESI_NO_ACCOUNTS
+  meaning: No statements or accounts are associated with this credential
+- kind: username
+  value: ARCADIA_MOCK_RESI_CLOSED
+  meaning: One closed electric account with one electric meter
+- kind: password
+  value: VERIFIED
+  meaning: Credential verified within Connect RTCV timeout; status CONNECT_SUCCESS / LOGIN_AND_DATA_DISCOVERY_SUCCESSFUL
+- kind: password
+  value: REJECTED
+  meaning: Credential rejected
+triggers:
+- POST /plug/credentials/{credentialId}/refresh (supports sandbox)
+- POST /plug/credentials/{credentialId}/statements (Generate New Statement endpoint, supports sandbox)
+docs:
+- https://docs.arcadia.com/docs/sandbox-testing.md
+- https://docs.arcadia.com/docs/sandbox-testing
+- https://docs.arcadia.com/reference/initiate-mfa-refresh.md
+- https://docs.arcadia.com/reference/list-statements.md

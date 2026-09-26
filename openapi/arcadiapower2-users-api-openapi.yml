@@ -1,0 +1,636 @@
+openapi: 3.2.0
+info:
+  title: Arcadia API Reference Users API
+  version: 0.3.0
+  contact:
+    email: platformsupport@arcadia.com
+  x-logo:
+    url: images/arcadia_logo.png
+servers:
+- url: https://api.arcadia.com
+security:
+- bearerAuth: []
+tags:
+- name: Users
+paths:
+  /users:
+    get:
+      tags:
+      - Users
+      summary: List Users
+      description: Returns a paginated list of Users. Default ordered by descending `updated_at`.
+      operationId: getUsers
+      parameters:
+      - $ref: '#/components/parameters/paginationLimitParam'
+      - $ref: '#/components/parameters/paginationUpdatedAfterParam'
+      - $ref: '#/components/parameters/paginationUpdatedBeforeParam'
+      - $ref: '#/components/parameters/paginationOrderParam'
+      - $ref: '#/components/parameters/arcVersionInHeaderParam'
+      responses:
+        '200':
+          description: Success
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUsers'
+  /users/{client_user_id}:
+    get:
+      tags:
+      - Users
+      summary: Get User
+      description: Get a single User associated with a `client_user_id`
+      operationId: getUser
+      parameters:
+      - $ref: '#/components/parameters/clientUserIdInPathParam'
+      - $ref: '#/components/parameters/arcVersionInHeaderParam'
+      responses:
+        '200':
+          description: Success
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '403':
+          description: Forbidden
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDataExceedsLimitsError'
+        '404':
+          description: Not Found
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserNotFoundError'
+    delete:
+      tags:
+      - Users
+      summary: Delete User
+      description: Delete all data associated with a `client_user_id`. Note that the actual delete happens asynchronously, so data for this User may still be available through the API for a few minutes after a delete request is made.
+      operationId: deleteUser
+      parameters:
+      - $ref: '#/components/parameters/clientUserIdInPathParam'
+      - $ref: '#/components/parameters/arcVersionInHeaderParam'
+      responses:
+        '204':
+          description: No Content
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+        '404':
+          description: Not Found
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserNotFoundError'
+        '422':
+          description: Unprocessable Entity
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteUserError'
+components:
+  schemas:
+    UtilityCredential:
+      required:
+      - created_at
+      - id
+      - updated_at
+      - client_user_id
+      - username
+      - utility_name
+      - utility_long_name
+      - verification_status
+      - accounts_load_in_progress
+      - verification_updated_at
+      - sandboxed
+      - uses_test_scenario
+      properties:
+        id:
+          type: integer
+          example: 12345
+        client_user_id:
+          type: string
+          example: fff57dc7-3a2b-4395-8a62-e3486d46dabe
+        utility_name:
+          type: string
+          example: AEP SWEPCO
+          description: The list of supported Arcadia utilities can be found [here](https://arc.arcadia.com/coverage?first=25&page=1).
+        utility_long_name:
+          type: string
+          example: AEP SWEPCO AR
+          description: Provides greater detail than `utility_name`. The list of supported Arcadia utilities can be found [here](https://arc.arcadia.com/coverage?first=25&page=1).
+        username:
+          type:
+          - string
+          - 'null'
+          example: great_customer
+        verification_status:
+          type: string
+          enum:
+          - pending
+          - verified
+          - rejected
+          - error
+          description: 'The verification status of the Utility Credential.
+
+
+            * `pending`: Credential verification is pending
+
+            * `verified`: The credentials were found to be correct
+
+            * `rejected`: The credentials were found to be incorrect
+
+            * `error`: There was an error attempting to verify the credentials. This status _may_ be transient, as Arcadia will continue to retry verification in the background.
+
+            '
+        accounts_load_in_progress:
+          type: boolean
+          example: false
+          description: 'Indicates if Arcadia is in the process of verifying a utility credential or loading associated utility accounts. The combination of `verification_status: verified` and `account_load_in_progress: false` will indicate that utility accounts are available in the API. Alternatively, the `utility_accounts_discovered` webhook will alert you when utility accounts are available in the API.'
+        verification_updated_at:
+          format: date-time
+          type:
+          - string
+          - 'null'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        sandboxed:
+          type: boolean
+          example: false
+        uses_test_scenario:
+          type: boolean
+          example: false
+          description: Indicates if the utility credential was created using a designated test username and password.
+    Availability:
+      type: string
+      enum:
+      - AVAILABLE
+      - NOT_AVAILABLE
+      - NOT_READY
+    Tariff:
+      description: Information about a tariff.
+      required:
+      - main_tariff_id
+      - tariff_code
+      - tariff_name
+      - utility_name
+      properties:
+        main_tariff_id:
+          type: string
+          description: The Genability 'masterTariffId' unique identifier for this tariff. See [Genability documentation](https://developer.genability.com/api-reference/tariff-api/tariff/) for details.
+          example: gen_mtid_3331108
+        property_inputs:
+          description: Properties applied to this tariff which may affect the calculated cost of electricity.
+          type: array
+          items:
+            type: object
+            required:
+            - id
+            - value
+            properties:
+              id:
+                type: string
+                example: territoryId
+              value:
+                type:
+                - boolean
+                - number
+                - string
+                example: 3
+        supplier_name:
+          description: The name of the retail electricity supplier or the community choice aggregator. If there is no retail electricity supplier or community choice aggregator, this field is null.
+          example: East Bay Community Energy
+          type:
+          - string
+          - 'null'
+        tariff_code:
+          type: string
+          description: Abbreviation code of the tariff used for this calculation.
+          example: EV-2A-TOU
+        tariff_name:
+          type: string
+          description: Full name of the tariff used for this calculation.
+          example: Residential - Time of Use - Plug-In Electric Vehicle 2
+        utility_name:
+          type: string
+          description: Name of the utility associated with this tariff
+          example: Pacific Gas & Electric
+    MostRecentTariff:
+      allOf:
+      - $ref: '#/components/schemas/Tariff'
+      - description: The most recent Tariff seen on this utility account.
+        required:
+        - tariff_as_of_date
+        properties:
+          tariff_as_of_date:
+            type:
+            - string
+            - 'null'
+            format: date
+            description: The statement date of the utility statement that reported use of this tariff.
+            example: '2021-03-01'
+    DeleteUserError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - Cannot delete a User who is pending_enrollment, enrolled, or pending unenrollment in a Bundle Product
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+            details:
+              type:
+              - object
+              - 'null'
+      additionalProperties: false
+    UtilityMeter:
+      required:
+      - id
+      - client_user_id
+      - utility_credential_id
+      - utility_account_id
+      - meter_number
+      - service_type
+      - created_at
+      - updated_at
+      - sandboxed
+      properties:
+        id:
+          type: integer
+          example: 12345
+        client_user_id:
+          type: string
+          example: fff57dc7-3a2b-4395-8a62-e3486d46dabe
+        utility_credential_id:
+          type: integer
+          example: 54321
+        utility_account_id:
+          type: integer
+          example: 65432
+        meter_number:
+          type: string
+          example: 12300000045 67
+        service_type:
+          type: string
+          enum:
+          - electric
+          - gas
+          - water
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        sandboxed:
+          type: boolean
+          example: false
+      additionalProperties: false
+    PaginatedUsers:
+      required:
+      - data
+      - total_count
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            required:
+            - client_user_id
+            - created_at
+            - updated_at
+            properties:
+              client_user_id:
+                type: string
+                example: fff57dc7-3a2b-4395-8a62-e3712d46dafl
+              created_at:
+                type: string
+                format: date-time
+              updated_at:
+                type: string
+                format: date-time
+        total_count:
+          type: integer
+          example: 1
+      additionalProperties: false
+    UserNotFoundError:
+      required:
+      - error
+      properties:
+        error:
+          type: string
+          enum:
+          - Couldn't find User
+      additionalProperties: false
+    User:
+      required:
+      - client_user_id
+      - created_at
+      - utility_credentials
+      properties:
+        client_user_id:
+          type: string
+          example: fff57dc7-3a2b-4395-8a62-e3712d46dafl
+        created_at:
+          type: string
+          format: date-time
+        utility_credentials:
+          type: array
+          items:
+            allOf:
+            - $ref: '#/components/schemas/UtilityCredential'
+            - type: object
+              required:
+              - utility_accounts
+              properties:
+                utility_accounts:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/UtilityAccount'
+    UserDataExceedsLimitsError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+            details:
+              type:
+              - object
+              - 'null'
+      additionalProperties: false
+    UtilityAccount:
+      required:
+      - id
+      - client_user_id
+      - utility_name
+      - utility_long_name
+      - utility_credential_id
+      - account_number
+      - service_address_city
+      - service_address_state
+      - service_address_street_one
+      - service_address_street_two
+      - service_address_zip
+      - service_customer_name
+      - status
+      - supplier_account_id
+      - most_recent_tariff
+      - flags
+      - services
+      - created_at
+      - updated_at
+      - feature_availability
+      - utility_meters
+      - sandboxed
+      properties:
+        id:
+          type: integer
+          example: 12345
+        client_user_id:
+          type: string
+          example: fff57dc7-3a2b-4395-8a62-e3486d46dabe
+        utility_name:
+          type: string
+          example: AEP SWEPCO
+          description: The list of supported Arcadia utilities can be found [here](https://arc.arcadia.com/coverage?first=25&page=1).
+        utility_long_name:
+          type: string
+          example: AEP SWEPCO AR
+          description: Provides greater detail than `utility_name`. The list of supported Arcadia utilities can be found [here](https://arc.arcadia.com/coverage?first=25&page=1).
+        utility_credential_id:
+          type: integer
+          example: 54321
+        account_number:
+          type:
+          - string
+          - 'null'
+          example: '7626177069'
+          description: The account number used by the utility to identify this UtilityAccount
+        service_address_street_one:
+          example: 1060 W Addison
+          type:
+          - string
+          - 'null'
+        service_address_street_two:
+          example: Apartment 1
+          type:
+          - string
+          - 'null'
+        service_address_city:
+          example: Chicago
+          type:
+          - string
+          - 'null'
+        service_address_state:
+          example: IL
+          type:
+          - string
+          - 'null'
+        service_address_zip:
+          example: '60613'
+          type:
+          - string
+          - 'null'
+        service_customer_name:
+          example: Joan Arcadia
+          type:
+          - string
+          - 'null'
+        supplier_account_id:
+          example: '123456789'
+          description: 'Utility specific account identifier for energy suppliers.
+
+            '
+          type:
+          - string
+          - 'null'
+        status:
+          anyOf:
+          - type: 'null'
+          - type: string
+            enum:
+            - active
+            - closed
+            - incomplete
+            - locked
+            - unknown
+        most_recent_tariff:
+          anyOf:
+          - type: 'null'
+          - $ref: '#/components/schemas/MostRecentTariff'
+        flags:
+          type: array
+          items:
+            type: string
+            enum:
+            - utility_statement_past_due
+        services:
+          type: array
+          items:
+            type: string
+            enum:
+            - electric
+            - gas
+            - water
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        feature_availability:
+          $ref: '#/components/schemas/FeatureAvailability'
+        utility_meters:
+          type: array
+          items:
+            $ref: '#/components/schemas/UtilityMeter'
+        sandboxed:
+          type: boolean
+          example: false
+      additionalProperties: false
+    FeatureAvailability:
+      required:
+      - charge_cost
+      - hosted_payments
+      - utility_remittance
+      - smart_charge
+      - utility_statements
+      properties:
+        charge_cost:
+          $ref: '#/components/schemas/Availability'
+        smart_charge:
+          $ref: '#/components/schemas/Availability'
+        utility_statements:
+          $ref: '#/components/schemas/Availability'
+        hosted_payments:
+          $ref: '#/components/schemas/Availability'
+        utility_remittance:
+          $ref: '#/components/schemas/Availability'
+      additionalProperties: false
+  parameters:
+    arcVersionInHeaderParam:
+      name: Arcadia-Version
+      in: header
+      example: '2022-10-13'
+      description: The Arcadia-Version for the request
+      required: true
+      schema:
+        type: string
+        default: '2022-10-13'
+    clientUserIdInPathParam:
+      name: client_user_id
+      in: path
+      required: true
+      schema:
+        type: string
+    paginationLimitParam:
+      in: query
+      name: limit
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
+    paginationUpdatedAfterParam:
+      in: query
+      name: updated_after
+      required: false
+      description: ISO8601 datetime, used to traverse paginated responses. Use of this parameter is mutually exclusive with `updated_before`.
+      schema:
+        type: string
+        format: date-time
+    paginationUpdatedBeforeParam:
+      in: query
+      name: updated_before
+      required: false
+      description: ISO8601 datetime, used to traverse paginated responses. Use of this parameter is mutually exclusive with `updated_after`.
+      schema:
+        type: string
+        format: date-time
+    paginationOrderParam:
+      in: query
+      name: order
+      required: false
+      description: Used to specify the order in which records should be returned. Currently ordered by `updated_at` timestamp.
+      schema:
+        type: string
+        enum:
+        - asc
+        - desc
+        default: desc
+  headers:
+    ArcVersion:
+      description: The Arcadia-Version for the response
+      schema:
+        type: string
+      example: '2022-10-13'
+      required: true
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+x-readme:
+  proxy-enabled: false
+  headers:
+  - key: from-readme
+    value: true
+x-tagGroups:
+- name: General
+  tags:
+  - Auth
+  - Webhooks
+  - Webhook Events
+- name: Connections
+  tags:
+  - Utility Credentials
+  - Utility Accounts
+  - Utility Meters (Beta)
+  - Users
+- name: Products
+  tags:
+  - Plug
+  - Spark

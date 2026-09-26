@@ -1,0 +1,546 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/arcadiapower2/main/json-schema/arcadiapower2-utility-statement-schema.json",
+  "title": "UtilityStatement",
+  "x-generated": "2026-09-26",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/arcadiapower2-openapi.yaml#/components/schemas/UtilityStatement",
+  "required": [
+    "client_user_id",
+    "created_at",
+    "due_date",
+    "final_bill",
+    "gas_charge",
+    "id",
+    "kwh",
+    "past_due",
+    "pdf_url",
+    "sandboxed",
+    "service_end_date",
+    "service_start_date",
+    "statement_date",
+    "supplier_charge",
+    "tariff",
+    "updated_at",
+    "utility_account_id",
+    "utility_charge",
+    "utility_name",
+    "utility_long_name",
+    "service_window_inclusive_of_end_date",
+    "commercial_line_items_detail",
+    "billing_flags",
+    "virtual_net_metering",
+    "most_recent_payment_detail"
+  ],
+  "properties": {
+    "id": {
+      "type": "integer"
+    },
+    "client_user_id": {
+      "type": "string"
+    },
+    "tariff": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/Tariff"
+        }
+      ]
+    },
+    "utility_name": {
+      "type": "string",
+      "description": "The list of supported Arcadia utilities can be found [here](https://arc.arcadia.com/coverage?first=25&page=1)."
+    },
+    "utility_long_name": {
+      "type": "string",
+      "description": "Provides greater detail than `utility_name`. The list of supported Arcadia utilities can be found [here](https://arc.arcadia.com/coverage?first=25&page=1)."
+    },
+    "utility_account_id": {
+      "type": "integer"
+    },
+    "statement_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "due_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    },
+    "service_start_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "service_end_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "kwh": {
+      "type": "integer"
+    },
+    "utility_charge": {
+      "type": "number",
+      "description": "Total dollar amount billed by the utility on this statement."
+    },
+    "supplier_charge": {
+      "description": "Total dollar amount billed by the energy supplier.\n\n**Note**: Not available for all utilities.\n",
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "gas_charge": {
+      "description": "Total dollar amount billed by the utility for natural gas.\n\n**Note**: Not available for all utilities that provide gas service.\n",
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "past_due": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sandboxed": {
+      "type": "boolean"
+    },
+    "pdf_url": {
+      "format": "uri",
+      "description": "A url to the utility created PDF bill for this statement. Note that this url will only be valid for 600 seconds.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "final_bill": {
+      "description": "Indicates if this is the final bill that this account will receive before closing.",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "service_window_inclusive_of_end_date": {
+      "type": "boolean",
+      "description": "Indicates that the service window for this UtilityStatement includes the service_end_date."
+    },
+    "net_metering": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "description": "Details on the customer's net metering credit data. Currently only supported for Versant.",
+          "required": [
+            "current_cycle_generated_kwh"
+          ],
+          "properties": {
+            "current_cycle_generated_kwh": {
+              "description": "The kwh generated during the current cycle",
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "virtual_net_metering": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "description": "Details on the customer's virtual net metering credit data. Currently only supported for National Grid New York and Central Maine Power.",
+          "required": [
+            "current_cycle_generated_credits",
+            "current_cycle_applied_credits",
+            "last_cycle_carry_over_credits",
+            "next_cycle_carry_over_credits",
+            "current_cycle_generated_kwh",
+            "current_cycle_applied_kwh",
+            "last_cycle_carry_over_kwh",
+            "next_cycle_carry_over_kwh",
+            "current_cycle_expiring_kwh",
+            "current_cycle_allocation_percentage",
+            "cdg_net_credit"
+          ],
+          "properties": {
+            "current_cycle_generated_credits": {
+              "description": "The amount of credits generated during the current cycle, in dollars",
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "current_cycle_applied_credits": {
+              "description": "The amount of credits applied during the current cycle, in dollars",
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "last_cycle_carry_over_credits": {
+              "description": "The amount of credits carried over from the last cycle, in dollars",
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "next_cycle_carry_over_credits": {
+              "description": "The amount of credits carried over to the next cycle, in dollars",
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "current_cycle_generated_kwh": {
+              "description": "The kwh generated during the current cycle",
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "current_cycle_applied_kwh": {
+              "description": "The kwh applied during the current cycle",
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "last_cycle_carry_over_kwh": {
+              "description": "The kwh carried over to the next cycle",
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "next_cycle_carry_over_kwh": {
+              "description": "The kwh carried over to the next cycle",
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "current_cycle_expiring_kwh": {
+              "description": "the kwh that are expiring during the current cycle",
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "current_cycle_allocation_percentage": {
+              "description": "the fixed allocation percentage during the current cycle",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "cdg_net_credit": {
+              "description": "The net credit from the community solar project, in dollars",
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "most_recent_payment_detail": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "description": "Detail on the most recent payment. Currently only supported for National Grid Massachusetts and NYSEG.",
+          "required": [
+            "most_recent_payment_received_amount",
+            "most_recent_payment_received_date"
+          ],
+          "properties": {
+            "most_recent_payment_received_amount": {
+              "description": "Total dollar amount received on the most recent payment.",
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "most_recent_payment_received_date": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date",
+              "description": "The date of the most recent payment."
+            }
+          }
+        }
+      ]
+    },
+    "commercial_line_items_detail": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "description": "This field is in *beta*. Click [here](release-phases) for a description on Arcadia's release phases. -- Details on line items specific to commercial accounts. Currently only supported for the ConEd utility.",
+          "required": [
+            "supply_energy_kwh",
+            "supply_energy_cost",
+            "supply_demand_kw",
+            "supply_demand_cost",
+            "supply_customer_charge",
+            "supply_merchant_function_charge",
+            "supply_taxes",
+            "supply_total_charge",
+            "delivery_energy_kwh",
+            "delivery_energy_cost",
+            "delivery_demand_kw",
+            "delivery_demand_cost",
+            "delivery_customer_charge",
+            "delivery_system_benefit_cost",
+            "delivery_processing_charge",
+            "delivery_taxes",
+            "delivery_total_charge",
+            "sales_tax",
+            "electric_charge"
+          ],
+          "properties": {
+            "supply_energy_kwh": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "supply_energy_cost": {
+              "description": "The energy supply cost, in dollars.",
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "supply_demand_kw": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "supply_demand_cost": {
+              "description": "The demand supply cost, in dollars.",
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "supply_customer_charge": {
+              "description": "The customer charge for energy supply, in dollars.",
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "supply_merchant_function_charge": {
+              "description": "The charge for merchant function in energy supply, in dollars.",
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "supply_taxes": {
+              "description": "Any other charges for taxes on energy supply, in dollars.",
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "supply_total_charge": {
+              "description": "The total cost of energy supply, in dollars.",
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "delivery_energy_kwh": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "delivery_energy_cost": {
+              "description": "The energy delivery cost, in dollars.",
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "delivery_demand_kw": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "delivery_demand_cost": {
+              "description": "The demand delivery cost, in dollars.",
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "delivery_customer_charge": {
+              "description": "The customer charge for energy delivery, in dollars.",
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "delivery_system_benefit_cost": {
+              "description": "The delivery system benefit cost, in dollars.",
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "delivery_processing_charge": {
+              "description": "The delivery processing charge, in dollars.",
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "delivery_taxes": {
+              "description": "Any other charges for taxes on energy delivery, in dollars.",
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "delivery_total_charge": {
+              "description": "The total cost of energy delivery, in dollars.",
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "sales_tax": {
+              "description": "Sales taxes applied to the total bill, in dollars.",
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "electric_charge": {
+              "description": "The total combined charge for this bill - supply, delivery, and taxes - in dollars.",
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "billing_flags": {
+      "type": "array",
+      "description": "These flags may be of interest if the corresponding Utility Account is enrolled in Bundle.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The 'possible_rebill' flag indicates that this Utility Statement may be a duplicate or variation of a previous Utility Statement",
+            "enum": [
+              "possible_rebill"
+            ]
+          },
+          "details": {
+            "type": "object",
+            "properties": {
+              "conflicting_utility_statment_id": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "Tariff": {
+      "description": "Information about a tariff.",
+      "required": [
+        "main_tariff_id",
+        "tariff_code",
+        "tariff_name",
+        "utility_name"
+      ],
+      "properties": {
+        "main_tariff_id": {
+          "type": "string",
+          "description": "The Genability 'masterTariffId' unique identifier for this tariff. See [Genability documentation](https://developer.genability.com/api-reference/tariff-api/tariff/) for details."
+        },
+        "property_inputs": {
+          "description": "Properties applied to this tariff which may affect the calculated cost of electricity.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "value"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "value": {
+                "type": [
+                  "boolean",
+                  "number",
+                  "string"
+                ]
+              }
+            }
+          }
+        },
+        "supplier_name": {
+          "description": "The name of the retail electricity supplier or the community choice aggregator. If there is no retail electricity supplier or community choice aggregator, this field is null.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "tariff_code": {
+          "type": "string",
+          "description": "Abbreviation code of the tariff used for this calculation."
+        },
+        "tariff_name": {
+          "type": "string",
+          "description": "Full name of the tariff used for this calculation."
+        },
+        "utility_name": {
+          "type": "string",
+          "description": "Name of the utility associated with this tariff"
+        }
+      }
+    }
+  }
+}

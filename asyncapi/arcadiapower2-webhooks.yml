@@ -1,0 +1,32 @@
+generated: '2026-09-25'
+method: searched
+generator: extract-docs-artifacts.py (local)
+source: https://docs.arcadia.com/reference/webhooks-overview.md
+sources:
+- https://docs.arcadia.com/reference/webhooks-overview.md
+- https://docs.arcadia.com/reference/list-webhooks.md
+- https://docs.arcadia.com/reference/retrieve-webhook.md
+- https://docs.arcadia.com/reference/resend-webhook.md
+description: Arcadia webhooks are sent via HTTP POST and must receive a 2xx response within 10 seconds. If not, Arcadia will retry the delivery
+  three times every six hours for up to one day (twelve automatic retries maximum). Real‑Time Credential Validation (RTCV) webhooks are retried
+  up to three times only.
+events:
+- event: STATUS_CHANGE
+  description: Arcadia will send this webhook for all status and status detail updates for Credentials, Accounts, Files, Downloads, and Meters,
+    including account and meter voiding.
+- event: EXISTING_DATA_UPDATED
+  description: Arcadia will send this webhook for any updates made to a statement that has already been discovered and stored, or when new interval
+    data is available for a Meter.
+- event: NEW_DATA_AVAILABLE
+  description: Arcadia will send this webhook when a new statement has been discovered for the first time, or when a new Meter has been discovered
+    for the first time.
+- event: REAL_TIME_CREDENTIAL_VALIDATION_SUCCESS
+  description: This webhook is sent only for credentials that support real‑time credential validation and have `isInteractive` set to true, indicating
+    Arcadia has successfully logged into the utility account.
+- event: REAL_TIME_CREDENTIAL_VALIDATION_FAILURE
+  description: This webhook is sent only for credentials that support real‑time credential validation and have `isInteractive` set to true, indicating
+    Arcadia failed to log into the utility account.
+delivery:
+  retries: Up to twelve automatic retries (three attempts every six hours for one day) for standard webhooks; RTCV webhooks retried up to three
+    times.
+docs: https://docs.arcadia.com/reference/webhooks-overview.md

@@ -1,0 +1,337 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/arcadiapower2/main/json-schema/arcadiapower2-utility-account-schema.json",
+  "title": "UtilityAccount",
+  "x-generated": "2026-09-26",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/arcadiapower2-openapi.yaml#/components/schemas/UtilityAccount",
+  "required": [
+    "id",
+    "client_user_id",
+    "utility_name",
+    "utility_long_name",
+    "utility_credential_id",
+    "account_number",
+    "service_address_city",
+    "service_address_state",
+    "service_address_street_one",
+    "service_address_street_two",
+    "service_address_zip",
+    "service_customer_name",
+    "status",
+    "supplier_account_id",
+    "most_recent_tariff",
+    "flags",
+    "services",
+    "created_at",
+    "updated_at",
+    "feature_availability",
+    "utility_meters",
+    "sandboxed"
+  ],
+  "properties": {
+    "id": {
+      "type": "integer"
+    },
+    "client_user_id": {
+      "type": "string"
+    },
+    "utility_name": {
+      "type": "string",
+      "description": "The list of supported Arcadia utilities can be found [here](https://arc.arcadia.com/coverage?first=25&page=1)."
+    },
+    "utility_long_name": {
+      "type": "string",
+      "description": "Provides greater detail than `utility_name`. The list of supported Arcadia utilities can be found [here](https://arc.arcadia.com/coverage?first=25&page=1)."
+    },
+    "utility_credential_id": {
+      "type": "integer"
+    },
+    "account_number": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The account number used by the utility to identify this UtilityAccount"
+    },
+    "service_address_street_one": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "service_address_street_two": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "service_address_city": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "service_address_state": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "service_address_zip": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "service_customer_name": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "supplier_account_id": {
+      "description": "Utility specific account identifier for energy suppliers.\n",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "status": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "enum": [
+            "active",
+            "closed",
+            "incomplete",
+            "locked",
+            "unknown"
+          ]
+        }
+      ]
+    },
+    "most_recent_tariff": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/MostRecentTariff"
+        }
+      ]
+    },
+    "flags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "utility_statement_past_due"
+        ]
+      }
+    },
+    "services": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "electric",
+          "gas",
+          "water"
+        ]
+      }
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "feature_availability": {
+      "$ref": "#/$defs/FeatureAvailability"
+    },
+    "utility_meters": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/UtilityMeter"
+      }
+    },
+    "sandboxed": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "Availability": {
+      "type": "string",
+      "enum": [
+        "AVAILABLE",
+        "NOT_AVAILABLE",
+        "NOT_READY"
+      ]
+    },
+    "FeatureAvailability": {
+      "required": [
+        "charge_cost",
+        "hosted_payments",
+        "utility_remittance",
+        "smart_charge",
+        "utility_statements"
+      ],
+      "properties": {
+        "charge_cost": {
+          "$ref": "#/$defs/Availability"
+        },
+        "smart_charge": {
+          "$ref": "#/$defs/Availability"
+        },
+        "utility_statements": {
+          "$ref": "#/$defs/Availability"
+        },
+        "hosted_payments": {
+          "$ref": "#/$defs/Availability"
+        },
+        "utility_remittance": {
+          "$ref": "#/$defs/Availability"
+        }
+      },
+      "additionalProperties": false
+    },
+    "MostRecentTariff": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/Tariff"
+        },
+        {
+          "description": "The most recent Tariff seen on this utility account.",
+          "required": [
+            "tariff_as_of_date"
+          ],
+          "properties": {
+            "tariff_as_of_date": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date",
+              "description": "The statement date of the utility statement that reported use of this tariff."
+            }
+          }
+        }
+      ]
+    },
+    "Tariff": {
+      "description": "Information about a tariff.",
+      "required": [
+        "main_tariff_id",
+        "tariff_code",
+        "tariff_name",
+        "utility_name"
+      ],
+      "properties": {
+        "main_tariff_id": {
+          "type": "string",
+          "description": "The Genability 'masterTariffId' unique identifier for this tariff. See [Genability documentation](https://developer.genability.com/api-reference/tariff-api/tariff/) for details."
+        },
+        "property_inputs": {
+          "description": "Properties applied to this tariff which may affect the calculated cost of electricity.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "value"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "value": {
+                "type": [
+                  "boolean",
+                  "number",
+                  "string"
+                ]
+              }
+            }
+          }
+        },
+        "supplier_name": {
+          "description": "The name of the retail electricity supplier or the community choice aggregator. If there is no retail electricity supplier or community choice aggregator, this field is null.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "tariff_code": {
+          "type": "string",
+          "description": "Abbreviation code of the tariff used for this calculation."
+        },
+        "tariff_name": {
+          "type": "string",
+          "description": "Full name of the tariff used for this calculation."
+        },
+        "utility_name": {
+          "type": "string",
+          "description": "Name of the utility associated with this tariff"
+        }
+      }
+    },
+    "UtilityMeter": {
+      "required": [
+        "id",
+        "client_user_id",
+        "utility_credential_id",
+        "utility_account_id",
+        "meter_number",
+        "service_type",
+        "created_at",
+        "updated_at",
+        "sandboxed"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "client_user_id": {
+          "type": "string"
+        },
+        "utility_credential_id": {
+          "type": "integer"
+        },
+        "utility_account_id": {
+          "type": "integer"
+        },
+        "meter_number": {
+          "type": "string"
+        },
+        "service_type": {
+          "type": "string",
+          "enum": [
+            "electric",
+            "gas",
+            "water"
+          ]
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sandboxed": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

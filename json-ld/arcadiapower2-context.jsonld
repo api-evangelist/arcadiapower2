@@ -1,0 +1,820 @@
+{
+  "@context": {
+    "@vocab": "https://arcadia.com/schema#",
+    "schema": "https://schema.org/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "dcterms": "http://purl.org/dc/terms/",
+    "arcadiapower2": "https://arcadia.com/schema#",
+    "AccessTokenResponse": "arcadiapower2:AccessTokenResponse",
+    "access_token": {
+      "@id": "arcadiapower2:access_token",
+      "@type": "xsd:string"
+    },
+    "expires_in": {
+      "@id": "arcadiapower2:expires_in",
+      "@type": "xsd:integer"
+    },
+    "token_type": {
+      "@id": "arcadiapower2:token_type",
+      "@type": "xsd:string"
+    },
+    "scope": {
+      "@id": "arcadiapower2:scope",
+      "@type": "xsd:string"
+    },
+    "created_at": {
+      "@id": "arcadiapower2:created_at",
+      "@type": "xsd:integer"
+    },
+    "AccessTokenUnauthorizedError": "arcadiapower2:AccessTokenUnauthorizedError",
+    "error": {
+      "@id": "arcadiapower2:error",
+      "@type": "xsd:string"
+    },
+    "ConnectUrlResponse": "arcadiapower2:ConnectUrlResponse",
+    "connect_url": {
+      "@id": "arcadiapower2:connect_url",
+      "@type": "xsd:string"
+    },
+    "ConnectTokenUnauthorizedError": "arcadiapower2:ConnectTokenUnauthorizedError",
+    "UtilityCredentialNotFoundError": "arcadiapower2:UtilityCredentialNotFoundError",
+    "ConnectTokenUnprocessableEntityError": "arcadiapower2:ConnectTokenUnprocessableEntityError",
+    "ConnectTokenTooManyParametersError": "arcadiapower2:ConnectTokenTooManyParametersError",
+    "ConnectUrlVariantError": "arcadiapower2:ConnectUrlVariantError",
+    "PingResponse": "arcadiapower2:PingResponse",
+    "pong": {
+      "@id": "arcadiapower2:pong",
+      "@type": "xsd:boolean"
+    },
+    "PingUnauthorizedError": "arcadiapower2:PingUnauthorizedError",
+    "Tariff": "arcadiapower2:Tariff",
+    "main_tariff_id": {
+      "@id": "arcadiapower2:main_tariff_id",
+      "@type": "xsd:string"
+    },
+    "property_inputs": {
+      "@id": "arcadiapower2:property_inputs",
+      "@container": "@list"
+    },
+    "supplier_name": {
+      "@id": "arcadiapower2:supplier_name",
+      "@type": "xsd:string"
+    },
+    "tariff_code": {
+      "@id": "arcadiapower2:tariff_code",
+      "@type": "xsd:string"
+    },
+    "tariff_name": {
+      "@id": "arcadiapower2:tariff_name",
+      "@type": "xsd:string"
+    },
+    "utility_name": {
+      "@id": "arcadiapower2:utility_name",
+      "@type": "xsd:string"
+    },
+    "Availability": "arcadiapower2:Availability",
+    "FeatureAvailability": "arcadiapower2:FeatureAvailability",
+    "charge_cost": {
+      "@id": "arcadiapower2:charge_cost",
+      "@type": "@id"
+    },
+    "smart_charge": {
+      "@id": "arcadiapower2:smart_charge",
+      "@type": "@id"
+    },
+    "utility_statements": {
+      "@id": "arcadiapower2:utility_statements",
+      "@type": "@id"
+    },
+    "hosted_payments": {
+      "@id": "arcadiapower2:hosted_payments",
+      "@type": "@id"
+    },
+    "utility_remittance": {
+      "@id": "arcadiapower2:utility_remittance",
+      "@type": "@id"
+    },
+    "UtilityMeter": "arcadiapower2:UtilityMeter",
+    "id": {
+      "@id": "arcadiapower2:id",
+      "@type": "xsd:integer"
+    },
+    "client_user_id": {
+      "@id": "arcadiapower2:client_user_id",
+      "@type": "xsd:string"
+    },
+    "utility_credential_id": {
+      "@id": "arcadiapower2:utility_credential_id",
+      "@type": "xsd:integer"
+    },
+    "utility_account_id": {
+      "@id": "arcadiapower2:utility_account_id",
+      "@type": "xsd:integer"
+    },
+    "meter_number": {
+      "@id": "arcadiapower2:meter_number",
+      "@type": "xsd:string"
+    },
+    "service_type": {
+      "@id": "arcadiapower2:service_type",
+      "@type": "xsd:string"
+    },
+    "updated_at": {
+      "@id": "arcadiapower2:updated_at",
+      "@type": "xsd:dateTime"
+    },
+    "sandboxed": {
+      "@id": "arcadiapower2:sandboxed",
+      "@type": "xsd:boolean"
+    },
+    "UtilityAccount": "arcadiapower2:UtilityAccount",
+    "utility_long_name": {
+      "@id": "arcadiapower2:utility_long_name",
+      "@type": "xsd:string"
+    },
+    "account_number": {
+      "@id": "arcadiapower2:account_number",
+      "@type": "xsd:string"
+    },
+    "service_address_street_one": {
+      "@id": "arcadiapower2:service_address_street_one",
+      "@type": "xsd:string"
+    },
+    "service_address_street_two": {
+      "@id": "arcadiapower2:service_address_street_two",
+      "@type": "xsd:string"
+    },
+    "service_address_city": {
+      "@id": "arcadiapower2:service_address_city",
+      "@type": "xsd:string"
+    },
+    "service_address_state": {
+      "@id": "arcadiapower2:service_address_state",
+      "@type": "xsd:string"
+    },
+    "service_address_zip": {
+      "@id": "arcadiapower2:service_address_zip",
+      "@type": "xsd:string"
+    },
+    "service_customer_name": {
+      "@id": "arcadiapower2:service_customer_name",
+      "@type": "xsd:string"
+    },
+    "supplier_account_id": {
+      "@id": "arcadiapower2:supplier_account_id",
+      "@type": "xsd:string"
+    },
+    "status": {
+      "@id": "arcadiapower2:status"
+    },
+    "most_recent_tariff": {
+      "@id": "arcadiapower2:most_recent_tariff"
+    },
+    "flags": {
+      "@id": "arcadiapower2:flags",
+      "@container": "@list"
+    },
+    "services": {
+      "@id": "arcadiapower2:services",
+      "@container": "@list"
+    },
+    "feature_availability": {
+      "@id": "arcadiapower2:feature_availability",
+      "@type": "@id"
+    },
+    "utility_meters": {
+      "@id": "arcadiapower2:utility_meters",
+      "@container": "@list"
+    },
+    "PaginatedUtilityAccounts": "arcadiapower2:PaginatedUtilityAccounts",
+    "data": {
+      "@id": "arcadiapower2:data",
+      "@container": "@list"
+    },
+    "total_count": {
+      "@id": "arcadiapower2:total_count",
+      "@type": "xsd:integer"
+    },
+    "PaginatedUsers": "arcadiapower2:PaginatedUsers",
+    "UtilityCredential": "arcadiapower2:UtilityCredential",
+    "username": {
+      "@id": "arcadiapower2:username",
+      "@type": "xsd:string"
+    },
+    "verification_status": {
+      "@id": "arcadiapower2:verification_status",
+      "@type": "xsd:string"
+    },
+    "accounts_load_in_progress": {
+      "@id": "arcadiapower2:accounts_load_in_progress",
+      "@type": "xsd:boolean"
+    },
+    "verification_updated_at": {
+      "@id": "arcadiapower2:verification_updated_at",
+      "@type": "xsd:dateTime"
+    },
+    "uses_test_scenario": {
+      "@id": "arcadiapower2:uses_test_scenario",
+      "@type": "xsd:boolean"
+    },
+    "User": "arcadiapower2:User",
+    "utility_credentials": {
+      "@id": "arcadiapower2:utility_credentials",
+      "@container": "@list"
+    },
+    "UserDataExceedsLimitsError": "arcadiapower2:UserDataExceedsLimitsError",
+    "UserNotFoundError": "arcadiapower2:UserNotFoundError",
+    "DeleteUserError": "arcadiapower2:DeleteUserError",
+    "PaginatedUtilityCredentials": "arcadiapower2:PaginatedUtilityCredentials",
+    "PaginatedUtilityMeters": "arcadiapower2:PaginatedUtilityMeters",
+    "MalformedParametersError": "arcadiapower2:MalformedParametersError",
+    "UtilityStatement": "arcadiapower2:UtilityStatement",
+    "tariff": {
+      "@id": "arcadiapower2:tariff"
+    },
+    "statement_date": {
+      "@id": "arcadiapower2:statement_date",
+      "@type": "xsd:date"
+    },
+    "due_date": {
+      "@id": "arcadiapower2:due_date",
+      "@type": "xsd:date"
+    },
+    "service_start_date": {
+      "@id": "arcadiapower2:service_start_date",
+      "@type": "xsd:date"
+    },
+    "service_end_date": {
+      "@id": "arcadiapower2:service_end_date",
+      "@type": "xsd:date"
+    },
+    "kwh": {
+      "@id": "arcadiapower2:kwh",
+      "@type": "xsd:integer"
+    },
+    "utility_charge": {
+      "@id": "arcadiapower2:utility_charge",
+      "@type": "xsd:decimal"
+    },
+    "supplier_charge": {
+      "@id": "arcadiapower2:supplier_charge",
+      "@type": "xsd:decimal"
+    },
+    "gas_charge": {
+      "@id": "arcadiapower2:gas_charge",
+      "@type": "xsd:decimal"
+    },
+    "past_due": {
+      "@id": "arcadiapower2:past_due",
+      "@type": "xsd:boolean"
+    },
+    "pdf_url": {
+      "@id": "arcadiapower2:pdf_url",
+      "@type": "@id"
+    },
+    "final_bill": {
+      "@id": "arcadiapower2:final_bill",
+      "@type": "xsd:boolean"
+    },
+    "service_window_inclusive_of_end_date": {
+      "@id": "arcadiapower2:service_window_inclusive_of_end_date",
+      "@type": "xsd:boolean"
+    },
+    "net_metering": {
+      "@id": "arcadiapower2:net_metering"
+    },
+    "virtual_net_metering": {
+      "@id": "arcadiapower2:virtual_net_metering"
+    },
+    "most_recent_payment_detail": {
+      "@id": "arcadiapower2:most_recent_payment_detail"
+    },
+    "commercial_line_items_detail": {
+      "@id": "arcadiapower2:commercial_line_items_detail"
+    },
+    "billing_flags": {
+      "@id": "arcadiapower2:billing_flags",
+      "@container": "@list"
+    },
+    "PaginatedUtilityStatements": "arcadiapower2:PaginatedUtilityStatements",
+    "UtilityAccountNotFoundError": "arcadiapower2:UtilityAccountNotFoundError",
+    "UtilityStatementsFeatureAvailabilityError": "arcadiapower2:UtilityStatementsFeatureAvailabilityError",
+    "ChargeCostRequestBodyParams": "arcadiapower2:ChargeCostRequestBodyParams",
+    "start_time": {
+      "@id": "arcadiapower2:start_time",
+      "@type": "xsd:dateTime"
+    },
+    "charge_block_resolution": {
+      "@id": "arcadiapower2:charge_block_resolution",
+      "@type": "xsd:string"
+    },
+    "energy_usage_kwh": {
+      "@id": "arcadiapower2:energy_usage_kwh",
+      "@container": "@list"
+    },
+    "ChargeCostResponse": "arcadiapower2:ChargeCostResponse",
+    "normalized_start_time": {
+      "@id": "arcadiapower2:normalized_start_time",
+      "@type": "xsd:dateTime"
+    },
+    "normalized_consumption_kwh": {
+      "@id": "arcadiapower2:normalized_consumption_kwh",
+      "@container": "@list"
+    },
+    "cost_cents": {
+      "@id": "arcadiapower2:cost_cents",
+      "@type": "xsd:integer"
+    },
+    "TariffResolutionError": "arcadiapower2:TariffResolutionError",
+    "ChargeCurvesTariffParamError": "arcadiapower2:ChargeCurvesTariffParamError",
+    "ChargeCostFeatureAvailabilityError": "arcadiapower2:ChargeCostFeatureAvailabilityError",
+    "SparkParamValidationError": "arcadiapower2:SparkParamValidationError",
+    "SmartChargeScheduleRequestBodyParams": "arcadiapower2:SmartChargeScheduleRequestBodyParams",
+    "end_time": {
+      "@id": "arcadiapower2:end_time",
+      "@type": "xsd:dateTime"
+    },
+    "minutes_to_charge_complete": {
+      "@id": "arcadiapower2:minutes_to_charge_complete",
+      "@type": "xsd:integer"
+    },
+    "TimeSeriesItem": "arcadiapower2:TimeSeriesItem",
+    "timestamp": {
+      "@id": "arcadiapower2:timestamp",
+      "@type": "xsd:dateTime"
+    },
+    "value": {
+      "@id": "arcadiapower2:value",
+      "@type": "xsd:decimal"
+    },
+    "SmartChargeScheduleResponse": "arcadiapower2:SmartChargeScheduleResponse",
+    "charge_block_active": {
+      "@id": "arcadiapower2:charge_block_active"
+    },
+    "SmartChargeFeatureAvailabilityError": "arcadiapower2:SmartChargeFeatureAvailabilityError",
+    "TariffRatesRequestBodyParams": "arcadiapower2:TariffRatesRequestBodyParams",
+    "time_block_resolution": {
+      "@id": "arcadiapower2:time_block_resolution",
+      "@type": "xsd:string"
+    },
+    "TariffRatesResponse": "arcadiapower2:TariffRatesResponse",
+    "rates_cost_per_kwh": {
+      "@id": "arcadiapower2:rates_cost_per_kwh"
+    },
+    "LoadServingEntitySchema": "arcadiapower2:LoadServingEntitySchema",
+    "lse_id": {
+      "@id": "arcadiapower2:lse_id",
+      "@type": "xsd:string"
+    },
+    "name": {
+      "@id": "arcadiapower2:name",
+      "@type": "xsd:string"
+    },
+    "code": {
+      "@id": "arcadiapower2:code",
+      "@type": "xsd:string"
+    },
+    "num_customers": {
+      "@id": "arcadiapower2:num_customers",
+      "@type": "xsd:integer"
+    },
+    "SearchLoadServingEntitiesResponse": "arcadiapower2:SearchLoadServingEntitiesResponse",
+    "TariffApplicabilityQuestionSchema": "arcadiapower2:TariffApplicabilityQuestionSchema",
+    "user_question": {
+      "@id": "arcadiapower2:user_question",
+      "@type": "xsd:string"
+    },
+    "user_question_details": {
+      "@id": "arcadiapower2:user_question_details",
+      "@type": "xsd:string"
+    },
+    "answer_data_type": {
+      "@id": "arcadiapower2:answer_data_type",
+      "@type": "xsd:string"
+    },
+    "TariffApplicabilityQuestionsResponse": "arcadiapower2:TariffApplicabilityQuestionsResponse",
+    "country": {
+      "@id": "arcadiapower2:country",
+      "@type": "xsd:string"
+    },
+    "zip_code": {
+      "@id": "arcadiapower2:zip_code",
+      "@type": "xsd:string"
+    },
+    "applicability_questions": {
+      "@id": "arcadiapower2:applicability_questions",
+      "@container": "@list"
+    },
+    "OptimizedTariffRecommendationsLseIdentificationParamError": "arcadiapower2:OptimizedTariffRecommendationsLseIdentificationParamError",
+    "TariffApplicabilityAnswerSchema": "arcadiapower2:TariffApplicabilityAnswerSchema",
+    "question_id": {
+      "@id": "arcadiapower2:question_id",
+      "@type": "xsd:string"
+    },
+    "data_type": {
+      "@id": "arcadiapower2:data_type",
+      "@type": "xsd:string"
+    },
+    "TariffApplicabilityAnswersRequestParams": "arcadiapower2:TariffApplicabilityAnswersRequestParams",
+    "applicability_answers": {
+      "@id": "arcadiapower2:applicability_answers",
+      "@container": "@list"
+    },
+    "OptimizedTariffRecommendationsResponse": "arcadiapower2:OptimizedTariffRecommendationsResponse",
+    "recommendations": {
+      "@id": "arcadiapower2:recommendations",
+      "@container": "@list"
+    },
+    "TariffScenarioDeviceSolarParams": "arcadiapower2:TariffScenarioDeviceSolarParams",
+    "device": {
+      "@id": "arcadiapower2:device",
+      "@type": "xsd:string"
+    },
+    "solar_system_kw": {
+      "@id": "arcadiapower2:solar_system_kw",
+      "@type": "xsd:decimal"
+    },
+    "EvChargePlan": "arcadiapower2:EvChargePlan",
+    "start_day_of_week": {
+      "@id": "arcadiapower2:start_day_of_week",
+      "@type": "xsd:integer"
+    },
+    "end_day_of_week": {
+      "@id": "arcadiapower2:end_day_of_week",
+      "@type": "xsd:integer"
+    },
+    "expected_consumption_kwh": {
+      "@id": "arcadiapower2:expected_consumption_kwh",
+      "@type": "xsd:decimal"
+    },
+    "TariffScenarioDeviceEvChargingParams": "arcadiapower2:TariffScenarioDeviceEvChargingParams",
+    "charging_availability": {
+      "@id": "arcadiapower2:charging_availability",
+      "@container": "@list"
+    },
+    "charging_power_kw": {
+      "@id": "arcadiapower2:charging_power_kw",
+      "@type": "xsd:decimal"
+    },
+    "operation_schedule": {
+      "@id": "arcadiapower2:operation_schedule",
+      "@type": "xsd:string"
+    },
+    "TariffScenarioDeviceRemovedEvChargingParams": "arcadiapower2:TariffScenarioDeviceRemovedEvChargingParams",
+    "TariffScenarioCostRequestParams": "arcadiapower2:TariffScenarioCostRequestParams",
+    "baseline_load": {
+      "@id": "arcadiapower2:baseline_load",
+      "@type": "xsd:string"
+    },
+    "device_loads": {
+      "@id": "arcadiapower2:device_loads",
+      "@container": "@list"
+    },
+    "TariffScenarioCostResponse": "arcadiapower2:TariffScenarioCostResponse",
+    "cost": {
+      "@id": "arcadiapower2:cost",
+      "@type": "xsd:decimal"
+    },
+    "start_date": {
+      "@id": "arcadiapower2:start_date",
+      "@type": "xsd:date"
+    },
+    "end_date": {
+      "@id": "arcadiapower2:end_date",
+      "@type": "xsd:date"
+    },
+    "TariffScenarioCostRequestTariffIdentificationParamError": "arcadiapower2:TariffScenarioCostRequestTariffIdentificationParamError",
+    "TouSeason": "arcadiapower2:TouSeason",
+    "seasonFromDay": {
+      "@id": "arcadiapower2:seasonFromDay",
+      "@type": "xsd:integer"
+    },
+    "seasonToDay": {
+      "@id": "arcadiapower2:seasonToDay",
+      "@type": "xsd:integer"
+    },
+    "seasonFromMonth": {
+      "@id": "arcadiapower2:seasonFromMonth",
+      "@type": "xsd:integer"
+    },
+    "seasonToMonth": {
+      "@id": "arcadiapower2:seasonToMonth",
+      "@type": "xsd:integer"
+    },
+    "TouPeriod": "arcadiapower2:TouPeriod",
+    "fromDayOfWeek": {
+      "@id": "arcadiapower2:fromDayOfWeek",
+      "@type": "xsd:integer"
+    },
+    "toDayOfWeek": {
+      "@id": "arcadiapower2:toDayOfWeek",
+      "@type": "xsd:integer"
+    },
+    "fromHour": {
+      "@id": "arcadiapower2:fromHour",
+      "@type": "xsd:integer"
+    },
+    "toHour": {
+      "@id": "arcadiapower2:toHour",
+      "@type": "xsd:integer"
+    },
+    "TimeOfUse": "arcadiapower2:TimeOfUse",
+    "season": {
+      "@id": "arcadiapower2:season"
+    },
+    "touPeriods": {
+      "@id": "arcadiapower2:touPeriods",
+      "@container": "@list"
+    },
+    "FixedSchedule": "arcadiapower2:FixedSchedule",
+    "chargeTous": {
+      "@id": "arcadiapower2:chargeTous",
+      "@container": "@list"
+    },
+    "dischargeTous": {
+      "@id": "arcadiapower2:dischargeTous",
+      "@container": "@list"
+    },
+    "timezone": {
+      "@id": "arcadiapower2:timezone",
+      "@type": "xsd:string"
+    },
+    "DispatchStrategy": "arcadiapower2:DispatchStrategy",
+    "optimize": {
+      "@id": "arcadiapower2:optimize",
+      "@type": "xsd:boolean"
+    },
+    "chargeOnSurplus": {
+      "@id": "arcadiapower2:chargeOnSurplus",
+      "@type": "xsd:boolean"
+    },
+    "fixedSchedule": {
+      "@id": "arcadiapower2:fixedSchedule"
+    },
+    "StorageOptimizationSchedulesRequestParams": "arcadiapower2:StorageOptimizationSchedulesRequestParams",
+    "tariff_property_inputs": {
+      "@id": "arcadiapower2:tariff_property_inputs",
+      "@container": "@list"
+    },
+    "from_date_time": {
+      "@id": "arcadiapower2:from_date_time",
+      "@type": "xsd:dateTime"
+    },
+    "consumption_curve_kwh_ac": {
+      "@id": "arcadiapower2:consumption_curve_kwh_ac",
+      "@container": "@list"
+    },
+    "solar_generation_curve_kwh_dc": {
+      "@id": "arcadiapower2:solar_generation_curve_kwh_dc",
+      "@container": "@list"
+    },
+    "dispatch_strategy": {
+      "@id": "arcadiapower2:dispatch_strategy"
+    },
+    "solar_dc_to_ac_efficiency": {
+      "@id": "arcadiapower2:solar_dc_to_ac_efficiency",
+      "@type": "xsd:decimal"
+    },
+    "allow_grid_to_battery": {
+      "@id": "arcadiapower2:allow_grid_to_battery",
+      "@type": "xsd:boolean"
+    },
+    "allow_solar_to_battery": {
+      "@id": "arcadiapower2:allow_solar_to_battery",
+      "@type": "xsd:boolean"
+    },
+    "allow_solar_to_grid": {
+      "@id": "arcadiapower2:allow_solar_to_grid",
+      "@type": "xsd:boolean"
+    },
+    "allow_battery_to_grid": {
+      "@id": "arcadiapower2:allow_battery_to_grid",
+      "@type": "xsd:boolean"
+    },
+    "battery_dc_coupled": {
+      "@id": "arcadiapower2:battery_dc_coupled",
+      "@type": "xsd:boolean"
+    },
+    "battery_ac_to_dc_efficiency": {
+      "@id": "arcadiapower2:battery_ac_to_dc_efficiency",
+      "@type": "xsd:decimal"
+    },
+    "battery_dc_to_ac_efficiency": {
+      "@id": "arcadiapower2:battery_dc_to_ac_efficiency",
+      "@type": "xsd:decimal"
+    },
+    "battery_input_efficiency": {
+      "@id": "arcadiapower2:battery_input_efficiency",
+      "@type": "xsd:decimal"
+    },
+    "battery_nameplate_power": {
+      "@id": "arcadiapower2:battery_nameplate_power",
+      "@type": "xsd:decimal"
+    },
+    "battery_nameplate_capacity": {
+      "@id": "arcadiapower2:battery_nameplate_capacity",
+      "@type": "xsd:decimal"
+    },
+    "battery_min_soc": {
+      "@id": "arcadiapower2:battery_min_soc",
+      "@type": "xsd:decimal"
+    },
+    "battery_max_soc": {
+      "@id": "arcadiapower2:battery_max_soc",
+      "@type": "xsd:decimal"
+    },
+    "battery_initial_soc": {
+      "@id": "arcadiapower2:battery_initial_soc",
+      "@type": "xsd:decimal"
+    },
+    "battery_degradation_cost_per_discharge_kwh": {
+      "@id": "arcadiapower2:battery_degradation_cost_per_discharge_kwh",
+      "@type": "xsd:decimal"
+    },
+    "export_limit_kwh_ac": {
+      "@id": "arcadiapower2:export_limit_kwh_ac",
+      "@type": "xsd:decimal"
+    },
+    "StorageOptimizationSchedulesResponse": "arcadiapower2:StorageOptimizationSchedulesResponse",
+    "grid_to_site_kwh_ac": {
+      "@id": "arcadiapower2:grid_to_site_kwh_ac",
+      "@container": "@list"
+    },
+    "grid_to_battery_kwh_ac": {
+      "@id": "arcadiapower2:grid_to_battery_kwh_ac",
+      "@container": "@list"
+    },
+    "solar_to_battery_kwh_dc": {
+      "@id": "arcadiapower2:solar_to_battery_kwh_dc",
+      "@container": "@list"
+    },
+    "solar_to_site_kwh_ac": {
+      "@id": "arcadiapower2:solar_to_site_kwh_ac",
+      "@container": "@list"
+    },
+    "solar_to_grid_kwh_ac": {
+      "@id": "arcadiapower2:solar_to_grid_kwh_ac",
+      "@container": "@list"
+    },
+    "solar_curtailed_kwh_dc": {
+      "@id": "arcadiapower2:solar_curtailed_kwh_dc",
+      "@container": "@list"
+    },
+    "battery_to_site_kwh_ac": {
+      "@id": "arcadiapower2:battery_to_site_kwh_ac",
+      "@container": "@list"
+    },
+    "battery_to_grid_kwh_ac": {
+      "@id": "arcadiapower2:battery_to_grid_kwh_ac",
+      "@container": "@list"
+    },
+    "net_load_kwh_ac": {
+      "@id": "arcadiapower2:net_load_kwh_ac",
+      "@container": "@list"
+    },
+    "battery_soc": {
+      "@id": "arcadiapower2:battery_soc",
+      "@container": "@list"
+    },
+    "BundleEnrollmentRequestBodyParams": "arcadiapower2:BundleEnrollmentRequestBodyParams",
+    "utility_account_ids": {
+      "@id": "arcadiapower2:utility_account_ids",
+      "@container": "@list"
+    },
+    "IneligibilityReasonEnum": "arcadiapower2:IneligibilityReasonEnum",
+    "IneligibilityReason": "arcadiapower2:IneligibilityReason",
+    "resolvable": {
+      "@id": "arcadiapower2:resolvable",
+      "@type": "xsd:boolean"
+    },
+    "reason": {
+      "@id": "arcadiapower2:reason",
+      "@type": "@id"
+    },
+    "BundleEnrollment": "arcadiapower2:BundleEnrollment",
+    "product_key": {
+      "@id": "arcadiapower2:product_key",
+      "@type": "xsd:string"
+    },
+    "ineligibility_reasons": {
+      "@id": "arcadiapower2:ineligibility_reasons",
+      "@container": "@list"
+    },
+    "removal_reason": {
+      "@id": "arcadiapower2:removal_reason"
+    },
+    "override_email": {
+      "@id": "arcadiapower2:override_email",
+      "@type": "xsd:string"
+    },
+    "UtilityRemittanceEnrollError": "arcadiapower2:UtilityRemittanceEnrollError",
+    "BundleEnrollmentInvalidUtilityAccountIdsError": "arcadiapower2:BundleEnrollmentInvalidUtilityAccountIdsError",
+    "BundleEnrollmentMissingUtilityAccountIdsError": "arcadiapower2:BundleEnrollmentMissingUtilityAccountIdsError",
+    "UnpermittedParametersError": "arcadiapower2:UnpermittedParametersError",
+    "InvalidResourceError": "arcadiapower2:InvalidResourceError",
+    "BundleUnenrollError": "arcadiapower2:BundleUnenrollError",
+    "BundleUtilityRemittanceItemCreateRequestBodyParams": "arcadiapower2:BundleUtilityRemittanceItemCreateRequestBodyParams",
+    "scheduled_at": {
+      "@id": "arcadiapower2:scheduled_at",
+      "@type": "xsd:date"
+    },
+    "amount_cents": {
+      "@id": "arcadiapower2:amount_cents",
+      "@type": "xsd:integer"
+    },
+    "UtilityRemittanceItem": "arcadiapower2:UtilityRemittanceItem",
+    "utility_statement_id": {
+      "@id": "arcadiapower2:utility_statement_id",
+      "@type": "xsd:decimal"
+    },
+    "remitted_at": {
+      "@id": "arcadiapower2:remitted_at",
+      "@type": "xsd:dateTime"
+    },
+    "ForbiddenError": "arcadiapower2:ForbiddenError",
+    "UtilityStatementNotFoundError": "arcadiapower2:UtilityStatementNotFoundError",
+    "UtilityRemittanceItemCreateError": "arcadiapower2:UtilityRemittanceItemCreateError",
+    "ThrottledError": "arcadiapower2:ThrottledError",
+    "WebhookEndpoint": "arcadiapower2:WebhookEndpoint",
+    "signing_key": {
+      "@id": "arcadiapower2:signing_key",
+      "@type": "xsd:string"
+    },
+    "url": {
+      "@id": "arcadiapower2:url",
+      "@type": "xsd:string"
+    },
+    "enabled": {
+      "@id": "arcadiapower2:enabled",
+      "@type": "xsd:boolean"
+    },
+    "arc_version": {
+      "@id": "arcadiapower2:arc_version",
+      "@type": "xsd:string"
+    },
+    "PaginatedWebhookEndpoints": "arcadiapower2:PaginatedWebhookEndpoints",
+    "CreateWebhookBodyParams": "arcadiapower2:CreateWebhookBodyParams",
+    "WebhookEndpointUnprocessableEntityError": "arcadiapower2:WebhookEndpointUnprocessableEntityError",
+    "UpdateWebhookBodyParams": "arcadiapower2:UpdateWebhookBodyParams",
+    "WebhookEventSummary": "arcadiapower2:WebhookEventSummary",
+    "webhook_endpoint_id": {
+      "@id": "arcadiapower2:webhook_endpoint_id",
+      "@type": "xsd:string"
+    },
+    "type": {
+      "@id": "arcadiapower2:type",
+      "@type": "xsd:string"
+    },
+    "delivered": {
+      "@id": "arcadiapower2:delivered",
+      "@type": "xsd:boolean"
+    },
+    "PaginatedWebhookEvents": "arcadiapower2:PaginatedWebhookEvents",
+    "WebhookDeliveryAttempt": "arcadiapower2:WebhookDeliveryAttempt",
+    "response_body": {
+      "@id": "arcadiapower2:response_body",
+      "@type": "xsd:string"
+    },
+    "response_status_code": {
+      "@id": "arcadiapower2:response_status_code",
+      "@type": "xsd:integer"
+    },
+    "webhook_event_id": {
+      "@id": "arcadiapower2:webhook_event_id",
+      "@type": "xsd:string"
+    },
+    "WebhookEvent": "arcadiapower2:WebhookEvent",
+    "delivery_attempts": {
+      "@id": "arcadiapower2:delivery_attempts",
+      "@container": "@list"
+    },
+    "SandboxBundleEnrollmentError": "arcadiapower2:SandboxBundleEnrollmentError",
+    "SandboxBundleRejectReasonsError": "arcadiapower2:SandboxBundleRejectReasonsError",
+    "SandboxBundleRemoveReasonError": "arcadiapower2:SandboxBundleRemoveReasonError",
+    "WebhookTriggerError": "arcadiapower2:WebhookTriggerError",
+    "UtilityCredentialVerifiedWebhookEvent": "arcadiapower2:UtilityCredentialVerifiedWebhookEvent",
+    "UtilityCredentialRejectedWebhookEvent": "arcadiapower2:UtilityCredentialRejectedWebhookEvent",
+    "UtilityCredentialRevokedWebhookEvent": "arcadiapower2:UtilityCredentialRevokedWebhookEvent",
+    "UtilityCredentialVerificationErrorWebhookEvent": "arcadiapower2:UtilityCredentialVerificationErrorWebhookEvent",
+    "UtilityAccountsDiscoveredWebhookEvent": "arcadiapower2:UtilityAccountsDiscoveredWebhookEvent",
+    "UtilityAccountsDiscoveryErrorWebhookEvent": "arcadiapower2:UtilityAccountsDiscoveryErrorWebhookEvent",
+    "UtilityAccountUpdatedWebhookEvent": "arcadiapower2:UtilityAccountUpdatedWebhookEvent",
+    "HistoricalUtilityStatementsDiscoveredWebhookEvent": "arcadiapower2:HistoricalUtilityStatementsDiscoveredWebhookEvent",
+    "NewUtilityStatementAvailableWebhookEvent": "arcadiapower2:NewUtilityStatementAvailableWebhookEvent",
+    "UtilityRemittancePendingEnrollmentWebhookEvent": "arcadiapower2:UtilityRemittancePendingEnrollmentWebhookEvent",
+    "UtilityRemittanceIneligibleWebhookEvent": "arcadiapower2:UtilityRemittanceIneligibleWebhookEvent",
+    "UtilityRemittanceEnrolledWebhookEvent": "arcadiapower2:UtilityRemittanceEnrolledWebhookEvent",
+    "UtilityRemittancePendingRemovalWebhookEvent": "arcadiapower2:UtilityRemittancePendingRemovalWebhookEvent",
+    "UtilityRemittanceRemovedWebhookEvent": "arcadiapower2:UtilityRemittanceRemovedWebhookEvent",
+    "UtilityRemittanceItemRemittedWebhookEvent": "arcadiapower2:UtilityRemittanceItemRemittedWebhookEvent",
+    "UtilityRemittanceItemScheduledWebhookEvent": "arcadiapower2:UtilityRemittanceItemScheduledWebhookEvent",
+    "TestWebhookEvent": "arcadiapower2:TestWebhookEvent"
+  },
+  "@type": "schema:Dataset",
+  "schema:name": "Arcadiapower2 API JSON-LD context",
+  "schema:description": "A JSON-LD @context for the objects Arcadiapower2's own API contract declares: one class per component schema, one property per declared field, typed from the contract. Derived by script (derive-json-ld.py, 2026-09-25) from openapi/arcadiapower2-openapi.yaml.",
+  "dcterms:created": "2026-09-25",
+  "dcterms:source": [
+    "openapi/arcadiapower2-openapi.yaml"
+  ]
+}

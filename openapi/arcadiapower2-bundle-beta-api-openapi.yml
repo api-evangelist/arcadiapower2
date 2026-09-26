@@ -1,0 +1,958 @@
+openapi: 3.2.0
+info:
+  title: Arcadia API Reference Bundle (Beta) API
+  version: 0.3.0
+  contact:
+    email: platformsupport@arcadia.com
+  x-logo:
+    url: images/arcadia_logo.png
+servers:
+- url: https://api.arcadia.com
+security:
+- bearerAuth: []
+tags:
+- name: Bundle (Beta)
+paths:
+  /bundle/utility_remittance/utility_credentials/{utility_credential_id}/enroll:
+    post:
+      tags:
+      - Bundle (Beta)
+      summary: Utility Remittance - Enroll into Utility Remittance
+      description: 'Enroll all Utility Accounts associated with the provided Utility Credential into Utility Remittance.
+
+        Enrollment is an asynchronous process. Track status changes through the associated Bundle Enrollment.'
+      operationId: enrollUtilityRemittance
+      parameters:
+      - $ref: '#/components/parameters/utilityCredentialIdInPathParam'
+      - $ref: '#/components/parameters/arcVersionInHeaderParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BundleEnrollmentRequestBodyParams'
+      responses:
+        '200':
+          description: Success
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BundleEnrollmentsArray'
+        '422':
+          description: Unprocessable Entity
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/UtilityRemittanceEnrollError'
+                - $ref: '#/components/schemas/BundleEnrollmentInvalidUtilityAccountIdsError'
+                - $ref: '#/components/schemas/BundleEnrollmentMissingUtilityAccountIdsError'
+                - $ref: '#/components/schemas/UnpermittedParametersError'
+                - $ref: '#/components/schemas/InvalidResourceError'
+  /bundle/utility_remittance/utility_credentials/{utility_credential_id}/remove:
+    delete:
+      tags:
+      - Bundle (Beta)
+      summary: Utility Remittance - Remove from Utility Remittance
+      description: 'Remove all Utility Accounts associated with the provided Utility Credential from Utility Remittance.
+
+        Removal is an asynchronous process. Track status changes through the associated Bundle Enrollment. Removal will trigger the `utility_remittance_removed` Webhook Event.'
+      operationId: removeUtilityRemittance
+      parameters:
+      - $ref: '#/components/parameters/utilityCredentialIdInPathParam'
+      - $ref: '#/components/parameters/arcVersionInHeaderParam'
+      responses:
+        '200':
+          description: Success
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BundleEnrollmentsArray'
+        '422':
+          description: Unprocessable Entity
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/BundleUnenrollError'
+                - $ref: '#/components/schemas/InvalidResourceError'
+  /bundle/utility_remittance/utility_statements/{utility_statement_id}/utility_remittance_items:
+    post:
+      tags:
+      - Bundle (Beta)
+      summary: Utility Remittance - Create a Utility Remittance Item
+      description: 'Creates and schedules a Utility Remittance Item for a Utility Statement.
+
+        You can specify a date for remittance using `scheduled_at`. Note that `scheduled_at` must be a date in the future. If the date you specify falls on a weekend or a banking holiday, remittance will be scheduled for the next business day. If `scheduled_at` is omitted, remittance will be scheduled for the next business day.
+
+        When creating a Utility Remittance Item, you can specify how much to remit for the corresponding Utility Statement by specifying `amount_cents`. In most cases, this should correspond to the `utility_charge` on a Utility Statement. If `amount_cents` is omitted, the Utility Remittance Item will be created using the `utility_charge` on the specified Utility Statement. At this time, `amount_cents` cannot exceed 3000000 cents ($30,000). Note that overpaying or underpaying the amount on a Utility Statement comes with risk. This field should be used with caution.
+
+        Please note that this endpoint is rate limited to 200 requests per 10 seconds. You will receive a 429 error if you exceed this limit. Please wait and try again. The `RateLimit-Reset` header will indicate when you can make another request.'
+      operationId: createUtilityRemittanceItem
+      parameters:
+      - $ref: '#/components/parameters/utilityStatementIdInPathParam'
+      - $ref: '#/components/parameters/arcVersionInHeaderParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BundleUtilityRemittanceItemCreateRequestBodyParams'
+      responses:
+        '201':
+          description: Success
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UtilityRemittanceItem'
+        '403':
+          description: ForbiddenError
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '404':
+          description: UtilityStatementNotFoundError
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UtilityStatementNotFoundError'
+        '422':
+          description: Unprocessable Entity
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/UtilityRemittanceItemCreateError'
+                - $ref: '#/components/schemas/UnpermittedParametersError'
+                - $ref: '#/components/schemas/InvalidResourceError'
+        '429':
+          description: Too Many Requests
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+            RateLimit-Limit:
+              $ref: '#/components/headers/RateLimitLimit'
+            RateLimit-Period:
+              $ref: '#/components/headers/RateLimitPeriod'
+            RateLimit-Reset:
+              $ref: '#/components/headers/RateLimitReset'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/ThrottledError'
+  /bundle/utility_remittance/utility_remittance_items/{utility_remittance_item_id}:
+    get:
+      tags:
+      - Bundle (Beta)
+      summary: Utility Remittance - Get a Utility Remittance Item
+      description: Returns a single Utility Remittance Item specified by ID.
+      operationId: getUtilityRemittanceItem
+      parameters:
+      - $ref: '#/components/parameters/utilityRemittanceItemIdInPathParam'
+      - $ref: '#/components/parameters/arcVersionInHeaderParam'
+      responses:
+        '200':
+          description: Success
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UtilityRemittanceItem'
+        '422':
+          description: Unprocessable Entity
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/InvalidResourceError'
+  /bundle/utility_remittance/utility_account/{utility_account_id}/enrollment:
+    get:
+      tags:
+      - Bundle (Beta)
+      summary: Utility Remittance - Get a Bundle Enrollment
+      description: Returns the Bundle Enrollment for a Utility Account.
+      operationId: showUtilityRemittanceEnrollment
+      parameters:
+      - $ref: '#/components/parameters/utilityAccountIdInPathParam'
+      - $ref: '#/components/parameters/arcVersionInHeaderParam'
+      responses:
+        '200':
+          description: Success
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BundleEnrollment'
+        '422':
+          description: Unprocessable Entity
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/InvalidResourceError'
+  /sandbox/bundle/utility_remittance/utility_credentials/{utility_credential_id}/accept:
+    post:
+      tags:
+      - Bundle (Beta)
+      summary: Sandboxed Only, Utility Remittance - Accept pending Utility Remittance…
+      description: 'Only available when using sandboxed API keys.
+
+        Updates the Bundle Enrollments created by the enroll into Utility Remittance endpoint for each Utility Account associated with this Utility Credential. The status will change from `pending_enrollment` to `enrolled` and trigger the `utility_remittance_enrolled` Webhook Event.'
+      operationId: sandboxUtilityRemittanceAccept
+      parameters:
+      - $ref: '#/components/parameters/utilityCredentialIdInPathParam'
+      - $ref: '#/components/parameters/arcVersionInHeaderParam'
+      responses:
+        '200':
+          description: Success
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BundleEnrollmentsArray'
+        '403':
+          description: ForbiddenError
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '422':
+          description: Unprocessable Entity
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/SandboxBundleEnrollmentError'
+                - $ref: '#/components/schemas/InvalidResourceError'
+  /sandbox/bundle/utility_remittance/utility_credentials/{utility_credential_id}/reject:
+    post:
+      tags:
+      - Bundle (Beta)
+      summary: Sandboxed Only, Utility Remittance - Reject pending Utility Remittance…
+      description: 'Only available when using sandboxed API keys.
+
+        Updates the Bundle Enrollments created by the enroll into Utility Remittance endpoint for each Utility Account associated with this Utility Credential. The status will change from `pending_enrollment` to `ineligible` and trigger the `utility_remittance_not_available` Webhook Event.'
+      operationId: sandboxUtilityRemittanceReject
+      parameters:
+      - $ref: '#/components/parameters/utilityCredentialIdInPathParam'
+      - $ref: '#/components/parameters/arcVersionInHeaderParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - ineligibility_reasons
+              properties:
+                ineligibility_reasons:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/IneligibilityReasonEnum'
+      responses:
+        '200':
+          description: Success
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BundleEnrollmentsArray'
+        '403':
+          description: ForbiddenError
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '422':
+          description: Unprocessable Entity
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/SandboxBundleRejectReasonsError'
+                - $ref: '#/components/schemas/UnpermittedParametersError'
+                - $ref: '#/components/schemas/SandboxBundleEnrollmentError'
+                - $ref: '#/components/schemas/InvalidResourceError'
+  /sandbox/bundle/utility_remittance/utility_credentials/{utility_credential_id}/remove:
+    post:
+      tags:
+      - Bundle (Beta)
+      summary: Sandboxed Only, Utility Remittance - Remove active or pending removal Utility…
+      description: 'Only available when using sandboxed API keys.
+
+        Updates the Bundle Enrollments created by the enroll into Utility Remittance endpoint for each Utility Account associated with this Utility Credential. The status will change from `enrolled` or `pending_removal` to `removed` and trigger the `utility_remittance_removed` Webhook Event.'
+      operationId: sandboxUtilityRemittanceRemove
+      parameters:
+      - $ref: '#/components/parameters/utilityCredentialIdInPathParam'
+      - $ref: '#/components/parameters/arcVersionInHeaderParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - removal_reason
+              properties:
+                removal_reason:
+                  type: string
+                  enum:
+                  - organization_requested
+                  - dropped_cant_login
+                  - dropped_no_remittance_scheduled
+      responses:
+        '200':
+          description: Success
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BundleEnrollmentsArray'
+        '403':
+          description: ForbiddenError
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '422':
+          description: Unprocessable Entity
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/SandboxBundleRemoveReasonError'
+                - $ref: '#/components/schemas/UnpermittedParametersError'
+                - $ref: '#/components/schemas/SandboxBundleEnrollmentError'
+                - $ref: '#/components/schemas/InvalidResourceError'
+components:
+  schemas:
+    UtilityRemittanceItem:
+      required:
+      - id
+      - utility_statement_id
+      - client_user_id
+      - amount_cents
+      - status
+      - created_at
+      - updated_at
+      - scheduled_at
+      - remitted_at
+      - sandboxed
+      properties:
+        id:
+          description: Unique `id` generated by Arcadia to identify this resource.
+          type: number
+        utility_statement_id:
+          description: Unique `id` generated by Arcadia to identify the Utility Statement associated with this resource.
+          type: number
+        client_user_id:
+          description: Your organization's unique key provided to associate Arcadia resources with your user.
+          type: string
+          example: fff57dc7-3a2b-4395-8a62-e3486d46dabe
+        amount_cents:
+          description: Monetary amount of this Utility Remittance Item. Given in cents.
+          type: integer
+        status:
+          type: string
+          enum:
+          - scheduled
+          - remitted
+          - void
+        created_at:
+          description: Date and time at which this resource was created. Given in UTC.
+          type: string
+          format: date-time
+        updated_at:
+          description: Date and time at which this resource was most recently updated. Given in UTC.
+          type: string
+          format: date-time
+        scheduled_at:
+          description: Date and time this Utility Remittance Item is scheduled to be remitted to the user's associated Utility. Given in UTC.
+          format: date-time
+          type:
+          - string
+          - 'null'
+        remitted_at:
+          description: Date and time this Utility Remittance Item was successfully remitted to the user's associated Utility. Given in UTC.
+          format: date-time
+          type:
+          - string
+          - 'null'
+        sandboxed:
+          description: If `true`, this resource is in the sandboxed environment. If `false`, this resource is in the live environment.
+          type: boolean
+          example: 'false'
+      additionalProperties: false
+    ThrottledError:
+      required:
+      - error
+      properties:
+        error:
+          type: string
+          pattern: '^Rate limit exceeded. Try again at '
+      additionalProperties: false
+    SandboxBundleEnrollmentError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - No Utility Accounts to accept for this Utility Credential.
+              - No Utility Accounts to reject for this Utility Credential.
+              - No Utility Accounts to remove for this Utility Credential.
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+            details:
+              type:
+              - object
+              - 'null'
+      additionalProperties: false
+    UtilityStatementNotFoundError:
+      required:
+      - error
+      properties:
+        error:
+          type: string
+          enum:
+          - Couldn't find UtilityStatement
+      additionalProperties: false
+    IneligibilityReasonEnum:
+      type: string
+      enum:
+      - 2fa
+      - ebill_ineligible_incorrect_credentials
+      - ebill_ineligible_third_party
+      - gas_only
+      - inactive_utility_account
+      - incomplete_utility_account
+      - missing_payment_method
+      - past_due
+      - payment_arrangement
+      - sdg&e_paperless_gas_account
+      - sibling_account_ineligible
+      - solar_non_approved_utility
+      - enrolled_in_mutually_exclusive_bundle_feature
+    IneligibilityReason:
+      required:
+      - resolvable
+      - reason
+      properties:
+        resolvable:
+          type: boolean
+          description: If `true`, signifies that corrective action can be taken to resolve this Ineligibility Reason. If `false`, this Ineligibility Reason cannot be resolved
+          example: false
+        reason:
+          $ref: '#/components/schemas/IneligibilityReasonEnum'
+      additionalProperties: false
+    BundleEnrollmentMissingUtilityAccountIdsError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - Must provide all non-closed utility_account_ids associated with the provided Utility Credential
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+            details:
+              anyOf:
+              - type: object
+                required:
+                - utility_credential_id
+                - missing_utility_account_ids
+                properties:
+                  utility_credential_id:
+                    type: integer
+                  missing_utility_account_ids:
+                    type: array
+                    items:
+                      type: integer
+      additionalProperties: false
+    SandboxBundleRejectReasonsError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - One or more unsupported reasons provided.
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+      additionalProperties: false
+    InvalidResourceError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - The requested resource is not valid
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+            details:
+              type: object
+              required:
+              - resource
+              properties:
+                resource:
+                  type: string
+                  enum:
+                  - user
+                  - utility_statement
+                  - utility_credential
+                  - utility_account
+                  - utility_remittance_item
+                  - invoice
+                  - payment_method
+                resource_id:
+                  type:
+                  - integer
+                  - string
+      additionalProperties: false
+    UtilityRemittanceItemCreateError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - Utility Remittance Item must be scheduled at least one day from now
+              - Utility Statement has already been scheduled for remittance
+              - A Utility Remittance Item cannot be created for a Utility Account not enrolled in Utility Remittance
+              - 'Invalid parameter: scheduled_at must be provided as an ISO date format and be a valid date.'
+              - Utility Remittance Item amount_cents must be greater than 0
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+            details:
+              type:
+              - object
+              - 'null'
+      additionalProperties: false
+    ForbiddenError:
+      required:
+      - error
+      properties:
+        error:
+          enum:
+          - Access denied
+      additionalProperties: false
+    BundleUtilityRemittanceItemCreateRequestBodyParams:
+      properties:
+        scheduled_at:
+          description: You can specify a date for remittance using `scheduled_at`. Note that `scheduled_at` must be a date in the future. If the date you specify falls on a weekend or a banking holiday, remittance will be scheduled for the next business day. If `scheduled_at` is omitted, remittance will be scheduled for the next business day.
+          type: string
+          format: date
+          example: '2021-07-28'
+        amount_cents:
+          description: You can specify how much to remit for this Utility Statement using `amount_cents`. In most cases, this should correspond to the `utility_charge` on a Utility Statement.  If `amount_cents` is omitted, the Utility Remittance Item will be created using the `utility_charge` on the specified Utility Statement. At this time, `amount_cents` cannot exceed 3000000 cents ($30,000). Note that overpaying or underpaying the amount on a Utility Statement comes with risk. This field should be used with caution.
+          type: integer
+          example: '8000'
+      additionalProperties: false
+    BundleEnrollment:
+      required:
+      - client_user_id
+      - utility_account_id
+      - product_key
+      - status
+      - ineligibility_reasons
+      - removal_reason
+      - start_date
+      - override_email
+      - sandboxed
+      properties:
+        client_user_id:
+          description: Your organization's unique key provided to associate Arcadia resources with your user.
+          type: string
+          example: fff57dc7-3a2b-4395-8a62-e3486d46dabe
+        utility_account_id:
+          description: Unique `id` generated by Arcadia to identify the Utility Account associated with this resource.
+          type: integer
+          example: 1234
+        product_key:
+          type: string
+          enum:
+          - hosted_payments
+          - utility_remittance
+        status:
+          anyOf:
+          - type: 'null'
+          - type: string
+            enum:
+            - enrolled
+            - pending_enrollment
+            - ineligible
+            - pending_removal
+            - removed
+          example: enrolled
+        ineligibility_reasons:
+          description: Reasons, if any, that an Account was ineligible for Bundle. This array will always be present but may be empty.
+          type: array
+          items:
+            $ref: '#/components/schemas/IneligibilityReason'
+        removal_reason:
+          anyOf:
+          - type: 'null'
+          - type: string
+            enum:
+            - organization_requested
+            - dropped_cant_login
+            - dropped_payment_decline
+            - dropped_no_remittance_scheduled
+            - moved
+          example: null
+        start_date:
+          description: Date the Bundle Enrollment was approved.
+          format: date
+          type:
+          - string
+          - 'null'
+        override_email:
+          description: Email address generated by Arcadia to override the user's email address on file with their Utility.
+          example: apb0123456@a.arcadiapower.com
+          type:
+          - string
+          - 'null'
+        sandboxed:
+          description: If `true`, this resource is in the sandboxed environment. If `false`, this resource is in the live environment.
+          type: boolean
+          example: false
+      additionalProperties: false
+    BundleEnrollmentInvalidUtilityAccountIdsError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - Request included utility_account_ids not valid for the specified Utility Credential
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+            details:
+              anyOf:
+              - type: object
+                required:
+                - utility_credential_id
+                - excess_utility_account_ids
+                properties:
+                  utility_credential_id:
+                    type: integer
+                  excess_utility_account_ids:
+                    type: array
+                    items:
+                      type: integer
+      additionalProperties: false
+    SandboxBundleRemoveReasonError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - Unsupported reason parameter provided.
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+      additionalProperties: false
+    UtilityRemittanceEnrollError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - The utility_remittance feature is not available for this UtilityAccount.
+              - The utility_remittance feature is not ready yet. Please refer to UtilityAccount#FeatureAvailability for updates.
+              - No Utility Accounts to enroll for this Utility Credential.
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+            details:
+              type:
+              - object
+              - 'null'
+      additionalProperties: false
+    BundleUnenrollError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - No Utility Accounts to unenroll for this Utility Credential.
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+            details:
+              type:
+              - object
+              - 'null'
+      additionalProperties: false
+    BundleEnrollmentsArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/BundleEnrollment'
+    BundleEnrollmentRequestBodyParams:
+      required:
+      - utility_account_ids
+      properties:
+        utility_account_ids:
+          description: The list of Utility Account IDs associated with the provided Utility Credential to enroll in the Bundle product. To ensure no unintended Utility Accounts are enrolled in Bundle, we require every non-closed Utility Account associated with a Utility Credential to be explicitly provided in this parameter. We do not support Bundle for a subset of non-closed Utility Accounts associated with a Utility Credential at this time.
+          type: array
+          items:
+            type: number
+          example:
+          - 12345
+          - 67890
+      additionalProperties: false
+    UnpermittedParametersError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - Request included unpermitted parameters
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+            details:
+              type: object
+              required:
+              - unpermitted_parameters
+              properties:
+                unpermitted_parameters:
+                  type: array
+                  items:
+                    type: string
+      additionalProperties: false
+  parameters:
+    arcVersionInHeaderParam:
+      name: Arcadia-Version
+      in: header
+      example: '2022-10-13'
+      description: The Arcadia-Version for the request
+      required: true
+      schema:
+        type: string
+        default: '2022-10-13'
+    utilityRemittanceItemIdInPathParam:
+      name: utility_remittance_item_id
+      in: path
+      required: true
+      schema:
+        type: string
+    utilityStatementIdInPathParam:
+      name: utility_statement_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    utilityAccountIdInPathParam:
+      name: utility_account_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    utilityCredentialIdInPathParam:
+      name: utility_credential_id
+      in: path
+      required: true
+      schema:
+        type: integer
+  headers:
+    RateLimitLimit:
+      description: The number of requests that can be made to the API in the RateLimit Period
+      schema:
+        type: integer
+      example: 200
+      required: true
+    ArcVersion:
+      description: The Arcadia-Version for the response
+      schema:
+        type: string
+      example: '2022-10-13'
+      required: true
+    RateLimitPeriod:
+      description: The number of seconds your application has to perform the number of requests specified by RateLimit Limit
+      schema:
+        type: integer
+      example: 10
+      required: true
+    RateLimitReset:
+      description: The time in which you can retry a request. Given in epoch time.
+      schema:
+        type: integer
+      example: 1690895650
+      required: true
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+x-readme:
+  proxy-enabled: false
+  headers:
+  - key: from-readme
+    value: true
+x-tagGroups:
+- name: General
+  tags:
+  - Auth
+  - Webhooks
+  - Webhook Events
+- name: Connections
+  tags:
+  - Utility Credentials
+  - Utility Accounts
+  - Utility Meters (Beta)
+  - Users
+- name: Products
+  tags:
+  - Plug
+  - Spark

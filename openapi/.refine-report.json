@@ -1,0 +1,35 @@
+{
+  "provider": "arcadiapower2",
+  "sources": [
+    "arcadiapower2-openapi.yaml"
+  ],
+  "outputs": [
+    "arcadiapower2-auth-api-openapi.yml",
+    "arcadiapower2-bundle-beta-api-openapi.yml",
+    "arcadiapower2-bundle-webhook-events-api-openapi.yml",
+    "arcadiapower2-plug-api-openapi.yml",
+    "arcadiapower2-spark-api-openapi.yml",
+    "arcadiapower2-users-api-openapi.yml",
+    "arcadiapower2-utility-accounts-api-openapi.yml",
+    "arcadiapower2-utility-credentials-api-openapi.yml",
+    "arcadiapower2-utility-meters-beta-api-openapi.yml",
+    "arcadiapower2-webhook-events-api-openapi.yml",
+    "arcadiapower2-webhooks-api-openapi.yml"
+  ],
+  "archived": [
+    "archived openapi/arcadiapower2-openapi.yaml"
+  ],
+  "errors": [],
+  "warnings": [],
+  "notes": [
+    "arcadiapower2-openapi.yaml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "arcadiapower2-openapi.yaml: declared missing tag: Bundle Webhook Events",
+    "arcadiapower2-openapi.yaml: declared missing tag: Users",
+    "arcadiapower2-openapi.yaml: declared missing tag: Utility Accounts",
+    "arcadiapower2-openapi.yaml: declared missing tag: Utility Credentials",
+    "arcadiapower2-openapi.yaml: declared missing tag: Utility Meters (Beta)",
+    "arcadiapower2-openapi.yaml: declared missing tag: Webhook Events",
+    "apis.yml register: written (+11 apis, 11 total)"
+  ],
+  "skipped": []
+}

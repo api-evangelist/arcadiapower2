@@ -1,0 +1,38 @@
+generated: '2026-09-25'
+method: generated
+generator: extract-docs-artifacts.py skills (local)
+source: openapi/arcadiapower2-openapi.yaml
+skills:
+- file: skills/arcadiapower2-create-and-test-webhook.md
+  name: arcadiapower2-create-and-test-webhook
+  api: openapi/arcadiapower2-openapi.yaml
+  operations:
+  - createWebhook
+  - requestWebookTestEvent
+- file: skills/arcadiapower2-enroll-and-create-utility-remittance.md
+  name: arcadiapower2-enroll-and-create-utility-remittance
+  api: openapi/arcadiapower2-openapi.yaml
+  operations:
+  - enrollUtilityRemittance
+  - createUtilityRemittanceItem
+  - getUtilityRemittanceItem
+- file: skills/arcadiapower2-retrieve-utility-credentials.md
+  name: arcadiapower2-retrieve-utility-credentials
+  api: openapi/arcadiapower2-openapi.yaml
+  operations:
+  - getUtilityCredentials
+  - getUtilityCredential
+- file: skills/arcadiapower2-spark-optimized-tariff-scenario.md
+  name: arcadiapower2-spark-optimized-tariff-scenario
+  api: openapi/arcadiapower2-openapi.yaml
+  operations:
+  - searchLoadServingEntities
+  - getOptimizedTariffsApplicabilities
+  - searchOptimizedTariffsByApplicabilities
+  - calculateOptimizedTariffsScenarioCost
+- file: skills/arcadiapower2-authenticate.md
+  name: arcadiapower2-authenticate
+  api: openapi/arcadiapower2-openapi.yaml
+  operations:
+  - createApiAccessToken
+  - ping

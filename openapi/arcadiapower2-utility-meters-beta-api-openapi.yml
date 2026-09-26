@@ -1,0 +1,276 @@
+openapi: 3.2.0
+info:
+  title: Arcadia API Reference Utility Meters (Beta) API
+  version: 0.3.0
+  contact:
+    email: platformsupport@arcadia.com
+  x-logo:
+    url: images/arcadia_logo.png
+servers:
+- url: https://api.arcadia.com
+security:
+- bearerAuth: []
+tags:
+- name: Utility Meters (Beta)
+paths:
+  /utility_meters:
+    get:
+      tags:
+      - Utility Meters (Beta)
+      summary: List Utility Meters
+      description: Returns a paginated list of utility meters for all users, utility accounts, and service types. May be filtered by `client_user_id`, `utility_account_id`, and/or `service_types` to further refine results. Default ordered by descending `updated_at`.
+      operationId: getUtilityMeters
+      parameters:
+      - $ref: '#/components/parameters/clientUserIdQueryParam'
+      - $ref: '#/components/parameters/utilityAccountIdQueryParam'
+      - $ref: '#/components/parameters/serviceTypesQueryParam'
+      - $ref: '#/components/parameters/paginationLimitParam'
+      - $ref: '#/components/parameters/paginationUpdatedAfterParam'
+      - $ref: '#/components/parameters/paginationUpdatedBeforeParam'
+      - $ref: '#/components/parameters/paginationOrderParam'
+      - $ref: '#/components/parameters/arcVersionInHeaderParam'
+      responses:
+        '200':
+          description: Success
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUtilityMeters'
+        '422':
+          description: Unprocessable Entity
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/MalformedParametersError'
+  /utility_meters/{utility_meter_id}:
+    get:
+      tags:
+      - Utility Meters (Beta)
+      summary: Get Utility Meter
+      description: Returns a single utility meter specified by ID.
+      operationId: getUtilityMeter
+      parameters:
+      - $ref: '#/components/parameters/utilityMeterIdInPathParam'
+      - $ref: '#/components/parameters/arcVersionInHeaderParam'
+      responses:
+        '200':
+          description: Success
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UtilityMeter'
+components:
+  parameters:
+    serviceTypesQueryParam:
+      in: query
+      name: service_types
+      required: false
+      description: A list of service types to filter the list of returns items by.
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+          - electric
+          - gas
+          - water
+    arcVersionInHeaderParam:
+      name: Arcadia-Version
+      in: header
+      example: '2022-10-13'
+      description: The Arcadia-Version for the request
+      required: true
+      schema:
+        type: string
+        default: '2022-10-13'
+    utilityAccountIdQueryParam:
+      in: query
+      name: utility_account_id
+      required: false
+      description: A utility account id to filter the list of returned items by.
+      schema:
+        type: integer
+    paginationUpdatedAfterParam:
+      in: query
+      name: updated_after
+      required: false
+      description: ISO8601 datetime, used to traverse paginated responses. Use of this parameter is mutually exclusive with `updated_before`.
+      schema:
+        type: string
+        format: date-time
+    utilityMeterIdInPathParam:
+      name: utility_meter_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    paginationLimitParam:
+      in: query
+      name: limit
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
+    clientUserIdQueryParam:
+      in: query
+      name: client_user_id
+      required: false
+      description: A client_user_id to filter the list of returned items by.
+      schema:
+        type: string
+    paginationOrderParam:
+      in: query
+      name: order
+      required: false
+      description: Used to specify the order in which records should be returned. Currently ordered by `updated_at` timestamp.
+      schema:
+        type: string
+        enum:
+        - asc
+        - desc
+        default: desc
+    paginationUpdatedBeforeParam:
+      in: query
+      name: updated_before
+      required: false
+      description: ISO8601 datetime, used to traverse paginated responses. Use of this parameter is mutually exclusive with `updated_after`.
+      schema:
+        type: string
+        format: date-time
+  schemas:
+    MalformedParametersError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - Request included malformed parameters
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+            details:
+              type: object
+              required: []
+              properties:
+                service_types:
+                  type: array
+                  items:
+                    type: string
+                    enum:
+                    - must be an array
+                amount_cents:
+                  type: array
+                  items:
+                    type: string
+                    enum:
+                    - must be an integer
+                    - must not exceed 3000000 cents
+      additionalProperties: false
+    UtilityMeter:
+      required:
+      - id
+      - client_user_id
+      - utility_credential_id
+      - utility_account_id
+      - meter_number
+      - service_type
+      - created_at
+      - updated_at
+      - sandboxed
+      properties:
+        id:
+          type: integer
+          example: 12345
+        client_user_id:
+          type: string
+          example: fff57dc7-3a2b-4395-8a62-e3486d46dabe
+        utility_credential_id:
+          type: integer
+          example: 54321
+        utility_account_id:
+          type: integer
+          example: 65432
+        meter_number:
+          type: string
+          example: 12300000045 67
+        service_type:
+          type: string
+          enum:
+          - electric
+          - gas
+          - water
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        sandboxed:
+          type: boolean
+          example: false
+      additionalProperties: false
+    PaginatedUtilityMeters:
+      required:
+      - data
+      - total_count
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/UtilityMeter'
+        total_count:
+          type: integer
+          example: 1
+      additionalProperties: false
+  headers:
+    ArcVersion:
+      description: The Arcadia-Version for the response
+      schema:
+        type: string
+      example: '2022-10-13'
+      required: true
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+x-readme:
+  proxy-enabled: false
+  headers:
+  - key: from-readme
+    value: true
+x-tagGroups:
+- name: General
+  tags:
+  - Auth
+  - Webhooks
+  - Webhook Events
+- name: Connections
+  tags:
+  - Utility Credentials
+  - Utility Accounts
+  - Utility Meters (Beta)
+  - Users
+- name: Products
+  tags:
+  - Plug
+  - Spark

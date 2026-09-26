@@ -1,0 +1,661 @@
+openapi: 3.2.0
+info:
+  title: Arcadia API Reference Webhooks API
+  version: 0.3.0
+  contact:
+    email: platformsupport@arcadia.com
+  x-logo:
+    url: images/arcadia_logo.png
+servers:
+- url: https://api.arcadia.com
+security:
+- bearerAuth: []
+tags:
+- name: Webhooks
+paths:
+  /webhook/endpoints:
+    get:
+      tags:
+      - Webhooks
+      summary: List webhook endpoints
+      description: Returns a paginated list of webhook endpoints.
+      operationId: getWebhooks
+      parameters:
+      - $ref: '#/components/parameters/paginationLimitParam'
+      - $ref: '#/components/parameters/paginationUpdatedAfterParam'
+      - $ref: '#/components/parameters/paginationUpdatedBeforeParam'
+      - $ref: '#/components/parameters/paginationOrderParam'
+      - $ref: '#/components/parameters/arcVersionInHeaderParam'
+      responses:
+        '200':
+          description: Success
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedWebhookEndpoints'
+    post:
+      tags:
+      - Webhooks
+      summary: Create a webhook endpoint
+      description: After creating a webhook endpoint, we will POST to the webhook URL whenever certain events happen in our system.
+      operationId: createWebhook
+      parameters:
+      - $ref: '#/components/parameters/arcVersionInHeaderParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWebhookBodyParams'
+      responses:
+        '200':
+          description: Success
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookEndpoint'
+        '422':
+          description: Unprocessable Entity
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookEndpointUnprocessableEntityError'
+  /webhook/endpoints/{webhook_endpoint_id}:
+    delete:
+      tags:
+      - Webhooks
+      summary: Delete a webhook endpoint
+      description: 'Delete a webhook endpoint and all associated webhook events and delivery attempt data. This will stop POST requests to the endpoint.
+
+
+        _**Note**: deletion will take place asynchronously and may not be complete when this request returns._'
+      operationId: deleteWebhook
+      parameters:
+      - $ref: '#/components/parameters/webhookEndpointIdInPathParam'
+      - $ref: '#/components/parameters/arcVersionInHeaderParam'
+      responses:
+        '202':
+          description: Accepted
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookEndpoint'
+    get:
+      tags:
+      - Webhooks
+      summary: Get a webhook endpoint
+      description: Returns a single webhook endpoint specified by ID.
+      operationId: getWebhookEndpoint
+      parameters:
+      - $ref: '#/components/parameters/webhookEndpointIdInPathParam'
+      - $ref: '#/components/parameters/arcVersionInHeaderParam'
+      responses:
+        '200':
+          description: Success
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookEndpoint'
+    patch:
+      tags:
+      - Webhooks
+      summary: Update a webhook endpoint
+      description: Updates a single webhook endpoint specified by ID.
+      operationId: updateWebhookEndpoint
+      parameters:
+      - $ref: '#/components/parameters/webhookEndpointIdInPathParam'
+      - $ref: '#/components/parameters/arcVersionInHeaderParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWebhookBodyParams'
+      responses:
+        '200':
+          description: Success
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookEndpoint'
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookEndpointUnprocessableEntityError'
+  /webhook/endpoints/{webhook_endpoint_id}/test:
+    put:
+      tags:
+      - Webhooks
+      summary: Triggers a test webhook event
+      description: Request a `test` event be sent to this webhook endpoint. Useful for debugging webhook implementations.
+      operationId: requestWebookTestEvent
+      parameters:
+      - $ref: '#/components/parameters/arcVersionInHeaderParam'
+      - $ref: '#/components/parameters/webhookEndpointIdInPathParam'
+      responses:
+        '202':
+          description: Success
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+  /webhook/endpoints/{webhook_endpoint_id}/events:
+    get:
+      tags:
+      - Webhooks
+      summary: List webhook events
+      description: 'Returns a paginated list of webhook events for a particular webhook endpoint.
+
+
+        _**Note**: webhook events are currently retained for 30 days._'
+      operationId: getWebhookEvents
+      parameters:
+      - $ref: '#/components/parameters/webhookEndpointIdInPathParam'
+      - name: delivered
+        in: query
+        required: false
+        description: Optionally filter webhook events by whether they were delivered successfully or not.
+        schema:
+          type: boolean
+      - $ref: '#/components/parameters/arcVersionInHeaderParam'
+      responses:
+        '200':
+          description: Success
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedWebhookEvents'
+  /webhook/endpoints/{webhook_endpoint_id}/events/{webhook_event_id}:
+    get:
+      tags:
+      - Webhooks
+      summary: Get a single webhook event
+      description: 'Returns a full representation of a webhook event, including the `data` payload and delivery attempts.
+
+
+        _**Note**: webhook events are currently retained for 30 days._'
+      operationId: getWebhookEvent
+      parameters:
+      - $ref: '#/components/parameters/webhookEndpointIdInPathParam'
+      - $ref: '#/components/parameters/webhookEventIdInPathParam'
+      - $ref: '#/components/parameters/arcVersionInHeaderParam'
+      responses:
+        '200':
+          description: Success
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookEvent'
+  /sandbox/webhook/trigger/new_utility_statement_available:
+    post:
+      tags:
+      - Webhooks
+      summary: Trigger a new_utility_statement_available webhook event
+      description: 'This endpoint will create a new utility statement for the associated utility account and emit a new_utility_statement_available webhook event.
+
+
+        Only available in sandbox.'
+      operationId: triggerNewUtilityStatementAvailable
+      parameters:
+      - $ref: '#/components/parameters/arcVersionInHeaderParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - utility_account_id
+              properties:
+                utility_account_id:
+                  type: integer
+      responses:
+        '202':
+          description: Success
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+        '422':
+          description: Unprocessable Entity
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookTriggerError'
+  /sandbox/webhook/trigger/utility_credential_revoked:
+    post:
+      tags:
+      - Webhooks
+      summary: Trigger a utility_credential_revoked webhook event
+      description: 'This endpoint will revoke a given utility credential (mimicing the severance of a customer''s connection with a utility, typically due to a change in password) and emit a utility_credential_revoked webhook event.
+
+
+        Only available in sandbox.'
+      operationId: triggerUtilityCredentialRevoked
+      parameters:
+      - $ref: '#/components/parameters/arcVersionInHeaderParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - utility_credential_id
+              properties:
+                utility_credential_id:
+                  type: integer
+      responses:
+        '202':
+          description: Success
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+        '422':
+          description: Unprocessable Entity
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookTriggerError'
+components:
+  schemas:
+    UpdateWebhookBodyParams:
+      properties:
+        enabled:
+          type: boolean
+          description: 'Determines whether this webhook endpoint will receive webhook events. Webhook endpoints that are `enabled: true` will  receive webhook events. Webhook endpoints that are `enabled: false` will not receive webhook events'
+          example: 'true'
+        arc_version:
+          type: string
+          description: The version of the Arcadia API this endpoint is designed to understand. The JSON body corresponding to a webhook event type may change across versions. Arcadia will continue to send events to this endpoint using the event schemas as they existed in the selected version, insulating you from breaking changes.
+          example: '2022-10-13'
+      additionalProperties: false
+    WebhookDeliveryAttempt:
+      required:
+      - id
+      - created_at
+      - updated_at
+      - response_body
+      - response_status_code
+      - webhook_event_id
+      - sandboxed
+      properties:
+        id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        response_body:
+          example: '{\"message\":\"ok\"}'
+          type:
+          - string
+          - 'null'
+        response_status_code:
+          example: 200
+          type:
+          - integer
+          - 'null'
+        webhook_event_id:
+          type: string
+          format: uuid
+          example: 3847dd41-8c90-499a-ac6e-10a027dd231f
+        sandboxed:
+          type: boolean
+          example: false
+      additionalProperties: false
+    PaginatedWebhookEndpoints:
+      required:
+      - data
+      - total_count
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhookEndpoint'
+        total_count:
+          type: integer
+          example: 1
+      additionalProperties: false
+    CreateWebhookBodyParams:
+      required:
+      - url
+      properties:
+        url:
+          type: string
+          description: The URL that webhook events should be POSTed to.
+          example: https://example.com/webhook-endpoint
+        arc_version:
+          type: string
+          description: The version of the Arcadia API this endpoint is designed to understand. The JSON body corresponding to a webhook event type may change across versions. Arcadia will continue to send events to this endpoint using the event schemas as they existed in the selected version, insulating you from breaking changes.
+          example: '2022-10-13'
+      additionalProperties: false
+    WebhookEndpointUnprocessableEntityError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - Provided url is not valid, see details for validation errors
+              - Provided arc_version is not valid, see details for validation errors
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+            details:
+              type: object
+              oneOf:
+              - required:
+                - url
+              - required:
+                - arc_version
+              properties:
+                url:
+                  type: array
+                  items:
+                    type: string
+                arc_version:
+                  type: array
+                  items:
+                    type: string
+      additionalProperties: false
+    WebhookEndpoint:
+      required:
+      - created_at
+      - updated_at
+      - id
+      - signing_key
+      - url
+      - sandboxed
+      - enabled
+      - arc_version
+      properties:
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        id:
+          type: string
+          format: uuid
+          example: 3847dd41-8c90-499a-ac6e-10a027dd231f
+        signing_key:
+          type: string
+          example: MIZ1ImBK1FiVisS1
+        url:
+          type: string
+          example: https://example.com/webhook-endpoint
+        sandboxed:
+          type: boolean
+          example: false
+        enabled:
+          type: boolean
+          example: true
+        arc_version:
+          type: string
+          example: '2022-10-13'
+      additionalProperties: false
+    WebhookEventSummary:
+      required:
+      - id
+      - created_at
+      - updated_at
+      - webhook_endpoint_id
+      - type
+      - sandboxed
+      - delivered
+      properties:
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        id:
+          type: string
+          format: uuid
+          example: 3847dd41-8c90-499a-ac6e-10a027dd231f
+        webhook_endpoint_id:
+          type: string
+          format: uuid
+          example: 3847dd41-8c90-499a-ac6e-10a027dd231f
+        type:
+          type: string
+          enum:
+          - test
+          - utility_credential_verified
+          - utility_credential_rejected
+          - utility_credential_revoked
+          - utility_credential_verification_error
+          - utility_accounts_discovered
+          - utility_accounts_discovery_error
+          - new_utility_statement_available
+          - invoice_collection_succeeded
+          - invoice_collection_failed
+        sandboxed:
+          type: boolean
+          example: false
+        delivered:
+          type: boolean
+          example: true
+      additionalProperties: false
+    WebhookEvent:
+      required:
+      - id
+      - created_at
+      - updated_at
+      - webhook_endpoint_id
+      - type
+      - sandboxed
+      - delivered
+      properties:
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        id:
+          type: string
+          format: uuid
+          example: 3847dd41-8c90-499a-ac6e-10a027dd231f
+        webhook_endpoint_id:
+          type: string
+          format: uuid
+          example: 3847dd41-8c90-499a-ac6e-10a027dd231f
+        type:
+          type: string
+          enum:
+          - test
+          - utility_credential_verified
+          - utility_credential_rejected
+          - utility_credential_revoked
+          - utility_credential_verification_error
+          - utility_accounts_discovered
+          - utility_accounts_discovery_error
+          - new_utility_statement_available
+        sandboxed:
+          type: boolean
+          example: false
+        delivered:
+          type: boolean
+          example: true
+        data:
+          type: object
+          description: Original `data` payload of the webhook event. See [webhook events](#tag/Webhook-Events) for schema details.
+        delivery_attempts:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhookDeliveryAttempt'
+      additionalProperties: false
+    PaginatedWebhookEvents:
+      required:
+      - data
+      - total_count
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhookEventSummary'
+        total_count:
+          type: integer
+          example: 1
+      additionalProperties: false
+    WebhookTriggerError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - This endpoint is only supported in the sandboxed API mode
+              - This endpoint is only supported in the sandboxed API mode using a UtilityAccount with test scenario interval data
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+            details:
+              type:
+              - object
+              - 'null'
+      additionalProperties: false
+  parameters:
+    webhookEndpointIdInPathParam:
+      name: webhook_endpoint_id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: 3847dd41-8c90-499a-ac6e-10a027dd231f
+    arcVersionInHeaderParam:
+      name: Arcadia-Version
+      in: header
+      example: '2022-10-13'
+      description: The Arcadia-Version for the request
+      required: true
+      schema:
+        type: string
+        default: '2022-10-13'
+    paginationUpdatedAfterParam:
+      in: query
+      name: updated_after
+      required: false
+      description: ISO8601 datetime, used to traverse paginated responses. Use of this parameter is mutually exclusive with `updated_before`.
+      schema:
+        type: string
+        format: date-time
+    paginationLimitParam:
+      in: query
+      name: limit
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
+    paginationOrderParam:
+      in: query
+      name: order
+      required: false
+      description: Used to specify the order in which records should be returned. Currently ordered by `updated_at` timestamp.
+      schema:
+        type: string
+        enum:
+        - asc
+        - desc
+        default: desc
+    webhookEventIdInPathParam:
+      name: webhook_event_id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: ff95f020-8ef9-409d-bff6-8489e880359c
+    paginationUpdatedBeforeParam:
+      in: query
+      name: updated_before
+      required: false
+      description: ISO8601 datetime, used to traverse paginated responses. Use of this parameter is mutually exclusive with `updated_after`.
+      schema:
+        type: string
+        format: date-time
+  headers:
+    ArcVersion:
+      description: The Arcadia-Version for the response
+      schema:
+        type: string
+      example: '2022-10-13'
+      required: true
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+x-readme:
+  proxy-enabled: false
+  headers:
+  - key: from-readme
+    value: true
+x-tagGroups:
+- name: General
+  tags:
+  - Auth
+  - Webhooks
+  - Webhook Events
+- name: Connections
+  tags:
+  - Utility Credentials
+  - Utility Accounts
+  - Utility Meters (Beta)
+  - Users
+- name: Products
+  tags:
+  - Plug
+  - Spark

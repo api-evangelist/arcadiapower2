@@ -1,0 +1,496 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/arcadiapower2/main/json-schema/arcadiapower2-storage-optimization-schedules-request-params-schema.json",
+  "title": "StorageOptimizationSchedulesRequestParams",
+  "x-generated": "2026-09-26",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/arcadiapower2-openapi.yaml#/components/schemas/StorageOptimizationSchedulesRequestParams",
+  "type": "object",
+  "properties": {
+    "main_tariff_id": {
+      "description": "The Genability 'masterTariffId' unique identifier for this tariff, prefixed with `gen_mtid_`. See [Genability documentation](https://developer.genability.com/api-reference/tariff-api/tariff/) for details.",
+      "type": "string"
+    },
+    "tariff_property_inputs": {
+      "description": "Genability `propertyInputs` applicable to the specified tariff that may affect the cost structure being optimized against. See [Genability documentation](https://developer.genability.com/api-reference/calculation-api/cost-calculation) for details on how to set these inputs for specific tariffs. Use Genability-defined input format.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "keyName",
+          "dataValue"
+        ],
+        "properties": {
+          "keyName": {
+            "type": "string"
+          },
+          "dataValue": {
+            "type": [
+              "boolean",
+              "number",
+              "string"
+            ]
+          }
+        }
+      }
+    },
+    "from_date_time": {
+      "description": "Start time of the consumption and solar curves. Must be the start of an hour (i.e. `:00:00`).",
+      "type": "string",
+      "format": "date-time"
+    },
+    "consumption_curve_kwh_ac": {
+      "description": "Timeseries representing how much AC consumption needs to be met at each timestep (kWh AC).",
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "number",
+        "minimum": 0
+      }
+    },
+    "solar_generation_curve_kwh_dc": {
+      "description": "Timeseries representing how much DC solar production occurs at each timestep (kWh DC). If absent, assumed to be 0. If present, must have the same length as `consumption_curve_kwh_ac`. Note that DC to AC conversion is specified with `solar_dc_to_ac_efficiency`.",
+      "type": "array",
+      "items": {
+        "type": "number",
+        "minimum": 0
+      }
+    },
+    "dispatch_strategy": {
+      "description": "Parameters controlling how to compute dispatch curves. Defaults to `{ 'optimize': true }`, which uses constrained optimization to determine a best-case schedule. Also supports `charge_on_surplus` and `fixed_schedule` strategies.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/DispatchStrategy"
+        }
+      ]
+    },
+    "solar_dc_to_ac_efficiency": {
+      "description": "How efficiently the solar inverter converts outgoing DC power to AC (`0.0` - `1.0`).",
+      "default": 0.96,
+      "minimum": 0,
+      "maximum": 1,
+      "type": "number"
+    },
+    "allow_grid_to_battery": {
+      "description": "Allow the battery to be charged from the grid (`true`/`false`, defaults to `true`). DC-coupled batteries only chargable via solar should set this to `false`.",
+      "default": true,
+      "type": "boolean"
+    },
+    "allow_solar_to_battery": {
+      "description": "Allow the battery to be charged from solar (`true`/`false`, defaults to `true`). AC-coupled batteries may want to set this to `false` if indirect AC charging from converted solar is not possible.",
+      "default": true,
+      "type": "boolean"
+    },
+    "allow_solar_to_grid": {
+      "description": "Allow excess solar to be sold back to the grid (`true`/`false`, defaults to `true`). Solar tied exclusively to the battery and/or the site should set this to `false`, which may cause curtailment in the result.",
+      "default": true,
+      "type": "boolean"
+    },
+    "allow_battery_to_grid": {
+      "description": "Allow battery to export energy to the grid (`true`/`false`, defaults to `true`). Batteries configured exclusively for self-consumption should set this to `false`.",
+      "default": true,
+      "type": "boolean"
+    },
+    "battery_dc_coupled": {
+      "description": "Whether the battery is DC coupled (`true`/`false`). If `false`, solar power must be converted from DC to AC and then back to DC before it can be stored.",
+      "default": true,
+      "type": "boolean"
+    },
+    "battery_ac_to_dc_efficiency": {
+      "description": "How efficiently the battery inverter converts incoming AC power to DC (`0.0` - `1.0`).",
+      "default": 0.96,
+      "minimum": 0,
+      "maximum": 1,
+      "type": "number"
+    },
+    "battery_dc_to_ac_efficiency": {
+      "description": "How efficiently the battery inverter converts outgoing DC power to AC (`0.0` - `1.0`)",
+      "default": 0.96,
+      "minimum": 0,
+      "maximum": 1,
+      "type": "number"
+    },
+    "battery_input_efficiency": {
+      "description": "Coulombic efficiency of the battery, i.e. ratio of input kWh for a full charge to output kWh for a full discharge (`0.0` - `1.0`).",
+      "default": 0.975,
+      "minimum": 0,
+      "maximum": 1,
+      "type": "number"
+    },
+    "battery_nameplate_power": {
+      "description": "The maximum amount of power that can instantaneously flow into or out of the battery (kW DC).",
+      "default": 3,
+      "exclusiveMinimum": 0,
+      "type": "number"
+    },
+    "battery_nameplate_capacity": {
+      "description": "Maximum charge that the battery can hold (kWh DC).",
+      "default": 6,
+      "exclusiveMinimum": 0,
+      "type": "number"
+    },
+    "battery_min_soc": {
+      "description": "Minimum state of charge of the battery (`0.0` - `1.0`).",
+      "default": 0.1,
+      "minimum": 0,
+      "maximum": 1,
+      "type": "number"
+    },
+    "battery_max_soc": {
+      "description": "Maximum state of charge of the battery (`0.0` - `1.0`).",
+      "default": 1,
+      "minimum": 0,
+      "maximum": 1,
+      "type": "number"
+    },
+    "battery_initial_soc": {
+      "description": "Initial state of charge of the battery (`0.0` - `1.0`).",
+      "default": 0.5,
+      "minimum": 0,
+      "maximum": 1,
+      "type": "number"
+    },
+    "battery_degradation_cost_per_discharge_kwh": {
+      "description": "Optionally impose a cost on total discharge from the battery as a simplified degradation model ($/kWh).",
+      "default": 0,
+      "minimum": 0,
+      "type": "number"
+    },
+    "export_limit_kwh_ac": {
+      "description": "Maximum energy that can be exported to the grid at any given timestep (kWh AC). Leave unspecified for unlimited exports, or set to `0` to forbid them.",
+      "minimum": 0,
+      "type": "number"
+    }
+  },
+  "required": [
+    "main_tariff_id",
+    "from_date_time",
+    "consumption_curve_kwh_ac"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "TouSeason": {
+      "title": "TouSeason",
+      "type": "object",
+      "properties": {
+        "seasonFromDay": {
+          "title": "Seasonfromday",
+          "description": "Day of the month on which this season begins (1 - 31).",
+          "minimum": 1,
+          "maximum": 31,
+          "type": "integer"
+        },
+        "seasonToDay": {
+          "title": "Seasontoday",
+          "description": "Day of the month after which this season ends (1 - 31).",
+          "minimum": 1,
+          "maximum": 31,
+          "type": "integer"
+        },
+        "seasonFromMonth": {
+          "title": "Seasonfrommonth",
+          "description": "Month of the year on which this season begins (1 - 12).",
+          "minimum": 1,
+          "maximum": 12,
+          "type": "integer"
+        },
+        "seasonToMonth": {
+          "title": "Seasontomonth",
+          "description": "Month of the year after which this season ends (1 - 12). End month is included in the season.",
+          "minimum": 1,
+          "maximum": 12,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "seasonFromMonth",
+        "seasonToMonth"
+      ]
+    },
+    "TouPeriod": {
+      "title": "TouPeriod",
+      "type": "object",
+      "properties": {
+        "fromDayOfWeek": {
+          "title": "Fromdayofweek",
+          "description": "Day of the week on which this period begins (0 - 6, Monday - Sunday).",
+          "default": 0,
+          "minimum": 0,
+          "maximum": 6,
+          "type": "integer"
+        },
+        "toDayOfWeek": {
+          "title": "Todayofweek",
+          "description": "Day of the week after which this period ends (0 - 6, Monday - Sunday). End day is included in the period.",
+          "default": 6,
+          "minimum": 0,
+          "maximum": 6,
+          "type": "integer"
+        },
+        "fromHour": {
+          "title": "Fromhour",
+          "description": "Hour of the day on which this period begins (0 - 23).",
+          "exclusiveMaximum": 24,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "toHour": {
+          "title": "Tohour",
+          "description": "Hour of the day before which this period ends (0 - 24). End hour is not included in the period.",
+          "minimum": 0,
+          "maximum": 24,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "fromHour",
+        "toHour"
+      ]
+    },
+    "TimeOfUse": {
+      "title": "TimeOfUse",
+      "type": "object",
+      "properties": {
+        "season": {
+          "title": "Season",
+          "description": "Season to which this TOU schedule applies.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/TouSeason"
+            }
+          ]
+        },
+        "touPeriods": {
+          "title": "Touperiods",
+          "description": "Set of TOU periods defining the schedule.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TouPeriod"
+          }
+        }
+      },
+      "required": [
+        "touPeriods"
+      ]
+    },
+    "FixedSchedule": {
+      "title": "FixedSchedule",
+      "type": "object",
+      "properties": {
+        "chargeTous": {
+          "title": "Chargetous",
+          "description": "TOU schedule for charging the storage system.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TimeOfUse"
+          }
+        },
+        "dischargeTous": {
+          "title": "Dischargetous",
+          "description": "TOU schedule for discharging the storage system.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TimeOfUse"
+          }
+        },
+        "timezone": {
+          "title": "Timezone",
+          "description": "Timezone in which the schedule is defined. Defaults to tariff timezone.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "chargeTous",
+        "dischargeTous"
+      ]
+    },
+    "DispatchStrategy": {
+      "title": "DispatchStrategy",
+      "type": "object",
+      "properties": {
+        "optimize": {
+          "title": "Optimize",
+          "description": "If `true`, find the optimal dispatch schedule for the given tariff, solar, and consumption curves, assuming perfect forecasts.",
+          "type": "boolean"
+        },
+        "chargeOnSurplus": {
+          "title": "Chargeonsurplus",
+          "description": "If `true`, charge whenever solar production exceeds consumption and discharge to meet consumption otherwise.",
+          "type": "boolean"
+        },
+        "fixedSchedule": {
+          "title": "Fixedschedule",
+          "description": "If specified, use a fixed schedule to control battery dispatch, charging as much as possible during `charge_tous` and discharging as much as possible during `discharge_tous`. Times of use (TOUs) should be specified using [Genability format](https://developer.genability.com/api-reference/tariff-api/time-of-use/), in either camel or snake case.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/FixedSchedule"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "$defs": {
+    "DispatchStrategy": {
+      "title": "DispatchStrategy",
+      "type": "object",
+      "properties": {
+        "optimize": {
+          "title": "Optimize",
+          "description": "If `true`, find the optimal dispatch schedule for the given tariff, solar, and consumption curves, assuming perfect forecasts.",
+          "type": "boolean"
+        },
+        "chargeOnSurplus": {
+          "title": "Chargeonsurplus",
+          "description": "If `true`, charge whenever solar production exceeds consumption and discharge to meet consumption otherwise.",
+          "type": "boolean"
+        },
+        "fixedSchedule": {
+          "title": "Fixedschedule",
+          "description": "If specified, use a fixed schedule to control battery dispatch, charging as much as possible during `charge_tous` and discharging as much as possible during `discharge_tous`. Times of use (TOUs) should be specified using [Genability format](https://developer.genability.com/api-reference/tariff-api/time-of-use/), in either camel or snake case.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/FixedSchedule"
+            }
+          ]
+        }
+      }
+    },
+    "FixedSchedule": {
+      "title": "FixedSchedule",
+      "type": "object",
+      "properties": {
+        "chargeTous": {
+          "title": "Chargetous",
+          "description": "TOU schedule for charging the storage system.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TimeOfUse"
+          }
+        },
+        "dischargeTous": {
+          "title": "Dischargetous",
+          "description": "TOU schedule for discharging the storage system.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TimeOfUse"
+          }
+        },
+        "timezone": {
+          "title": "Timezone",
+          "description": "Timezone in which the schedule is defined. Defaults to tariff timezone.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "chargeTous",
+        "dischargeTous"
+      ]
+    },
+    "TimeOfUse": {
+      "title": "TimeOfUse",
+      "type": "object",
+      "properties": {
+        "season": {
+          "title": "Season",
+          "description": "Season to which this TOU schedule applies.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/TouSeason"
+            }
+          ]
+        },
+        "touPeriods": {
+          "title": "Touperiods",
+          "description": "Set of TOU periods defining the schedule.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TouPeriod"
+          }
+        }
+      },
+      "required": [
+        "touPeriods"
+      ]
+    },
+    "TouPeriod": {
+      "title": "TouPeriod",
+      "type": "object",
+      "properties": {
+        "fromDayOfWeek": {
+          "title": "Fromdayofweek",
+          "description": "Day of the week on which this period begins (0 - 6, Monday - Sunday).",
+          "default": 0,
+          "minimum": 0,
+          "maximum": 6,
+          "type": "integer"
+        },
+        "toDayOfWeek": {
+          "title": "Todayofweek",
+          "description": "Day of the week after which this period ends (0 - 6, Monday - Sunday). End day is included in the period.",
+          "default": 6,
+          "minimum": 0,
+          "maximum": 6,
+          "type": "integer"
+        },
+        "fromHour": {
+          "title": "Fromhour",
+          "description": "Hour of the day on which this period begins (0 - 23).",
+          "exclusiveMaximum": 24,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "toHour": {
+          "title": "Tohour",
+          "description": "Hour of the day before which this period ends (0 - 24). End hour is not included in the period.",
+          "minimum": 0,
+          "maximum": 24,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "fromHour",
+        "toHour"
+      ]
+    },
+    "TouSeason": {
+      "title": "TouSeason",
+      "type": "object",
+      "properties": {
+        "seasonFromDay": {
+          "title": "Seasonfromday",
+          "description": "Day of the month on which this season begins (1 - 31).",
+          "minimum": 1,
+          "maximum": 31,
+          "type": "integer"
+        },
+        "seasonToDay": {
+          "title": "Seasontoday",
+          "description": "Day of the month after which this season ends (1 - 31).",
+          "minimum": 1,
+          "maximum": 31,
+          "type": "integer"
+        },
+        "seasonFromMonth": {
+          "title": "Seasonfrommonth",
+          "description": "Month of the year on which this season begins (1 - 12).",
+          "minimum": 1,
+          "maximum": 12,
+          "type": "integer"
+        },
+        "seasonToMonth": {
+          "title": "Seasontomonth",
+          "description": "Month of the year after which this season ends (1 - 12). End month is included in the season.",
+          "minimum": 1,
+          "maximum": 12,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "seasonFromMonth",
+        "seasonToMonth"
+      ]
+    }
+  }
+}

@@ -1,0 +1,28 @@
+generated: '2026-09-25'
+method: searched
+generator: extract-docs-artifacts.py (local)
+source: https://docs.arcadia.com/reference/rate-limiting.md
+sources:
+- https://docs.arcadia.com/reference/rate-limiting.md
+name: Arcadiapower2 rate limits
+limits:
+- name: Plug API Rate
+  limit_text: 100 requests per second
+  max: 100
+  window: second
+  endpoint: Plug API
+- name: Plug API Burst
+  limit_text: 50 requests
+  max: 50
+  endpoint: Plug API
+- name: Plug API Quota
+  limit_text: 1,000,000 requests per day
+  max: 1000000
+  window: day
+  endpoint: Plug API
+- name: Connect Credentials
+  limit_text: Up to 100 unique credentials per hour per organization.
+  max: 100
+  window: hour
+  endpoint: Connect
+docs: https://docs.arcadia.com/reference/rate-limiting.md

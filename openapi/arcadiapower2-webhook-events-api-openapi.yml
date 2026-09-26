@@ -1,0 +1,1067 @@
+openapi: 3.2.0
+info:
+  title: Arcadia API Reference Webhook Events API
+  version: 0.3.0
+  contact:
+    email: platformsupport@arcadia.com
+  x-logo:
+    url: images/arcadia_logo.png
+servers:
+- url: https://api.arcadia.com
+security:
+- bearerAuth: []
+tags:
+- name: Webhook Events
+paths: {}
+webhooks:
+  utilityCredentialVerified:
+    post:
+      summary: Utility Credential Verified
+      description: Webhook posted when a utility credential has been verified. The utility credential verification status is `verified`. The `id` field represents a utility credential (`utility_credential_id`) that is associated with the user whose `client_user_id` is in the data object.
+      operationId: utilityCredentialVerified
+      tags:
+      - Webhook Events
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UtilityCredentialVerifiedWebhookEvent'
+  utilityCredentialRejected:
+    post:
+      summary: Utility Credential Rejected
+      description: Webhook posted when a utility credential has been initially rejected. The utility credential verification status is `rejected`. The `id` field represents a utility credential (`utility_credential_id`) that is associated with the user whose `client_user_id` is in the data object.
+      operationId: utilityCredentialRejected
+      tags:
+      - Webhook Events
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UtilityCredentialRejectedWebhookEvent'
+  utilityCredentialRevoked:
+    post:
+      summary: Utility Credential Revoked
+      description: Webhook posted when a utility credential is no longer correct. The utility credential verification status is `rejected`. The `id` field represents a utility credential (`utility_credential_id`) that is associated with the user whose `client_user_id` is in the data object.
+      operationId: utilityCredentialRevoked
+      tags:
+      - Webhook Events
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UtilityCredentialRevokedWebhookEvent'
+  UtilityCredentialVerificationError:
+    post:
+      summary: Utility Credential Verification Error
+      description: 'Webhook posted when an error was encountered attempting to verify the utility credentials.
+
+        See the description of `verification_status` in the Response section of Get Utility Credential for more information. The `id` field represents a utility credential (`utility_credential_id`) that is associated with the user whose `client_user_id` is in the data object.'
+      operationId: utilityCredentialVerificationError
+      tags:
+      - Webhook Events
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UtilityCredentialVerificationErrorWebhookEvent'
+  utilityAccountsDiscovered:
+    post:
+      summary: Utility Accounts Discovered
+      description: Webhook posted when utility accounts are discovered.
+      operationId: utilityAccountsDiscovered
+      tags:
+      - Webhook Events
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UtilityAccountsDiscoveredWebhookEvent'
+  utilityAccountsDiscoveryError:
+    post:
+      summary: Utility Account Discovery Error
+      description: Webhook posted when there is an error discovering utility accounts.
+      operationId: utilityAccountsDiscoveryError
+      tags:
+      - Webhook Events
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UtilityAccountsDiscoveryErrorWebhookEvent'
+  utilityAccountUpdated:
+    post:
+      summary: Utility Account Updated
+      description: Webhook posted when any information changes on a utility account
+      operationId: utilityAccountUpdated
+      tags:
+      - Webhook Events
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UtilityAccountUpdatedWebhookEvent'
+  historicalUtilityStatementsDiscovered:
+    post:
+      summary: Historical Utility Statements Discovered
+      description: Webhook posted when historical utility statements are discovered.
+      operationId: HistoricalUtilityStatementsDiscovered
+      tags:
+      - Webhook Events
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HistoricalUtilityStatementsDiscoveredWebhookEvent'
+  newUtilityStatementAvailable:
+    post:
+      summary: New Utility Statement Available
+      description: Webhook posted when a new utility statement is discovered.
+      operationId: newUtilityStatementAvailable
+      tags:
+      - Webhook Events
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewUtilityStatementAvailableWebhookEvent'
+  test:
+    post:
+      summary: Test
+      description: Webhook posted when requested via the test webhook endpoint
+      operationId: test
+      tags:
+      - Webhook Events
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TestWebhookEvent'
+components:
+  schemas:
+    UtilityCredentialRevokedWebhookEvent:
+      required:
+      - type
+      - created_at
+      - data
+      properties:
+        type:
+          type: string
+          enum:
+          - utility_credential_revoked
+        created_at:
+          type: string
+          format: date-time
+        data:
+          $ref: '#/components/schemas/UtilityCredential'
+      additionalProperties: false
+    UtilityCredential:
+      required:
+      - created_at
+      - id
+      - updated_at
+      - client_user_id
+      - username
+      - utility_name
+      - utility_long_name
+      - verification_status
+      - accounts_load_in_progress
+      - verification_updated_at
+      - sandboxed
+      - uses_test_scenario
+      properties:
+        id:
+          type: integer
+          example: 12345
+        client_user_id:
+          type: string
+          example: fff57dc7-3a2b-4395-8a62-e3486d46dabe
+        utility_name:
+          type: string
+          example: AEP SWEPCO
+          description: The list of supported Arcadia utilities can be found [here](https://arc.arcadia.com/coverage?first=25&page=1).
+        utility_long_name:
+          type: string
+          example: AEP SWEPCO AR
+          description: Provides greater detail than `utility_name`. The list of supported Arcadia utilities can be found [here](https://arc.arcadia.com/coverage?first=25&page=1).
+        username:
+          type:
+          - string
+          - 'null'
+          example: great_customer
+        verification_status:
+          type: string
+          enum:
+          - pending
+          - verified
+          - rejected
+          - error
+          description: 'The verification status of the Utility Credential.
+
+
+            * `pending`: Credential verification is pending
+
+            * `verified`: The credentials were found to be correct
+
+            * `rejected`: The credentials were found to be incorrect
+
+            * `error`: There was an error attempting to verify the credentials. This status _may_ be transient, as Arcadia will continue to retry verification in the background.
+
+            '
+        accounts_load_in_progress:
+          type: boolean
+          example: false
+          description: 'Indicates if Arcadia is in the process of verifying a utility credential or loading associated utility accounts. The combination of `verification_status: verified` and `account_load_in_progress: false` will indicate that utility accounts are available in the API. Alternatively, the `utility_accounts_discovered` webhook will alert you when utility accounts are available in the API.'
+        verification_updated_at:
+          format: date-time
+          type:
+          - string
+          - 'null'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        sandboxed:
+          type: boolean
+          example: false
+        uses_test_scenario:
+          type: boolean
+          example: false
+          description: Indicates if the utility credential was created using a designated test username and password.
+    Tariff:
+      description: Information about a tariff.
+      required:
+      - main_tariff_id
+      - tariff_code
+      - tariff_name
+      - utility_name
+      properties:
+        main_tariff_id:
+          type: string
+          description: The Genability 'masterTariffId' unique identifier for this tariff. See [Genability documentation](https://developer.genability.com/api-reference/tariff-api/tariff/) for details.
+          example: gen_mtid_3331108
+        property_inputs:
+          description: Properties applied to this tariff which may affect the calculated cost of electricity.
+          type: array
+          items:
+            type: object
+            required:
+            - id
+            - value
+            properties:
+              id:
+                type: string
+                example: territoryId
+              value:
+                type:
+                - boolean
+                - number
+                - string
+                example: 3
+        supplier_name:
+          description: The name of the retail electricity supplier or the community choice aggregator. If there is no retail electricity supplier or community choice aggregator, this field is null.
+          example: East Bay Community Energy
+          type:
+          - string
+          - 'null'
+        tariff_code:
+          type: string
+          description: Abbreviation code of the tariff used for this calculation.
+          example: EV-2A-TOU
+        tariff_name:
+          type: string
+          description: Full name of the tariff used for this calculation.
+          example: Residential - Time of Use - Plug-In Electric Vehicle 2
+        utility_name:
+          type: string
+          description: Name of the utility associated with this tariff
+          example: Pacific Gas & Electric
+    UtilityAccount:
+      required:
+      - id
+      - client_user_id
+      - utility_name
+      - utility_long_name
+      - utility_credential_id
+      - account_number
+      - service_address_city
+      - service_address_state
+      - service_address_street_one
+      - service_address_street_two
+      - service_address_zip
+      - service_customer_name
+      - status
+      - supplier_account_id
+      - most_recent_tariff
+      - flags
+      - services
+      - created_at
+      - updated_at
+      - feature_availability
+      - utility_meters
+      - sandboxed
+      properties:
+        id:
+          type: integer
+          example: 12345
+        client_user_id:
+          type: string
+          example: fff57dc7-3a2b-4395-8a62-e3486d46dabe
+        utility_name:
+          type: string
+          example: AEP SWEPCO
+          description: The list of supported Arcadia utilities can be found [here](https://arc.arcadia.com/coverage?first=25&page=1).
+        utility_long_name:
+          type: string
+          example: AEP SWEPCO AR
+          description: Provides greater detail than `utility_name`. The list of supported Arcadia utilities can be found [here](https://arc.arcadia.com/coverage?first=25&page=1).
+        utility_credential_id:
+          type: integer
+          example: 54321
+        account_number:
+          type:
+          - string
+          - 'null'
+          example: '7626177069'
+          description: The account number used by the utility to identify this UtilityAccount
+        service_address_street_one:
+          example: 1060 W Addison
+          type:
+          - string
+          - 'null'
+        service_address_street_two:
+          example: Apartment 1
+          type:
+          - string
+          - 'null'
+        service_address_city:
+          example: Chicago
+          type:
+          - string
+          - 'null'
+        service_address_state:
+          example: IL
+          type:
+          - string
+          - 'null'
+        service_address_zip:
+          example: '60613'
+          type:
+          - string
+          - 'null'
+        service_customer_name:
+          example: Joan Arcadia
+          type:
+          - string
+          - 'null'
+        supplier_account_id:
+          example: '123456789'
+          description: 'Utility specific account identifier for energy suppliers.
+
+            '
+          type:
+          - string
+          - 'null'
+        status:
+          anyOf:
+          - type: 'null'
+          - type: string
+            enum:
+            - active
+            - closed
+            - incomplete
+            - locked
+            - unknown
+        most_recent_tariff:
+          anyOf:
+          - type: 'null'
+          - $ref: '#/components/schemas/MostRecentTariff'
+        flags:
+          type: array
+          items:
+            type: string
+            enum:
+            - utility_statement_past_due
+        services:
+          type: array
+          items:
+            type: string
+            enum:
+            - electric
+            - gas
+            - water
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        feature_availability:
+          $ref: '#/components/schemas/FeatureAvailability'
+        utility_meters:
+          type: array
+          items:
+            $ref: '#/components/schemas/UtilityMeter'
+        sandboxed:
+          type: boolean
+          example: false
+      additionalProperties: false
+    NewUtilityStatementAvailableWebhookEvent:
+      required:
+      - type
+      - created_at
+      - data
+      properties:
+        type:
+          type: string
+          enum:
+          - new_utility_statement_available
+        created_at:
+          type: string
+          format: date-time
+        data:
+          $ref: '#/components/schemas/UtilityStatement'
+      additionalProperties: false
+    MostRecentTariff:
+      allOf:
+      - $ref: '#/components/schemas/Tariff'
+      - description: The most recent Tariff seen on this utility account.
+        required:
+        - tariff_as_of_date
+        properties:
+          tariff_as_of_date:
+            type:
+            - string
+            - 'null'
+            format: date
+            description: The statement date of the utility statement that reported use of this tariff.
+            example: '2021-03-01'
+    UtilityMeter:
+      required:
+      - id
+      - client_user_id
+      - utility_credential_id
+      - utility_account_id
+      - meter_number
+      - service_type
+      - created_at
+      - updated_at
+      - sandboxed
+      properties:
+        id:
+          type: integer
+          example: 12345
+        client_user_id:
+          type: string
+          example: fff57dc7-3a2b-4395-8a62-e3486d46dabe
+        utility_credential_id:
+          type: integer
+          example: 54321
+        utility_account_id:
+          type: integer
+          example: 65432
+        meter_number:
+          type: string
+          example: 12300000045 67
+        service_type:
+          type: string
+          enum:
+          - electric
+          - gas
+          - water
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        sandboxed:
+          type: boolean
+          example: false
+      additionalProperties: false
+    UtilityStatement:
+      required:
+      - client_user_id
+      - created_at
+      - due_date
+      - final_bill
+      - gas_charge
+      - id
+      - kwh
+      - past_due
+      - pdf_url
+      - sandboxed
+      - service_end_date
+      - service_start_date
+      - statement_date
+      - supplier_charge
+      - tariff
+      - updated_at
+      - utility_account_id
+      - utility_charge
+      - utility_name
+      - utility_long_name
+      - service_window_inclusive_of_end_date
+      - commercial_line_items_detail
+      - billing_flags
+      - virtual_net_metering
+      - most_recent_payment_detail
+      properties:
+        id:
+          type: integer
+          example: 123
+        client_user_id:
+          type: string
+          example: fff57dc7-3a2b-4395-8a62-e3486d46dabe
+        tariff:
+          anyOf:
+          - type: 'null'
+          - $ref: '#/components/schemas/Tariff'
+        utility_name:
+          type: string
+          example: AEP SWEPCO
+          description: The list of supported Arcadia utilities can be found [here](https://arc.arcadia.com/coverage?first=25&page=1).
+        utility_long_name:
+          type: string
+          example: AEP SWEPCO AR
+          description: Provides greater detail than `utility_name`. The list of supported Arcadia utilities can be found [here](https://arc.arcadia.com/coverage?first=25&page=1).
+        utility_account_id:
+          type: integer
+          example: 2243
+        statement_date:
+          type: string
+          format: date
+          example: '2019-08-24'
+        due_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          example: '2019-09-24'
+        service_start_date:
+          type: string
+          format: date
+          example: '2019-08-24'
+        service_end_date:
+          type: string
+          format: date
+          example: '2019-09-24'
+        kwh:
+          type: integer
+          example: 100
+        utility_charge:
+          type: number
+          example: 90.33
+          description: Total dollar amount billed by the utility on this statement.
+        supplier_charge:
+          example: 41.54
+          description: 'Total dollar amount billed by the energy supplier.
+
+
+            **Note**: Not available for all utilities.
+
+            '
+          type:
+          - number
+          - 'null'
+        gas_charge:
+          example: 23.32
+          description: 'Total dollar amount billed by the utility for natural gas.
+
+
+            **Note**: Not available for all utilities that provide gas service.
+
+            '
+          type:
+          - number
+          - 'null'
+        past_due:
+          type:
+          - boolean
+          - 'null'
+          example: false
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        sandboxed:
+          type: boolean
+          example: false
+        pdf_url:
+          format: uri
+          description: A url to the utility created PDF bill for this statement. Note that this url will only be valid for 600 seconds.
+          type:
+          - string
+          - 'null'
+        final_bill:
+          description: Indicates if this is the final bill that this account will receive before closing.
+          example: false
+          type:
+          - boolean
+          - 'null'
+        service_window_inclusive_of_end_date:
+          type: boolean
+          example: true
+          description: Indicates that the service window for this UtilityStatement includes the service_end_date.
+        net_metering:
+          anyOf:
+          - type: 'null'
+          - type: object
+            description: Details on the customer's net metering credit data. Currently only supported for Versant.
+            required:
+            - current_cycle_generated_kwh
+            properties:
+              current_cycle_generated_kwh:
+                description: The kwh generated during the current cycle
+                example: 40.57
+                type:
+                - number
+                - 'null'
+        virtual_net_metering:
+          anyOf:
+          - type: 'null'
+          - type: object
+            description: Details on the customer's virtual net metering credit data. Currently only supported for National Grid New York and Central Maine Power.
+            required:
+            - current_cycle_generated_credits
+            - current_cycle_applied_credits
+            - last_cycle_carry_over_credits
+            - next_cycle_carry_over_credits
+            - current_cycle_generated_kwh
+            - current_cycle_applied_kwh
+            - last_cycle_carry_over_kwh
+            - next_cycle_carry_over_kwh
+            - current_cycle_expiring_kwh
+            - current_cycle_allocation_percentage
+            - cdg_net_credit
+            properties:
+              current_cycle_generated_credits:
+                description: The amount of credits generated during the current cycle, in dollars
+                example: 100.15
+                type:
+                - number
+                - 'null'
+              current_cycle_applied_credits:
+                description: The amount of credits applied during the current cycle, in dollars
+                example: 90.33
+                type:
+                - number
+                - 'null'
+              last_cycle_carry_over_credits:
+                description: The amount of credits carried over from the last cycle, in dollars
+                example: 3.83
+                type:
+                - number
+                - 'null'
+              next_cycle_carry_over_credits:
+                description: The amount of credits carried over to the next cycle, in dollars
+                example: 5.99
+                type:
+                - number
+                - 'null'
+              current_cycle_generated_kwh:
+                description: The kwh generated during the current cycle
+                example: 40
+                type:
+                - number
+                - 'null'
+              current_cycle_applied_kwh:
+                description: The kwh applied during the current cycle
+                example: 30
+                type:
+                - number
+                - 'null'
+              last_cycle_carry_over_kwh:
+                description: The kwh carried over to the next cycle
+                example: 5
+                type:
+                - number
+                - 'null'
+              next_cycle_carry_over_kwh:
+                description: The kwh carried over to the next cycle
+                example: 10
+                type:
+                - number
+                - 'null'
+              current_cycle_expiring_kwh:
+                description: the kwh that are expiring during the current cycle
+                example: 5
+                type:
+                - number
+                - 'null'
+              current_cycle_allocation_percentage:
+                description: the fixed allocation percentage during the current cycle
+                example: '0.05'
+                type:
+                - string
+                - 'null'
+              cdg_net_credit:
+                description: The net credit from the community solar project, in dollars
+                example: 10
+                type:
+                - number
+                - 'null'
+        most_recent_payment_detail:
+          anyOf:
+          - type: 'null'
+          - type: object
+            description: Detail on the most recent payment. Currently only supported for National Grid Massachusetts and NYSEG.
+            required:
+            - most_recent_payment_received_amount
+            - most_recent_payment_received_date
+            properties:
+              most_recent_payment_received_amount:
+                example: 50.5
+                description: Total dollar amount received on the most recent payment.
+                type:
+                - number
+                - 'null'
+              most_recent_payment_received_date:
+                type:
+                - string
+                - 'null'
+                format: date
+                description: The date of the most recent payment.
+                example: '2023-08-24'
+        commercial_line_items_detail:
+          anyOf:
+          - type: 'null'
+          - type: object
+            description: This field is in *beta*. Click [here](release-phases) for a description on Arcadia's release phases. -- Details on line items specific to commercial accounts. Currently only supported for the ConEd utility.
+            required:
+            - supply_energy_kwh
+            - supply_energy_cost
+            - supply_demand_kw
+            - supply_demand_cost
+            - supply_customer_charge
+            - supply_merchant_function_charge
+            - supply_taxes
+            - supply_total_charge
+            - delivery_energy_kwh
+            - delivery_energy_cost
+            - delivery_demand_kw
+            - delivery_demand_cost
+            - delivery_customer_charge
+            - delivery_system_benefit_cost
+            - delivery_processing_charge
+            - delivery_taxes
+            - delivery_total_charge
+            - sales_tax
+            - electric_charge
+            properties:
+              supply_energy_kwh:
+                type:
+                - number
+                - 'null'
+              supply_energy_cost:
+                description: The energy supply cost, in dollars.
+                type:
+                - number
+                - 'null'
+              supply_demand_kw:
+                type:
+                - number
+                - 'null'
+              supply_demand_cost:
+                description: The demand supply cost, in dollars.
+                type:
+                - number
+                - 'null'
+              supply_customer_charge:
+                description: The customer charge for energy supply, in dollars.
+                type:
+                - number
+                - 'null'
+              supply_merchant_function_charge:
+                description: The charge for merchant function in energy supply, in dollars.
+                type:
+                - number
+                - 'null'
+              supply_taxes:
+                description: Any other charges for taxes on energy supply, in dollars.
+                type:
+                - number
+                - 'null'
+              supply_total_charge:
+                description: The total cost of energy supply, in dollars.
+                type:
+                - number
+                - 'null'
+              delivery_energy_kwh:
+                type:
+                - number
+                - 'null'
+              delivery_energy_cost:
+                description: The energy delivery cost, in dollars.
+                type:
+                - number
+                - 'null'
+              delivery_demand_kw:
+                type:
+                - number
+                - 'null'
+              delivery_demand_cost:
+                description: The demand delivery cost, in dollars.
+                type:
+                - number
+                - 'null'
+              delivery_customer_charge:
+                description: The customer charge for energy delivery, in dollars.
+                type:
+                - number
+                - 'null'
+              delivery_system_benefit_cost:
+                description: The delivery system benefit cost, in dollars.
+                type:
+                - number
+                - 'null'
+              delivery_processing_charge:
+                description: The delivery processing charge, in dollars.
+                type:
+                - number
+                - 'null'
+              delivery_taxes:
+                description: Any other charges for taxes on energy delivery, in dollars.
+                type:
+                - number
+                - 'null'
+              delivery_total_charge:
+                description: The total cost of energy delivery, in dollars.
+                type:
+                - number
+                - 'null'
+              sales_tax:
+                description: Sales taxes applied to the total bill, in dollars.
+                type:
+                - number
+                - 'null'
+              electric_charge:
+                description: The total combined charge for this bill - supply, delivery, and taxes - in dollars.
+                type:
+                - number
+                - 'null'
+        billing_flags:
+          type: array
+          description: These flags may be of interest if the corresponding Utility Account is enrolled in Bundle.
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The 'possible_rebill' flag indicates that this Utility Statement may be a duplicate or variation of a previous Utility Statement
+                enum:
+                - possible_rebill
+              details:
+                type: object
+                properties:
+                  conflicting_utility_statment_id:
+                    type: integer
+      additionalProperties: false
+    UtilityCredentialRejectedWebhookEvent:
+      required:
+      - type
+      - created_at
+      - data
+      properties:
+        type:
+          type: string
+          enum:
+          - utility_credential_rejected
+        created_at:
+          type: string
+          format: date-time
+        data:
+          $ref: '#/components/schemas/UtilityCredential'
+      additionalProperties: false
+    UtilityAccountUpdatedWebhookEvent:
+      required:
+      - type
+      - created_at
+      - data
+      properties:
+        type:
+          type: string
+          enum:
+          - utility_account_updated
+        created_at:
+          type: string
+          format: date-time
+        data:
+          $ref: '#/components/schemas/UtilityAccount'
+      additionalProperties: false
+    TestWebhookEvent:
+      required:
+      - type
+      - created_at
+      properties:
+        type:
+          type: string
+          enum:
+          - test
+        created_at:
+          type: string
+          format: date-time
+      additionalProperties: false
+    UtilityAccountsDiscoveredWebhookEvent:
+      required:
+      - type
+      - created_at
+      - data
+      properties:
+        type:
+          type: string
+          enum:
+          - utility_accounts_discovered
+        created_at:
+          type: string
+          format: date-time
+        data:
+          type: object
+          required:
+          - client_user_id
+          - utility_credential_id
+          - utility_accounts
+          properties:
+            client_user_id:
+              type: string
+              example: fff57dc7-3a2b-4395-8a62-e3486d46dabe
+            utility_credential_id:
+              type: integer
+              example: 1234
+            utility_accounts:
+              type: array
+              items:
+                $ref: '#/components/schemas/UtilityAccount'
+      additionalProperties: false
+    UtilityCredentialVerifiedWebhookEvent:
+      required:
+      - type
+      - created_at
+      - data
+      properties:
+        type:
+          type: string
+          enum:
+          - utility_credential_verified
+        created_at:
+          type: string
+          format: date-time
+        data:
+          $ref: '#/components/schemas/UtilityCredential'
+      additionalProperties: false
+    UtilityAccountsDiscoveryErrorWebhookEvent:
+      required:
+      - type
+      - created_at
+      - data
+      properties:
+        type:
+          type: string
+          enum:
+          - utility_accounts_discovery_error
+        created_at:
+          type: string
+          format: date-time
+        data:
+          $ref: '#/components/schemas/UtilityCredential'
+      additionalProperties: false
+    FeatureAvailability:
+      required:
+      - charge_cost
+      - hosted_payments
+      - utility_remittance
+      - smart_charge
+      - utility_statements
+      properties:
+        charge_cost:
+          $ref: '#/components/schemas/Availability'
+        smart_charge:
+          $ref: '#/components/schemas/Availability'
+        utility_statements:
+          $ref: '#/components/schemas/Availability'
+        hosted_payments:
+          $ref: '#/components/schemas/Availability'
+        utility_remittance:
+          $ref: '#/components/schemas/Availability'
+      additionalProperties: false
+    HistoricalUtilityStatementsDiscoveredWebhookEvent:
+      required:
+      - type
+      - created_at
+      - data
+      properties:
+        type:
+          type: string
+          enum:
+          - historical_utility_statements_discovered
+        created_at:
+          type: string
+          format: date-time
+        data:
+          type: object
+          required:
+          - client_user_id
+          - utility_account_id
+          - utility_statements
+          properties:
+            client_user_id:
+              type: string
+              example: fff57dc7-3a2b-4395-8a62-e3486d46dabe
+            utility_account_id:
+              type: integer
+              example: 1234
+            utility_statements:
+              type: array
+              items:
+                $ref: '#/components/schemas/UtilityStatement'
+      additionalProperties: false
+    UtilityCredentialVerificationErrorWebhookEvent:
+      required:
+      - type
+      - created_at
+      - data
+      properties:
+        type:
+          type: string
+          enum:
+          - utility_credential_verification_error
+        created_at:
+          type: string
+          format: date-time
+        data:
+          $ref: '#/components/schemas/UtilityCredential'
+      additionalProperties: false
+    Availability:
+      type: string
+      enum:
+      - AVAILABLE
+      - NOT_AVAILABLE
+      - NOT_READY
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+x-readme:
+  proxy-enabled: false
+  headers:
+  - key: from-readme
+    value: true
+x-tagGroups:
+- name: General
+  tags:
+  - Auth
+  - Webhooks
+  - Webhook Events
+- name: Connections
+  tags:
+  - Utility Credentials
+  - Utility Accounts
+  - Utility Meters (Beta)
+  - Users
+- name: Products
+  tags:
+  - Plug
+  - Spark

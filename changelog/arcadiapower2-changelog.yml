@@ -1,0 +1,42 @@
+generated: '2026-09-25'
+method: searched
+generator: extract-docs-artifacts.py (local)
+source: https://docs.arcadia.com/docs/provider-statement-versioning-adjustments.md
+sources:
+- https://docs.arcadia.com/docs/provider-statement-versioning-adjustments.md
+- https://docs.arcadia.com/docs/statement-versioning-and-repair.md
+- https://docs.arcadia.com/docs/provider-data-migrations.md
+- https://docs.arcadia.com/docs/uc-plug-detailed-migration-guide.md
+entries:
+- breaking: false
+  highlights:
+  - 'Document Version: 1.0'
+  - 'Plug API Version: `2024-02-21` (Most recent)'
+  - 'Last Updated: 2026-04-07'
+  - This document is the comprehensive migration reference for customers moving from the Utility Cloud (UC) API to the Plug API.
+  date: '2026-05-13'
+- breaking: false
+  highlights:
+  - Utility providers frequently issue multiple versions of the same bill or post adjustments to correct historical data.
+  - Arcadia treats the Statement ID as a unique digital fingerprint of the source file, even minor formatting changes trigger a new unique hexadecimal
+    Statement ID.
+  - Customers should treat the Statement ID as a file-specific identifier rather than a permanent record key.
+  - If multiple Statement IDs exist for the same combination, the data from the latest iteration published should be prioritized.
+  date: '2026-03-18'
+- breaking: false
+  highlights:
+  - Prior to December 2025, when a data point changed, the previous value was overwritten.
+  - Statement Versioning replaces this "delete-and-replace" model with an immutable ledger.
+  - Every statement now has a complete version history and entities that are removed are marked with a `voidedAt` timestamp.
+  - The `EXISTING_DATA_UPDATED` webhook now includes the new `versionId` in the payload.
+  date: '2026-02-03'
+- breaking: false
+  highlights:
+  - June 2025 - PG&E Multi-factor Authentication (MFA) rollout may cause an outage of data from June 9th through July 9th, 2025.
+  - 'Workaround: use the Bill uploader to upload PDF bills manually.'
+  - October 2023 – ConEd Account Number Migration replaces 15‑digit numbers with 11‑digit numbers.
+  - The new account numbers will be treated as new utility accounts within Utility Cloud.
+  date: '2025-08-06'
+current_version: Document Version 1.0 / Plug API Version 2024-02-21
+note: Versioning scheme not explicitly defined in the provided pages; fields not present are omitted.
+docs: https://docs.arcadia.com/docs/provider-statement-versioning-adjustments.md

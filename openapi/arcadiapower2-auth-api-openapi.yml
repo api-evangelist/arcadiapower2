@@ -1,0 +1,438 @@
+openapi: 3.2.0
+info:
+  title: Arcadia API Reference Auth API
+  version: 0.3.0
+  contact:
+    email: platformsupport@arcadia.com
+  x-logo:
+    url: images/arcadia_logo.png
+servers:
+- url: https://api.arcadia.com
+security:
+- bearerAuth: []
+tags:
+- name: Auth
+paths:
+  /auth/access_token:
+    post:
+      security: []
+      tags:
+      - Auth
+      summary: Create an Access Token
+      description: 'Use your API credentials to create an Access Token that has permission to use all Arcadia API endpoints.
+
+
+        API access tokens are valid for 2 hours.'
+      operationId: createApiAccessToken
+      parameters:
+      - $ref: '#/components/parameters/arcVersionInHeaderParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - client_id
+              - client_secret
+              properties:
+                client_id:
+                  type: string
+                  description: Your client ID, provided by Arcadia.
+                  example: Lttwdte5TofL4X3JI0kGbu_E5k7Uv9tT8xBD6GBXcT0
+                client_secret:
+                  type: string
+                  description: Your client secret, provided by Arcadia.
+                  example: 34_whUQ99g5A07cOHCSz3PfNMHOmsNwUcrS8kFlkiAw
+      responses:
+        '200':
+          description: Success
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessTokenResponse'
+        '401':
+          description: Unauthorized
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessTokenUnauthorizedError'
+  /auth/connect_token:
+    post:
+      tags:
+      - Auth
+      summary: Create a Connect Token
+      description: 'The Connect front-end component must be initialized with a Connect Token scoped to the user entering the *Connect* flow.
+
+
+        For new users, or users creating an additional utility credential, post with a unique `client_user_id` parameter. For users editing an existing utility credential, post with the `utility_credential_id` parameter corresponding to the utility credential to be updated. Make sure the `Authorization` header is set to `Bearer ${ACCESS_TOKEN}`.
+
+
+        Tokens expire after two hours.'
+      operationId: createConnectToken
+      parameters:
+      - $ref: '#/components/parameters/arcVersionInHeaderParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                client_user_id:
+                  type: string
+                  description: The unique identifier for your user. This parameter is required for users entering the Connect flow for the first time. Note either `client_user_id` or `utility_credential_id` must be supplied to the endpoint for all requests.
+                  example: fff57dc7-3a2b-4395-8a62-e3486d46dabe
+                utility_credential_id:
+                  type: integer
+                  description: The id associated the utility credential to be updated. This parameter is required for users entering Connect to update an existing utility credential. Note either `client_user_id` or `utility_credential_id` must be supplied to the endpoint for all requests.
+                  example: 1
+      responses:
+        '200':
+          description: Success
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectUrlResponse'
+        '401':
+          description: Unauthorized.
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectTokenUnauthorizedError'
+        '404':
+          description: Not Found
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UtilityCredentialNotFoundError'
+        '422':
+          description: Unprocessable Entity
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/ConnectTokenUnprocessableEntityError'
+                - $ref: '#/components/schemas/ConnectTokenTooManyParametersError'
+                - $ref: '#/components/schemas/ConnectUrlVariantError'
+  /auth/connect_url:
+    post:
+      tags:
+      - Auth
+      summary: Create a Connect URL
+      description: 'You can also send your users through the *Connect* flow by linking them to a unique Connect URL (provided by this endpoint).
+
+
+        Just like the Connect Token, you need to provide either a `client_user_id` or a`utility credential_id` to get a URL that will initialize Connect in ‘create mode’ or ‘update mode’ respectively. See this page for a guide on the difference between those two modes. This endpoint will provide a URL in a response.
+
+        Once you have the URL, provide it to the given user for them to complete Connect and give you access to their utility data. The URL will expire after 5 days.
+
+        If you would like to provide your user with the [Connect tariff selection mode] (https://docs.arcadia.com/docs/connect-tariff-selection-mode) instead, pass `tariff` as the variant parameter.'
+      operationId: createConnectUrl
+      parameters:
+      - $ref: '#/components/parameters/arcVersionInHeaderParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                client_user_id:
+                  type: string
+                  description: The unique identifier for your user. This parameter is required for users entering the Connect flow for the first time. Note either `client_user_id` or `utility_credential_id` must be supplied to the endpoint for all requests.
+                  example: fff57dc7-3a2b-4395-8a62-e3486d46dabe
+                utility_credential_id:
+                  type: integer
+                  description: The id associated with the utility credential to be updated. This parameter is required for users entering Connect to update or repair an existing utility credential. Note that you must supply either `client_user_id` or `utility_credential_id` to the endpoint.
+                  example: 1
+                variant:
+                  type: string
+                  description: The variant of Connect that the user will be sent through. Variant will default to 'connect'. To provide a user with the tariff-selection variant instead, pass `tariff` as the variant
+                  example: tariff
+      responses:
+        '200':
+          description: Success
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectUrlResponse'
+        '401':
+          description: Unauthorized.
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectTokenUnauthorizedError'
+        '404':
+          description: Not Found
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UtilityCredentialNotFoundError'
+        '422':
+          description: Unprocessable Entity
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/ConnectTokenUnprocessableEntityError'
+                - $ref: '#/components/schemas/ConnectTokenTooManyParametersError'
+                - $ref: '#/components/schemas/ConnectUrlVariantError'
+  /ping:
+    get:
+      tags:
+      - Auth
+      summary: Ping
+      description: 'No-op authorization test endpoint. Returns a 200 if requested with a valid Bearer auth token.
+
+        Any valid authorization token with any scope will be able to get a 200 from this endpoint.'
+      operationId: ping
+      parameters:
+      - $ref: '#/components/parameters/arcVersionInHeaderParam'
+      responses:
+        '200':
+          description: Success
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PingResponse'
+        '401':
+          description: Unauthorized
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PingUnauthorizedError'
+        '403':
+          description: Forbidden
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PingUnauthorizedError'
+components:
+  schemas:
+    PingUnauthorizedError:
+      required:
+      - error
+      properties:
+        error:
+          type: string
+          enum:
+          - Unknown or invalid access token
+      additionalProperties: false
+    ConnectUrlVariantError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - You can only pass in 'connect' or 'tariff' as the variant.
+            type:
+              type: string
+              enum:
+              - INVALID_VARIANT
+            details:
+              type:
+              - object
+              - 'null'
+      additionalProperties: false
+    ConnectTokenTooManyParametersError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - You cannot pass both client_user_id and utility_credential_id. Please only pass one
+            type:
+              type: string
+              enum:
+              - INVALID_PARAMATERS
+            details:
+              type:
+              - object
+              - 'null'
+      additionalProperties: false
+    PingResponse:
+      required:
+      - pong
+      properties:
+        pong:
+          type: boolean
+          description: Always true
+          example: true
+      additionalProperties: false
+    AccessTokenUnauthorizedError:
+      required:
+      - error
+      properties:
+        error:
+          type: string
+          enum:
+          - The supplied credentials are invalid.
+      additionalProperties: false
+    UtilityCredentialNotFoundError:
+      required:
+      - error
+      properties:
+        error:
+          type: string
+          enum:
+          - Couldn't find UtilityCredential
+      additionalProperties: false
+    ConnectTokenUnauthorizedError:
+      required:
+      - error
+      properties:
+        error:
+          type: string
+          enum:
+          - Unknown or invalid access token
+      additionalProperties: false
+    AccessTokenResponse:
+      required:
+      - access_token
+      - expires_in
+      - scope
+      - token_type
+      - created_at
+      properties:
+        access_token:
+          type: string
+          description: The access token to be used for subsequent requests.
+          example: 6-3MbUgRHRV-nNDcgsLpDWQ4hYsZToWZgpf-mfM7ICo
+        expires_in:
+          type: integer
+          description: The number of seconds until the token expires.
+          example: 7200
+        token_type:
+          type: string
+          description: The type of token. This will always be "Bearer".
+          enum:
+          - Bearer
+          example: Bearer
+        scope:
+          type: string
+          description: The scope of the token.
+          enum:
+          - write
+          - connect_token
+          example: write
+        created_at:
+          type: integer
+          description: When the token was created. Provided in Unix timestamp format.
+          example: 1611205026
+      additionalProperties: false
+    ConnectTokenUnprocessableEntityError:
+      required:
+      - error
+      properties:
+        error:
+          type: string
+          enum:
+          - 'Param is missing or the value is empty: client_user_id or utility_credential_id'
+      additionalProperties: false
+    ConnectUrlResponse:
+      required:
+      - connect_url
+      properties:
+        connect_url:
+          type: string
+          description: The url to be used for initializing standalone Connect.
+          example: https://connect.arcadia.com?token=QYEPoBOJWc4bV_XpIzJdr8BLG4RdK6h68AP672nab4f
+      additionalProperties: false
+  parameters:
+    arcVersionInHeaderParam:
+      name: Arcadia-Version
+      in: header
+      example: '2022-10-13'
+      description: The Arcadia-Version for the request
+      required: true
+      schema:
+        type: string
+        default: '2022-10-13'
+  headers:
+    ArcVersion:
+      description: The Arcadia-Version for the response
+      schema:
+        type: string
+      example: '2022-10-13'
+      required: true
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+x-readme:
+  proxy-enabled: false
+  headers:
+  - key: from-readme
+    value: true
+x-tagGroups:
+- name: General
+  tags:
+  - Auth
+  - Webhooks
+  - Webhook Events
+- name: Connections
+  tags:
+  - Utility Credentials
+  - Utility Accounts
+  - Utility Meters (Beta)
+  - Users
+- name: Products
+  tags:
+  - Plug
+  - Spark

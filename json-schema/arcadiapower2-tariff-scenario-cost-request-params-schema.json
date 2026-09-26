@@ -1,0 +1,207 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/arcadiapower2/main/json-schema/arcadiapower2-tariff-scenario-cost-request-params-schema.json",
+  "title": "TariffScenarioCostRequestParams",
+  "x-generated": "2026-09-26",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/arcadiapower2-openapi.yaml#/components/schemas/TariffScenarioCostRequestParams",
+  "required": [
+    "baseline_load",
+    "device_loads"
+  ],
+  "properties": {
+    "utility_account_id": {
+      "description": "(Beta - due to limited coverage) The unique ID of the utility account that this calculation is being run against. Optional if calculating costs by Genability `main_tariff_id`/`zip_code`.",
+      "type": "integer"
+    },
+    "main_tariff_id": {
+      "type": "string",
+      "description": "The Genability 'masterTariffId' unique identifier for this tariff. See [Genability documentation](https://developer.genability.com/api-reference/tariff-api/tariff/) for details. Must be provided if calculating costs by Genability `main_tariff_id`/`zip_code`."
+    },
+    "zip_code": {
+      "type": "string",
+      "description": "The zip code of the scenario. Must be provided if calculating costs by Genability `main_tariff_id`/`zip_code`."
+    },
+    "applicability_answers": {
+      "type": "array",
+      "description": "Answers to tariff applicability questions",
+      "items": {
+        "$ref": "#/$defs/TariffApplicabilityAnswerSchema"
+      }
+    },
+    "baseline_load": {
+      "type": "string",
+      "description": "A `TYPICALS` `baseline_load` uses the typical hourly energy usage for the end-user's zip code.",
+      "default": "TYPICALS",
+      "enum": [
+        "TYPICALS"
+      ]
+    },
+    "device_loads": {
+      "type": "array",
+      "description": "List of device simulations to add additional synthetic load curves on top of the `baseline_load`",
+      "items": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/TariffScenarioDeviceSolarParams"
+          },
+          {
+            "$ref": "#/$defs/TariffScenarioDeviceEvChargingParams"
+          },
+          {
+            "$ref": "#/$defs/TariffScenarioDeviceRemovedEvChargingParams"
+          }
+        ]
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "EvChargePlan": {
+      "description": "Specifies a time window where the EV is at home and available for charging.",
+      "required": [
+        "start_day_of_week",
+        "start_time",
+        "end_day_of_week",
+        "end_time",
+        "expected_consumption_kwh"
+      ],
+      "properties": {
+        "start_day_of_week": {
+          "type": "integer",
+          "description": "Day of the week the available charging block begins. ISO format -- 1 is Monday, 7 is Sunday."
+        },
+        "start_time": {
+          "type": "string",
+          "description": "Time when the EV is available to begin charging. For example, when the driver comes home in the evening."
+        },
+        "end_day_of_week": {
+          "type": "integer",
+          "description": "Day of the week the available charging block ends. ISO format -- 1 is Monday, 7 is Sunday."
+        },
+        "end_time": {
+          "type": "string",
+          "description": "Time when the EV is no longer available for charging. For example, when the driver leaves for their morning commute."
+        },
+        "expected_consumption_kwh": {
+          "type": "number",
+          "description": "Expected kwh consumption until the next EvChargePlan residential charging event."
+        }
+      },
+      "additionalProperties": false
+    },
+    "TariffApplicabilityAnswerSchema": {
+      "required": [
+        "question_id",
+        "value",
+        "data_type"
+      ],
+      "properties": {
+        "question_id": {
+          "type": "string",
+          "description": "String identifier for the applicability question"
+        },
+        "value": {
+          "type": "boolean",
+          "description": "User response to the tariff applicability question"
+        },
+        "data_type": {
+          "type": "string",
+          "description": "Type of answer expected to be returned for this tariff applicability question"
+        }
+      },
+      "additionalProperties": false
+    },
+    "TariffScenarioDeviceEvChargingParams": {
+      "description": "Parameters for charging level and EV operation schedule",
+      "required": [
+        "device",
+        "charging_availability",
+        "charging_power_kw",
+        "operation_schedule"
+      ],
+      "properties": {
+        "device": {
+          "type": "string",
+          "description": "A value of `EV_CHARGING` indicates a future EV purchase.",
+          "enum": [
+            "EV_CHARGING"
+          ]
+        },
+        "charging_availability": {
+          "type": "array",
+          "description": "Schedule of when the car is at home and able to be charged. `BASIC` charging will simulate a charging schedule assuming charging starts at the specified window start times (for example, at 18:00 when the driver comes home). `SMART` charging will simulate a charging schedule using our Calculate Smart Charging Schedule endpoint logic to charge during the cheapest hours on this tariff in the provided windows.",
+          "items": {
+            "$ref": "#/$defs/EvChargePlan"
+          }
+        },
+        "charging_power_kw": {
+          "type": "number",
+          "description": "This helps to determine the EVSE (electric vehicle supply equipment) level. 0.0 indicates no charging at home. 1.8kW or 2.4kW chargers are typical power levels for wall outlets (Level 1). 7.2kW or 9.6kW are typical charging powers for a Level 2 charger."
+        },
+        "operation_schedule": {
+          "type": "string",
+          "enum": [
+            "BASIC",
+            "SMART"
+          ],
+          "description": "An operation schedule of `BASIC` charging will simulate a charging schedule assuming charging starts at the specified window start times (for example, at 18:00 when the driver comes home). `SMART` charging will simulate a charging schedule using our Calculate Smart Charging Schedule endpoint logic to charge during the cheapest hours on this tariff in the provided windows."
+        }
+      },
+      "additionalProperties": false
+    },
+    "TariffScenarioDeviceRemovedEvChargingParams": {
+      "description": "Parameters for charging level and EV operation schedule",
+      "properties": {
+        "device": {
+          "type": "string",
+          "description": "The `REMOVED_EV_CHARGING` parameter is used to remove (disaggregate) simulated existing EV load, eg to simulate effects of adding smart charging by removing effects of basic charging.",
+          "enum": [
+            "REMOVED_EV_CHARGING"
+          ]
+        },
+        "charging_availability": {
+          "type": "array",
+          "description": "Schedule of when the car is at home and able to be charged. `BASIC` charging will simulate a charging schedule assuming charging starts at the specified window start times (for example, at 18:00 when the driver comes home). `SMART` charging will simulate a charging schedule using our Calculate Smart Charging Schedule endpoint logic to charge during the cheapest hours on this tariff in the provided windows.",
+          "items": {
+            "$ref": "#/$defs/EvChargePlan"
+          }
+        },
+        "charging_power_kw": {
+          "type": "number",
+          "description": "This helps to determine the EVSE (electric vehicle supply equipment) level. 0.0 indicates no charging at home. 1.8kW or 2.4kW chargers are typical power levels for wall outlets (Level 1). 7.2kW or 9.6kW are typical charging powers for a Level 2 charger."
+        },
+        "operation_schedule": {
+          "type": "string",
+          "enum": [
+            "BASIC",
+            "SMART"
+          ],
+          "description": "An operation schedule of `BASIC` charging will simulate a charging schedule assuming charging starts at the specified window start times (for example, at 18:00 when the driver comes home). `SMART` charging will simulate a charging schedule using our Calculate Smart Charging Schedule endpoint logic to charge during the cheapest hours on this tariff in the provided windows."
+        }
+      },
+      "additionalProperties": false
+    },
+    "TariffScenarioDeviceSolarParams": {
+      "required": [
+        "device",
+        "solar_system_kw"
+      ],
+      "properties": {
+        "device": {
+          "type": "string",
+          "description": "Identifies this device as a rooftop solar system",
+          "enum": [
+            "SOLAR"
+          ]
+        },
+        "solar_system_kw": {
+          "type": "number",
+          "description": "Size of solar system in kW"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

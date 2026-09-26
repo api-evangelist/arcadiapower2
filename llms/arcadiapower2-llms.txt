@@ -1,0 +1,204 @@
+# Arcadia Documentation
+
+> Documentation for Arcadia
+
+Append .md to any documentation page URL to get its markdown version.
+
+## Guides
+- [Dashboard Quick Start](https://docs.arcadia.com/docs/dashboard-quick-start-guide.md): How to quickly connect, view, and download data from the Dashboard
+- [API Quick Start](https://docs.arcadia.com/docs/api-quick-start-guide.md): Step by step guide to using the API
+- [Arcadia Data Model](https://docs.arcadia.com/docs/arcadia-data-model.md)
+- [Key Concepts](https://docs.arcadia.com/docs/key-concepts.md): Learn how data is structure, how to find the data you need, and handle edge cases.
+- [Possible Data Model Scenarios](https://docs.arcadia.com/docs/possible-data-model-scenarios.md)
+- [Locating the Data You Need](https://docs.arcadia.com/docs/locating-the-data-you-need.md)
+- [How P&I Impacts the Data Structure](https://docs.arcadia.com/docs/how-pi-impacts-the-data-structure.md)
+- [The Value of a Site](https://docs.arcadia.com/docs/the-value-of-a-site.md): An overview of what sites are and how sites provide value.
+- [Handling Common Data Scenarios and Edge Cases](https://docs.arcadia.com/docs/handling-common-data-scenarios-and-edge-cases.md)
+- [Consolidated & Summary Billing](https://docs.arcadia.com/docs/provider-invoice-data-modeling-consolidated-billing.md)
+- [Time Normalization](https://docs.arcadia.com/docs/time-normalization.md)
+- [Sewer Meter and Charges](https://docs.arcadia.com/docs/sewer-meter-and-charges.md)
+- [Indirect Sources and Statement Chains](https://docs.arcadia.com/docs/indirect-sources-and-billing.md)
+- [Indeterminate Services](https://docs.arcadia.com/docs/indeterminate-services.md)
+- [Usage Attribution & Redundancy](https://docs.arcadia.com/docs/usage-attribution-redundancy.md)
+- [Adjustments & Provider Statement Versioning](https://docs.arcadia.com/docs/provider-statement-versioning-adjustments.md)
+- [Account and Meter Identification](https://docs.arcadia.com/docs/account-and-meter-identification.md)
+- [Supported Service Types](https://docs.arcadia.com/docs/supported-service-types.md): Details on the variety of supported provider service types (eg. electricity, water, etc.)
+- [MCP Setup](https://docs.arcadia.com/docs/mcp.md)
+- [Sandbox Mode](https://docs.arcadia.com/docs/sandbox-testing.md): Learn and test the Arcadia Platform without real provider credentials with the Plug Sandbox.
+- [Status and Status Detail Descriptions](https://docs.arcadia.com/docs/status-and-status-detail-definitions.md): Definitions for possible statuses and status details in the Plug API.
+- [Plug Statements Product FAQs](https://docs.arcadia.com/docs/product-faqs.md)
+- [Correlation IDs](https://docs.arcadia.com/docs/correlationids.md)
+- [DataHub Overview](https://docs.arcadia.com/docs/datahub-overview.md)
+- [DataHub Tables](https://docs.arcadia.com/docs/datahub-tables.md)
+- [Data Access Options](https://docs.arcadia.com/docs/data-access-options.md)
+- [Plug API Field Descriptions](https://docs.arcadia.com/docs/plug-api-field-descriptions.md): Field descriptions for Plug API resources.
+- [Single Sign On (SSO)](https://docs.arcadia.com/docs/single-sign-on.md)
+- [Customize Connect](https://docs.arcadia.com/docs/customize-connect.md): Customizing the appearance of Connect to meet your needs
+- [Integrate Connect](https://docs.arcadia.com/docs/integrate-connect.md): Developer guidance on how to embed Connect into a website or email using HTML
+- [Add a Correlation ID to Connect](https://docs.arcadia.com/docs/add-a-correlation-id-to-connect.md): Learn to use a Correlation ID to identify your customers within the Plug Dashboard.
+- [Dashboard User Guide](https://docs.arcadia.com/docs/dashboard-user-guide.md): An overview of the new Dashboard, released January 4, 2024.
+- [Health Overview](https://docs.arcadia.com/docs/health-overview-page.md): A detailed guide for the metrics on the Overview page.
+- [Advanced Search and Triage](https://docs.arcadia.com/docs/advanced-search-and-triage.md): A walkthrough of the search and filter functionalities on Dashboard.
+- [Provider Coverage](https://docs.arcadia.com/docs/provider-coverage.md): Real time data showing what providers are supported on Plug Statements and Plug Intervals.
+- [Custom Data](https://docs.arcadia.com/docs/custom-data.md): A detailed walk through of custom data.
+- [Bulk Credential Upload](https://docs.arcadia.com/docs/bulk-credential-upload.md): A walkthrough of the bulk credential upload functionalities on Dashboard.
+- [Bulk Site Upload](https://docs.arcadia.com/docs/bulk-site-upload.md): A walkthrough of the bulk site upload functionalities on Dashboard.
+- [Arcadia Impersonation Feature](https://docs.arcadia.com/docs/arcadia-impersonation-feature.md): Understanding Arcadia Dashboard impersonation.
+- [Guided Site Onboarding](https://docs.arcadia.com/docs/guided-site-onboarding.md): A detailed walk through of site-to-meter mapping functionality.
+- [Bulk Meter Mapping Upload](https://docs.arcadia.com/docs/bulk-meter-mapping-upload.md): A walkthrough of the bulk meter mapping upload functionalities on Dashboard.
+- [Identifying Statement Gaps](https://docs.arcadia.com/docs/identifying-statement-gaps.md): A detailed walkthrough of the statement gap identification feature.
+- [Discovered and Published Statements](https://docs.arcadia.com/docs/discovered-and-published-statements.md): Early access to source documents that have not yet passed data quality checks.
+- [Discovered and Expected Accounts](https://docs.arcadia.com/docs/discovered-and-expected-accounts.md)
+- [Bulk Account Update](https://docs.arcadia.com/docs/bulk-account-update.md): A walkthrough of the bulk account update functionalities on the Dashboard.
+- [Statement Versioning and Repair](https://docs.arcadia.com/docs/statement-versioning-and-repair.md): System of record and process to improve data quality.
+- [Proration and Inference](https://docs.arcadia.com/docs/proration-and-inference.md): We can now prorate usages and charges to the meter level and infer usages at the meter level when they are not present.
+- [Uploaded Bills Processing](https://docs.arcadia.com/docs/uploaded-bills-processing.md): An overview of how Arcadia accesses utility data from uploaded bills and invoices along with the coverage we support.
+- [Plug - Email PDF Support BETA](https://docs.arcadia.com/docs/plug-email-beta.md)
+- [Plug Intervals](https://docs.arcadia.com/docs/plug-intervals.md)
+- [Plug Intervals : Provider Coverage](https://docs.arcadia.com/docs/plug-intervals-provider-coverage.md)
+- [Plug Intervals FAQ](https://docs.arcadia.com/docs/plug-intervals-faq.md)
+- [Plug Intervals: Smart Meter Texas](https://docs.arcadia.com/docs/plug-intervals-smart-meter-texas.md)
+- [Discovered Meters and Active Meter Data Recency](https://docs.arcadia.com/docs/discovered-meters-and-active-meter-data-recency.md): A walkthrough of discovered meter data.
+- [Residential Utility Accounts with Multiple Meters](https://docs.arcadia.com/docs/residential-utility-accounts-with-multiple-meters.md)
+- [Meter Management](https://docs.arcadia.com/docs/meter-management.md)
+- [Multi-factor Authentication (MFA)](https://docs.arcadia.com/docs/mfa.md)
+- [Automated Guest Access](https://docs.arcadia.com/docs/automated-guest-access.md)
+- [Automated MFA Opt-Out Guide](https://docs.arcadia.com/docs/automated-mfa-opt-out-guide.md): Guide to using the Automated MFA Opt-Out solution to disable MFA for a credential.
+- [Token Storage](https://docs.arcadia.com/docs/token-storage.md): Guide to Onboarding and Re-Authenticating Utility Credentials Using the Plug Dashboard
+- [Automated MFA Login - Arcadia Managed Email ](https://docs.arcadia.com/docs/automated-mfa-login-arcadia-managed-email.md)
+- [Organization Configurations](https://docs.arcadia.com/docs/organization-configurations.md)
+- [Business Unit Feature Guide](https://docs.arcadia.com/docs/business-unit-feature-guide.md)
+- [Building Meter Level Usage Data CSVs](https://docs.arcadia.com/docs/building-meter-level-usage-data-csvs.md): How to build a CSV file that contains the meter level usage you are interested in.
+- [Group & Sort Aggregated Meter Usage Data by Site ID & Service Type](https://docs.arcadia.com/docs/group-and-sort-aggregated-meter-usage-data-by-site-id-and-service-type.md)
+- [Group & Sort Aggregated Meter Usage Data by Site ID & Unit of Measure](https://docs.arcadia.com/docs/group-and-sort-aggregated-meter-usage-data-by-site-id-and-unit-of-measure.md)
+- [Provider Data Migrations](https://docs.arcadia.com/docs/provider-data-migrations.md)
+- [Legacy Utility Cloud API to Plug API](https://docs.arcadia.com/docs/uc-plug-detailed-migration-guide.md): Detailed Migration Guide
+- [Differences between Console and Dashboard](https://docs.arcadia.com/docs/changes-between-console-and-dashboard.md): Learn more about the primary differences between legacy Console and the Dashboard, released January 4, 2024
+- [Links to Legacy Guides](https://docs.arcadia.com/docs/links-to-legacy-guides.md)
+- [Legacy UDS API to Plug API](https://docs.arcadia.com/docs/legacy-uds-api-to-plug-api.md)
+- [UDS and Plug API Differences](https://docs.arcadia.com/docs/api-authentication.md): Read this page prior to starting an API integration with Plug to understand how key API mechanics are different in Plug compared to UDS.
+- [UDS to Plug Status Mapping](https://docs.arcadia.com/docs/uds-to-plug-status-mapping.md): Migrating from UDS to Plug involves a shift from a multi-field status model to a unified, action-oriented model.
+- [Legacy UDS Platform to Plug Platform](https://docs.arcadia.com/docs/legacy-uds-platform-to-plug-platform.md)
+- [Plug to UDS Bridge](https://docs.arcadia.com/docs/plug-uds-bridge.md)
+- [Plug SQL 1.4 File Delivery Migration Guide](https://docs.arcadia.com/docs/plug-sql-14-file-delivery-migration-guide.md): A quickstart guide for customers transitioning from UDS SQL 1.3 to Plug SQL 1.4 file delivery (SFTP).
+
+## API Reference
+- [Introduction](https://docs.arcadia.com/reference/introduction.md)
+- [Release Phases](https://docs.arcadia.com/reference/release-phases.md)
+- [Versioning](https://docs.arcadia.com/reference/api-versioning.md): Arcadia API versioning system and breaking and non-breaking changes definitions.
+- [Rate Limiting](https://docs.arcadia.com/reference/rate-limiting.md)
+- [Error Responses](https://docs.arcadia.com/reference/response-codes.md)
+- [Searching](https://docs.arcadia.com/reference/searching.md)
+- [Pagination](https://docs.arcadia.com/reference/pagination.md)
+- [Data Values](https://docs.arcadia.com/reference/data-values-1.md)
+- [Webhooks](https://docs.arcadia.com/reference/webhooks-overview.md)
+- [Testing API Calls](https://docs.arcadia.com/reference/testing-api-calls.md)
+- [Response Compression](https://docs.arcadia.com/reference/response-compression.md)
+- [List API Keys](https://docs.arcadia.com/reference/list-api-keys.md): Returns a paginated list of API keys within the caller's organization, scoped to the Business Units the caller is permitted to access.
+- [Create API Key](https://docs.arcadia.com/reference/create-api-key.md): Creates a new API key for the caller's organization, optionally scoped to one or more Business Units.
+- [Update API Key](https://docs.arcadia.com/reference/update-api-key.md): Partially updates an API key. Only the fields supplied in the request body are changed; omitted fields are left as-is.
+- [List API Key Events](https://docs.arcadia.com/reference/list-api-key-events.md): Returns a paginated list of the change events recorded against a single API key, such as creation and business unit assignment updates.
+- [Delete API Key](https://docs.arcadia.com/reference/delete-api-key.md): Permanently deletes an API key, revoking its ability to authenticate.
+- [Delete Credential Along With its Accounts, Meters, and Statements Resources](https://docs.arcadia.com/reference/delete-credential-along-with-its-accounts-meters-and-statements-resources.md): Use this endpoint to delete a Credential from the system. Once completed, this Credential and its associated Accounts, Meters, and Statements resources will be deleted and cannot be recovered. After…
+- [Delete Business Unit](https://docs.arcadia.com/reference/delete-business-unit.md): Deletes a Business Unit. Any accounts assigned to it are moved to the Business Unit specified by `moveAccountsToBusinessUnitId`, or to its parent if that parameter is omitted.
+- [Retrieve Deletion Log](https://docs.arcadia.com/reference/retrieve-deletion-log.md): This endpoint allows you to view the details of a particular deletion request, after performing the deletion.
+- [Deletes File Along With its Accounts, Meters, and Statements Resources](https://docs.arcadia.com/reference/deletes-file-along-with-its-accounts-meters-and-statements-resources.md): Once completed, this File and its associated Accounts, Meters, and Statements resources will be deleted and cannot be recovered. After completion, you can check the status of deletion by using the…
+- [Delete Site](https://docs.arcadia.com/reference/delete-site.md): Unlike Credential and File deletions, Site deletion does not delete any related entities, but it does remove references to the deleted Site on those related entities. For example, Meters assigned to…
+- [List Business Units](https://docs.arcadia.com/reference/list-business-units.md): Returns a paginated list of Business Units within the caller's organization, scoped to the Business Units the caller is permitted to access.
+- [Create Business Unit](https://docs.arcadia.com/reference/create-business-unit.md): Creates a new Business Unit as a child of the specified parent Business Unit.
+- [Retrieve Business Unit](https://docs.arcadia.com/reference/retrieve-business-unit.md): Returns a single Business Unit along with the IDs of its ancestors and the full tree of its descendants.
+- [Update Business Unit](https://docs.arcadia.com/reference/update-business-unit.md): Partially updates a Business Unit. Only the fields supplied in the request body are changed; omitted fields are left as-is.
+- [List Business Unit Events](https://docs.arcadia.com/reference/list-business-unit-events.md): Returns a paginated list of the change events recorded against a single Business Unit, such as creation and field updates.
+- [List Business Unit Assignment Events](https://docs.arcadia.com/reference/list-business-unit-assignment-events.md): Account-level Business Unit assignment and unassignment history for a Business Unit the caller has access to.
+- [Create an Access Token](https://docs.arcadia.com/reference/create-access-token.md): Use API credentials from the Dashboard to create an Access Token that has permission to use all Arcadia API endpoints. API access tokens are valid for one hour.
+- [List Accounts](https://docs.arcadia.com/reference/list-accounts.md): Get a list of accounts in the Arcadia system. This endpoint is pageable. If your organization does not have the Intervals product enabled and if the account is not activated, you will see limited…
+- [Create Account Through Third Party Portal](https://docs.arcadia.com/reference/create-account-through-third-party-portal.md): Create a new account in the Arcadia system. This is used for providers that support third party portals for indirect account access. Rather than submitting utility login credentials, you would submit…
+- [List Detailed Accounts](https://docs.arcadia.com/reference/list-detailed-accounts.md): Get a list of Detailed Accounts in the Arcadia system. This endpoint is pageable.  This endpoint supports [Sandbox Mode](https://docs.arcadia.com/docs/sandbox-testing).
+- [Download Account Statements](https://docs.arcadia.com/reference/download-account-statements.md): Downloading a CSV file with high-level summary information for account, statements, and associated metadata is a 2 step process. The first step (this one) prepares the download and provides a URL in…
+- [Retrieve Account](https://docs.arcadia.com/reference/retrieve-account.md): If you have the accountId, you can use this endpoint to retrieve the details for that specific account. If your organization does not have the Intervals product enabled and if the associated account…
+- [Update Account](https://docs.arcadia.com/reference/update-account.md): To make updates to a specific account, you can make a PATCH call to the accounts endpoint. Each account can have up to 25 custom data fields associated. Custom data fields are not required. Custom…
+- [Set Account](https://docs.arcadia.com/reference/set-account.md): Each account can have up to 25 custom data fields associated. Custom data fields are not required. Custom data allows you to organize accounts and tie them back to records in your own system. To…
+- [Retrieve Detailed Account](https://docs.arcadia.com/reference/retrieve-detailed-account.md): Retrieve a single Detailed Account record.  This endpoint supports [Sandbox Mode](https://docs.arcadia.com/docs/sandbox-testing).
+- [List Account's Events](https://docs.arcadia.com/reference/list-accounts-events.md): This endpoint allows you to view the event history for an account. For example, you can query this endpoint to find out when an account was created and who it was created by. This endpoint is…
+- [List Account's Payments](https://docs.arcadia.com/reference/list-accounts-payments.md): A payment is a transaction made by the account holder to decrease the balance of the account. An account may return one or many payments for each account. This endpoint is pageable.  This endpoint…
+- [List Credentials](https://docs.arcadia.com/reference/list-credentials.md): A credential is defined as a set of login requirements needed for Arcadia to access data from utility providers. The credentials endpoint allows you to get a list of all the credentials that are in…
+- [Create Credential](https://docs.arcadia.com/reference/create-credential.md): The credential endpoint allows you to create a new credential in the system. In order to create a new credential, you must submit the required provider ID, username, and password as defined by the…
+- [Generate Encoded Arcadia Connect URL](https://docs.arcadia.com/reference/generate-encoded-arcadia-connect-url.md): This endpoint generates a submission URL for Arcadia Connect with encoded parameters. The encoding prevents users from tampering with the generated URLs, so they may be shared with users to track…
+- [Retrieve Credential](https://docs.arcadia.com/reference/retrieve-credential.md): If you have the credentialId for a specific credential, you can get the details of that credential.  This endpoint supports [Sandbox Mode](https://docs.arcadia.com/docs/sandbox-testing).
+- [Update Credential](https://docs.arcadia.com/reference/update-credential.md): To make updates to a credential, make a PATCH call to the credentials endpoint with a specific credentialId. For a list of fields that can be updated look below. None of these fields are required,…
+- [Get the credential's count of associated account, statement and meter resources](https://docs.arcadia.com/reference/get-the-credentials-count-of-associated-account-statement-and-meter-resources.md): This endpoint returns the count of Accounts, Meters and Statements that was obtained by a specific credential.  This endpoint supports [Sandbox Mode](https://docs.arcadia.com/docs/sandbox-testing).
+- [List Credential's Events](https://docs.arcadia.com/reference/list-credentials-events.md): This endpoint allows you to view the event history for a credential. For example, you query this endpoint to find out when a credential was created and who it was created by. This endpoint is…
+- [Submit One-Time Passcode](https://docs.arcadia.com/reference/submit-one-time-passcode.md): Submit the one-time passcode for the specified credential's current job after selecting the multi-factor authentication (MFA) verification method. Read more about the MFA workflow…
+- [Retrieve Sensitive Credentials](https://docs.arcadia.com/reference/retrieve-sensitive-credentials.md): This endpoint allows you to retrieve the passwords for a given credential. You must be an admin user to use this endpoint.  This endpoint supports [Sandbox…
+- [Initiate MFA Refresh](https://docs.arcadia.com/reference/initiate-mfa-refresh.md): Starts a job attempting to login to the credential so that its MFA session can be refreshed. This endpoint can only be used for Credentials for Providers which Arcadia supports MFA for. Read more…
+- [Refresh MFA Credentials With Arcadia Connect](https://docs.arcadia.com/reference/refresh-mfa-credentials-with-arcadia-connect.md): This endpoint generates a Connect URL that allows a user to refresh their multi-factor authentication (MFA) session for a specified credential. The URL generated will only work for 72 hours after it…
+- [Update Credentials With Arcadia Connect](https://docs.arcadia.com/reference/update-credentials-with-arcadia-connect.md): This endpoint generates a Connect URL that allows a user to update their password for a specified credential. The URL generated will only work for 72 hours after it is generated.  This endpoint…
+- [Submit Multi-factor Authentication Method](https://docs.arcadia.com/reference/submit-multi-factor-authentication-method.md): Select the multi-factor authentication (MFA) verification method for the specified credential's current job. Read more about the MFA workflow [here](https://docs.arcadia.com/docs/mfa).
+- [List Discovered Statements](https://docs.arcadia.com/reference/list-discovered-statements.md): Get a list of discovered statements in the Arcadia system. This endpoint is pageable.  This endpoint supports [Sandbox Mode](https://docs.arcadia.com/docs/sandbox-testing).
+- [Retrieve Discovered Statement](https://docs.arcadia.com/reference/retrieve-discovered-statement.md): Retrieve a single discovered statement record.  This endpoint supports [Sandbox Mode](https://docs.arcadia.com/docs/sandbox-testing).
+- [Download Discovered Statement Source](https://docs.arcadia.com/reference/download-discovered-statement-source.md): Download the source file for a discovered statement.
+- [List Discovered Statement Versions](https://docs.arcadia.com/reference/list-discovered-statement-versions.md): List all versions of a specific Discovered Statement.  This endpoint supports [Sandbox Mode](https://docs.arcadia.com/docs/sandbox-testing).
+- [Retrieve a Discovered Statement Version](https://docs.arcadia.com/reference/retrieve-a-discovered-statement-version.md): Retrieve a specific version of a Discovered Statement.  This endpoint supports [Sandbox Mode](https://docs.arcadia.com/docs/sandbox-testing).
+- [Create a CSV Download Request](https://docs.arcadia.com/reference/create-a-csv-download-request.md): This endpoint will generate a CSV report based on the provided parameters.  The `globalSearch` and `search` parameters reuse the search functionality for the list endpoints of the `entityType`…
+- [Get the DownloadRequest](https://docs.arcadia.com/reference/get-the-downloadrequest.md): If you have the specific download request ID, this endpoint allows you to retrieve detailed information about the download request.
+- [Stream Download](https://docs.arcadia.com/reference/stream-download.md): Downloading a CSV file through the API is a 2 step process. The first step prepares the download and provides a URL in the response body that can be used for downloading the CSV file. The next step…
+- [Create Expected Account](https://docs.arcadia.com/reference/create-expected-account.md): This endpoint allows you to create a new expected account in the Arcadia system.
+- [List Expected Accounts](https://docs.arcadia.com/reference/list-expected-accounts.md): Get a list of expected accounts in the Arcadia system. This endpoint is pageable.
+- [List Files](https://docs.arcadia.com/reference/list-files.md): A file is a utility statement PDF uploaded for OCR processing on the Arcadia Platform. This endpoint allows you to get a list of all the files that are in the system. This endpoint is pageable.
+- [Add Files](https://docs.arcadia.com/reference/add-files.md): This endpoint allows you to upload new files into the system. In order to add new files, they must be in PDF format. Multiple statements cannot be combined into a single file; each individual file…
+- [Retrieve File](https://docs.arcadia.com/reference/retrieve-file.md): This endpoint allows you to view the details of a particular file.
+- [Update File](https://docs.arcadia.com/reference/update-file.md): To update a file, make a PATCH call to the files endpoint with a specific fileId. Currently only correlationId can be updated.
+- [Get the File's Count of Associated Account, Statement and Meter Resources](https://docs.arcadia.com/reference/get-the-files-count-of-associated-account-statement-and-meter-resources.md): This endpoint returns the count of Accounts, Meters and Statements that was obtained by a specific file.
+- [List File's Events](https://docs.arcadia.com/reference/list-files-events.md): This endpoint allows you to view the event history for a file. For example, you can query this endpoint to find out when a file was created and who it was created by. This endpoint is pageable.
+- [Download File Source](https://docs.arcadia.com/reference/download-file-source.md): This endpoint allows you to retrieve the source PDF for a specific file.
+- [List Intervals for a Meter](https://docs.arcadia.com/reference/list-intervals-for-a-meter.md): The Intervals API endpoint allow you to interact programmatically with the intervals data offering of the Arcadia Platform to retrieve utility provided intervals data for electric meters. This…
+- [List Normalized Intervals for a Meter](https://docs.arcadia.com/reference/list-normalized-intervals-for-a-meter.md): The Intervals API endpoint allow interacting programmatically with the intervals data offering of the Arcadia Platform to retrieve utility provided intervals data for electric meters. The normalized…
+- [List Meters](https://docs.arcadia.com/reference/list-meters.md): Arcadia retrieves Meters from utility providers using the credentials that are submitted. There can be one or more meters behind a credential. This endpoint is pageable  This endpoint supports…
+- [Create Meter through an Intervals Third Party Portal](https://docs.arcadia.com/reference/create-meter-through-an-intervals-third-party-portal.md): Create a new meter in the Arcadia system. This is used for providers that support intervals third party portals for indirect account access. The end user will receive an email and have to approve…
+- [Download Meter Intervals](https://docs.arcadia.com/reference/download-meter-intervals.md): Downloading a CSV file with meter intervals is a 2 step process. The first step (this one) prepares the download and provides a URL in the response body that can be used for downloading the CSV file.…
+- [Download Meter Usage](https://docs.arcadia.com/reference/download-meter-usage.md): Downloading a CSV file with high-level summary information for  meters, statements, sites, and associated metadata is a 2 step process. The first step (this one) prepares the download and provides a…
+- [Retrieve Meter](https://docs.arcadia.com/reference/retrieve-meter.md): You can use this endpoint to retrieve the details for a specific meter. If your organization does not have the Intervals product enabled and if the associated account is not activated, you will see…
+- [Update Meter](https://docs.arcadia.com/reference/update-meter.md): To make updates to a specific meter, you can make a PATCH call to the meters endpoint. Each meter can have up to 10 custom data fields associated. Custom data fields are not required. Custom data…
+- [Set Meter](https://docs.arcadia.com/reference/set-meter.md): Each meter can have up to 10 custom data fields associated. Custom data fields are not required. Custom data allows you to organize meters and tie them back to records in your own system. To update a…
+- [List Meter's Events](https://docs.arcadia.com/reference/list-meters-events.md): This endpoint allows you to view the event history for a meter. For example, you can query this endpoint to find out when a meter was created and who it was created by. This endpoint is pageable.…
+- [List Sites](https://docs.arcadia.com/reference/list-sites.md): The sites endpoint allows you to get a list of all the sites that are in the Arcadia system. A site object allows you to group credentials, accounts, meters, and statements by a location or another…
+- [Create Site](https://docs.arcadia.com/reference/create-site.md): This endpoint allows you to create a new site in the Arcadia system. A site object allows you to group credentials, accounts, meters, and statements by a location or another logical grouping for your…
+- [Download Meter Intervals by Site](https://docs.arcadia.com/reference/download-meter-intervals-by-site.md): Downloading a CSV file with meter intervals is a 2 step process. The first step (this one) prepares the download and provides a URL in the response body that can be used for downloading the CSV file.…
+- [Download Sites' Usage](https://docs.arcadia.com/reference/download-sites-usage.md): Downloading a CSV file with high-level summary information for statements, sites, and associated metadata is a 2 step process. The first step (this one) prepares the download and provides a URL in…
+- [Retrieve Site](https://docs.arcadia.com/reference/retrieve-site.md): If you have the siteId, you can use this endpoint to retrieve the details for that specific site.  This endpoint supports [Sandbox Mode](https://docs.arcadia.com/docs/sandbox-testing).
+- [Update Site](https://docs.arcadia.com/reference/update-site.md): Each site has 20 fields where you can define values associated. These custom data allow you to organize Arcadia data and tie them back to records in your system as well as enrich your synthetic…
+- [Update Site using PUT method](https://docs.arcadia.com/reference/update-site-using-put-method.md): Each site has 20 fields where you can define values associated. These custom data allow you to organize Arcadia data and tie them back to records in your system as well as enrich your synthetic…
+- [List Site's Events](https://docs.arcadia.com/reference/list-sites-events.md): This endpoint allows you to view the event history for a site. For example, you can query this endpoint to find out when a site was created and who it was created by. This endpoint is pageable.  This…
+- [Remove Meters From a Site](https://docs.arcadia.com/reference/remove-meters-from-a-site.md): This endpoint allows you to disassociate a list of meters from a site. Note that the specified meters will not be deleted; only the association between the meters and the site will be removed.…
+- [Add Meters to a Site](https://docs.arcadia.com/reference/add-meters-to-a-site.md): This endpoint allows you to associate a list of meters with a site. Provide a non-empty list of meter IDs in the request body to add the specified meters to the site.  This endpoint supports [Sandbox…
+- [List Statements](https://docs.arcadia.com/reference/list-statements.md): Get a list of statements in the Arcadia system. This endpoint does not return any line item charges or usages regardless of contribution status. This endpoint is pageable.  This endpoint supports…
+- [List Detailed Statements](https://docs.arcadia.com/reference/list-detailed-statements.md): Get a list of Detailed Statements in the Arcadia system. This endpoint is pageable.  This endpoint supports [Sandbox Mode](https://docs.arcadia.com/docs/sandbox-testing).
+- [Download Statements](https://docs.arcadia.com/reference/download-statements.md): Downloading a CSV file with high-level summary information for accounts, statements, and associated metadata is a 2 step process. The first step (this one) prepares the download and provides a URL in…
+- [Retrieve Statement](https://docs.arcadia.com/reference/retrieve-statement.md): Retrieve a single Statement record.  This endpoint supports [Sandbox Mode](https://docs.arcadia.com/docs/sandbox-testing).
+- [Retrieve Detailed Statement](https://docs.arcadia.com/reference/retrieve-detailed-statement.md): Retrieve a single Detailed Statement record.  This endpoint supports [Sandbox Mode](https://docs.arcadia.com/docs/sandbox-testing).
+- [Download Statement Source](https://docs.arcadia.com/reference/download-statement-source.md): Arcadia provides a copy of the source file for where the system retrieved data. In most cases this is a copy of the structured PDF. In some cases this may be a PDF rendering of a portion of the…
+- [List Statement Versions](https://docs.arcadia.com/reference/list-statement-versions.md): List all versions of a specific Statement.  This endpoint supports [Sandbox Mode](https://docs.arcadia.com/docs/sandbox-testing).
+- [Retrieve Statement Version](https://docs.arcadia.com/reference/retrieve-statement-version.md): Retrieve a specific version of a Statement.  This endpoint supports [Sandbox Mode](https://docs.arcadia.com/docs/sandbox-testing).
+- [Retrieve Detailed Statement Version](https://docs.arcadia.com/reference/retrieve-detailed-statement-version.md): Retrieve a specific, detailed version of a Statement.  This endpoint supports [Sandbox Mode](https://docs.arcadia.com/docs/sandbox-testing).
+- [List Webhooks](https://docs.arcadia.com/reference/list-webhooks.md): Plug can send webhook events for any notable events for recurring requests. For example, this could include if a new statement is available or we notice a credential is now resulting in login…
+- [Retrieve Webhook](https://docs.arcadia.com/reference/retrieve-webhook.md): If you have the webhookId for a specific webhook, you can get the details of that webhook.See the description of [this endpoint](ref:list-webhooks) for more details on how the system stores webhooks.…
+- [Resend Webhook](https://docs.arcadia.com/reference/resend-webhook.md): If you have the webhookId for a specific webhook, you can initiate a resend attempt for that webhook. Note that this happens asynchronously and merely reschedules the webhook to be resent as soon as…
+- [List Providers](https://docs.arcadia.com/reference/list-providers.md): Get a list of all Providers available in the Arcadia system. This endpoint is pageable.  This endpoint supports [Sandbox Mode](https://docs.arcadia.com/docs/sandbox-testing).
+- [Retrieve Provider](https://docs.arcadia.com/reference/retrieve-provider.md): Retrieve a single Provider.  This endpoint supports [Sandbox Mode](https://docs.arcadia.com/docs/sandbox-testing).
+- [Retrieve Organization](https://docs.arcadia.com/reference/retrieve-organization.md): This endpoint returns your Arcadia organization name and also returns your account and meter level custom data field names.
+- [Update Organization Custom Data](https://docs.arcadia.com/reference/update-organization-custom-data.md): In order to use account or meter level custom data fields, you need to define the field names. You can update these custom data field names through this endpoint. You can have up to 25 custom data…
+- [Set Organization Custom Data](https://docs.arcadia.com/reference/set-organization-custom-data.md): In order to use account or meter level custom data fields, you need to define the field names. You can update these custom data field names through this endpoint. You can have up to 25 custom data…
+- [Get Organization Events](https://docs.arcadia.com/reference/get-organization-events.md): This endpoint allows you to view the history of changes made to your organization's custom data fields. This endpoint is pageable.
+- [Generate a new Statement for a Sandbox Credential](https://docs.arcadia.com/reference/generate-a-new-statement-for-a-sandbox-credential.md): This endpoint triggers the generation of a new statement for a sandbox credential. It is applicable only in the sandbox mode.  This endpoint supports [Sandbox…
+
+## Changelog
+- [[Plug] New Providers - August 2026](https://docs.arcadia.com/changelog/plug-new-providers-august-2026.md)
+- [[Plug] Extraction Bug Fixes - August 2026](https://docs.arcadia.com/changelog/plug-extraction-bug-fixes-august-2026.md)
+- [[Signal, Switch] Closing legacy net metering tariffs for Ameren Illinois and Commonwealth Edison](https://docs.arcadia.com/changelog/signal-closing-legacy-net-metering-tariffs-for-ameren-illinois-and-comed.md)
+- [[Plug] Business Units](https://docs.arcadia.com/changelog/plug-business-units.md)
+- [[Plug] Extraction Bug Fixes - July 2026](https://docs.arcadia.com/changelog/plug-extraction-bug-fixes-july-2026.md)
+- [[Plug] New Providers - July 2026](https://docs.arcadia.com/changelog/plug-new-providers-july-2026.md)
+- [[Plug] New Providers - June 2026](https://docs.arcadia.com/changelog/plug-new-providers-june-2026.md)
+- [[Plug] Extraction Bug Fixes - June 2026](https://docs.arcadia.com/changelog/plug-extraction-bug-fixes-june-2026.md)
+- [[Plug] New Providers - May 2026](https://docs.arcadia.com/changelog/plug-new-providers-may-2026.md)
+- [[Plug] Extraction Bug Fixes - May 2026](https://docs.arcadia.com/changelog/plug-extraction-bug-fixes-may-2026.md)

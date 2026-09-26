@@ -1,0 +1,1853 @@
+openapi: 3.2.0
+info:
+  title: Arcadia API Reference Spark API
+  version: 0.3.0
+  contact:
+    email: platformsupport@arcadia.com
+  x-logo:
+    url: images/arcadia_logo.png
+servers:
+- url: https://api.arcadia.com
+security:
+- bearerAuth: []
+tags:
+- name: Spark
+paths:
+  /spark/charge_curve/cost:
+    post:
+      tags:
+      - Spark
+      summary: Calculate Charge Cost
+      description: Provided a charge curve starting at a particular time of day, calculates the electricity cost of that charge curve for a particular `UtilityAccount` or Genability tariff.
+      operationId: calculateChargeCost
+      parameters:
+      - $ref: '#/components/parameters/arcVersionInHeaderParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChargeCostRequestBodyParams'
+      responses:
+        '200':
+          description: Success
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChargeCostResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TariffResolutionError'
+        '404':
+          description: Not Found
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/UtilityAccountNotFoundError'
+                - $ref: '#/components/schemas/ChargeCurvesTariffParamError'
+        '422':
+          description: Unprocessable Entity
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/ChargeCostFeatureAvailabilityError'
+                - $ref: '#/components/schemas/SparkParamValidationError'
+                - $ref: '#/components/schemas/ChargeCurvesTariffParamError'
+  /spark/charge_curve/schedule:
+    post:
+      tags:
+      - Spark
+      summary: Calculate Smart Charging Schedule
+      description: Provided details around charging duration and a prospective charging window, returns a charging schedule that minimizes costs for a particular `UtilityAccount`.
+      operationId: calculateSmartChargeSchedule
+      parameters:
+      - $ref: '#/components/parameters/arcVersionInHeaderParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SmartChargeScheduleRequestBodyParams'
+      responses:
+        '200':
+          description: Success
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmartChargeScheduleResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TariffResolutionError'
+        '404':
+          description: Not Found
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UtilityAccountNotFoundError'
+        '422':
+          description: Unprocessable Entity
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/SmartChargeFeatureAvailabilityError'
+                - $ref: '#/components/schemas/SparkParamValidationError'
+  /spark/tariff_rates:
+    post:
+      tags:
+      - Spark
+      summary: Calculate Tariff Rate ($/kWh)
+      description: 'Calculates marginal rate ($/kWh) for a short-term time period on the electric tariff a given utility account is subscribed to. This endpoint will report appropriate costs for TOU periods (daily peak/off-peak hours, weekend schedules, seasonal changes).
+
+        This endpoint is not recommended for monthly bill reproduction. Marginal rates generally do not include monthly adjustments or charges such as tiering (costs are generally reported at the base tier), fixed charges, monthly discounts, special event days, etc.'
+      operationId: retrieveTariffRates
+      parameters:
+      - $ref: '#/components/parameters/arcVersionInHeaderParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TariffRatesRequestBodyParams'
+      responses:
+        '200':
+          description: Success
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TariffRatesResponse'
+  /spark/optimized_tariffs/load_serving_entities:
+    get:
+      tags:
+      - Spark
+      summary: Tariff Optimize - Search for Load Serving Entities
+      description: Returns a list of Genability load serving entities (LSEs) for a given zip code, for use in tariff searches.
+      operationId: searchLoadServingEntities
+      parameters:
+      - $ref: '#/components/parameters/arcVersionInHeaderParam'
+      - in: query
+        name: zip_code
+        required: true
+        description: United States zip code.
+        example: '94105'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchLoadServingEntitiesResponse'
+  /spark/optimized_tariffs/applicabilities:
+    get:
+      tags:
+      - Spark
+      summary: Tariff Optimize - Get Tariff Applicability Questions
+      description: 'Gets the list of applicability questions for all potential tariffs. Tariffs sometimes have eligibility conditions to sign up for them ("applicabilities"). For example, signing up for an EV tariff often requires an electric car registered to the account holder at the account''s address. Answers to the returned applicability questions can be passed to the recommendations endpoint to get the most relevant tariffs.
+
+
+        The set of potential tariffs can be specified either by an Arcadia Utility Account ID, or by considering all tariffs in a given zip code served by a specific Genability Load Serving Entity (LSE).
+
+
+        __Either utility_account_id or both the zip_code/lse_id must be specified.__'
+      operationId: getOptimizedTariffsApplicabilities
+      parameters:
+      - $ref: '#/components/parameters/arcVersionInHeaderParam'
+      - in: query
+        name: utility_account_id
+        required: false
+        example: 12345
+        description: The unique ID of the Utility Account for this tariff search. Optional if searching for tariffs by Genability `lse_id`/`zip_code`.
+        schema:
+          type: integer
+      - in: query
+        name: zip_code
+        required: false
+        description: The zip code of the site inside the LSE's territory. Must be provided if searching for tariffs by Genability `lse_id`/`zip_code`.
+        example: '94706'
+        schema:
+          type: string
+      - in: query
+        name: lse_id
+        required: false
+        description: The ID of the Genability [load serving entity](https://developer.genability.com/api-reference/tariff-api/load-serving-entity/) prefixed with `gen_lse_`. Must be provided if searching for tariffs by Genability `lse_id`/`zip_code`.
+        example: gen_lse_734
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TariffApplicabilityQuestionsResponse'
+        '422':
+          description: Bad Request
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptimizedTariffRecommendationsLseIdentificationParamError'
+  /spark/optimized_tariffs/recommendations:
+    post:
+      tags:
+      - Spark
+      summary: Tariff Optimize - Search for Recommended Applicable Tariffs
+      description: 'Returns a list of applicable tariffs to use in a Tariff-Scenario Cost Calculation given the answers to the submitted Applicability Questions.
+
+
+        The set of recommended tariffs can be specified either by an Arcadia Utility Account ID, or by considering all tariffs in a given zip code served by a specific Genability Load Serving Entity (LSE).
+
+
+        __Either utility_account_id or both the zip_code/lse_id must be specified.__'
+      operationId: searchOptimizedTariffsByApplicabilities
+      parameters:
+      - $ref: '#/components/parameters/arcVersionInHeaderParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TariffApplicabilityAnswersRequestParams'
+      responses:
+        '200':
+          description: Success
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptimizedTariffRecommendationsResponse'
+        '422':
+          description: Bad Request
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptimizedTariffRecommendationsLseIdentificationParamError'
+  /spark/optimized_tariffs/scenario_cost:
+    post:
+      tags:
+      - Spark
+      summary: Tariff Optimize - Calculate Tariff-Scenario Cost
+      description: 'Calculates the “what-if” cost of a single tariff-scenario, or combination of tariff, load curve and qualifying criteria. A tariff-scenario can simulate additional devices with various operational schedules. For example, we can simulate the cost of adding an EV with basic charging, and we can compare that to another tariff-scenario where the cost on the same tariff is simulated with an EV using smart charging.
+
+
+        __Either utility_account_id or zip_code/main_tariff_id must be specified.__'
+      operationId: calculateOptimizedTariffsScenarioCost
+      parameters:
+      - $ref: '#/components/parameters/arcVersionInHeaderParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TariffScenarioCostRequestParams'
+      responses:
+        '200':
+          description: Success
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TariffScenarioCostResponse'
+        '422':
+          description: Bad Request
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TariffScenarioCostRequestTariffIdentificationParamError'
+  /spark/storage_optimization/schedules:
+    post:
+      description: Optimize energy flows into and out of a storage system to minimize cost, given a corresponding tariff, consumption profile, solar generation profile, and storage specifications. Supports a variety of installation configurations and dispatch strategies.
+      operationId: calculateStorageOptimizationSchedules
+      parameters:
+      - $ref: '#/components/parameters/arcVersionInHeaderParam'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StorageOptimizationSchedulesRequestParams'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorageOptimizationSchedulesResponse'
+          description: Success
+          headers:
+            Arcadia-Version:
+              $ref: '#/components/headers/ArcVersion'
+      summary: Optimize Storage Dispatch Schedules (Beta)
+      tags:
+      - Spark
+components:
+  schemas:
+    SmartChargeFeatureAvailabilityError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - The smart_charge feature is not available for this UtilityAccount.
+              - The smart_charge feature is not ready yet. Please refer to UtilityAccount#FeatureAvailability for updates.
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+            details:
+              type:
+              - object
+              - 'null'
+      additionalProperties: false
+    FixedSchedule:
+      title: FixedSchedule
+      type: object
+      properties:
+        chargeTous:
+          title: Chargetous
+          description: TOU schedule for charging the storage system.
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeOfUse'
+        dischargeTous:
+          title: Dischargetous
+          description: TOU schedule for discharging the storage system.
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeOfUse'
+        timezone:
+          title: Timezone
+          description: Timezone in which the schedule is defined. Defaults to tariff timezone.
+          type: string
+      required:
+      - chargeTous
+      - dischargeTous
+    TouSeason:
+      title: TouSeason
+      type: object
+      properties:
+        seasonFromDay:
+          title: Seasonfromday
+          description: Day of the month on which this season begins (1 - 31).
+          minimum: 1
+          maximum: 31
+          type: integer
+        seasonToDay:
+          title: Seasontoday
+          description: Day of the month after which this season ends (1 - 31).
+          minimum: 1
+          maximum: 31
+          type: integer
+        seasonFromMonth:
+          title: Seasonfrommonth
+          description: Month of the year on which this season begins (1 - 12).
+          minimum: 1
+          maximum: 12
+          type: integer
+        seasonToMonth:
+          title: Seasontomonth
+          description: Month of the year after which this season ends (1 - 12). End month is included in the season.
+          minimum: 1
+          maximum: 12
+          type: integer
+      required:
+      - seasonFromMonth
+      - seasonToMonth
+    TariffApplicabilityAnswersRequestParams:
+      required: []
+      properties:
+        utility_account_id:
+          type: integer
+          example: 12345
+          description: The unique ID of the Utility Account for this tariff search. Optional if searching for tariffs by Genability `lse_id`/`zip_code`.
+        zip_code:
+          type: string
+          example: '94706'
+          description: The zip code of the site inside the LSE's territory. Must be provided if searching for tariffs by Genability `lse_id`/`zip_code`.
+        lse_id:
+          type: string
+          example: gen_lse_734
+          description: The ID of the Genability [load serving entity](https://developer.genability.com/api-reference/tariff-api/load-serving-entity/) prefixed with `gen_lse_`. Must be provided if searching for tariffs by Genability `lse_id`/`zip_code`.
+        applicability_answers:
+          type: array
+          description: Site or customer-specific answers to applicability questions to determine tariff eligibility.
+          items:
+            $ref: '#/components/schemas/TariffApplicabilityAnswerSchema'
+          example:
+          - question_id: EV
+            value: true
+            data_type: YES_NO
+          - question_id: SOLAR
+            value: true
+            data_type: YES_NO
+          - question_id: ELECTRIC_HEAT
+            value: false
+            data_type: YES_NO
+          - question_id: ELECTRIC_WATER
+            value: false
+            data_type: YES_NO
+          - question_id: HEAT_PUMP
+            value: false
+            data_type: YES_NO
+          - question_id: SENIOR_CITIZEN
+            value: false
+            data_type: YES_NO
+          - question_id: LOW_INCOME
+            value: false
+            data_type: YES_NO
+          - question_id: CA_CARE_CUSTOMER
+            value: false
+            data_type: YES_NO
+          - question_id: CA_FERA
+            value: false
+            data_type: YES_NO
+      additionalProperties: false
+    ChargeCostResponse:
+      required:
+      - tariff
+      - normalized_start_time
+      - normalized_consumption_kwh
+      - cost_cents
+      properties:
+        utility_account_id:
+          example: 12345
+          type:
+          - integer
+          - 'null'
+        tariff:
+          $ref: '#/components/schemas/MostRecentTariff'
+        normalized_start_time:
+          type: string
+          format: date-time
+          description: The start_time normalized down to the resolution that lines up with any TOU periods on the tariff (generally hourly).
+          example: '2021-03-18T22:00:00-07:00'
+        normalized_consumption_kwh:
+          type: array
+          items:
+            type: number
+          description: The `energy_usage_kwh` aggregated into periods that line up with any TOU periods on the tariff (generally hourly).
+          example:
+          - 0
+          - 0
+          - 7.2
+          - 0
+          - 7.2
+          - 2.9
+        cost_cents:
+          type: integer
+          example: 525
+          description: Cost of the charging curve on the utility account's tariff, in cents.
+      additionalProperties: false
+    TariffScenarioCostRequestTariffIdentificationParamError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - Either utility_account_id or zip_code/main_tariff_id must be specified
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+            details:
+              type: 'null'
+      additionalProperties: false
+    SmartChargeScheduleResponse:
+      required:
+      - start_time
+      - charge_block_active
+      - charge_block_resolution
+      properties:
+        start_time:
+          type: string
+          format: date-time
+          example: '2021-03-18T22:00:00-07:00'
+        charge_block_resolution:
+          description: The duration of the charge blocks returned in the `charge_block_active` array.
+          type: string
+          enum:
+          - 5m
+          - 10m
+          - 15m
+          - 30m
+          - 1h
+          example: 1h
+        charge_block_active:
+          type: object
+          required:
+          - frequency
+          - data
+          properties:
+            frequency:
+              description: The duration of the charge blocks returned in the `charge_block_active` array.
+              type: string
+              enum:
+              - 5m
+              - 10m
+              - 15m
+              - 30m
+              - 1h
+              example: 1h
+            data:
+              type: array
+              description: Whether or not the vehicle should be actively charging during each charging bucket, starting at the `start_time`.
+              items:
+                $ref: '#/components/schemas/TimeSeriesItem'
+      additionalProperties: false
+    OptimizedTariffRecommendationsLseIdentificationParamError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - Either utility_account_id or zip_code/lse_id must be specified
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+            details:
+              type: 'null'
+      additionalProperties: false
+    TimeSeriesItem:
+      required:
+      - timestamp
+      - value
+      properties:
+        timestamp:
+          description: ISO8601 timestamp indicating time of data collection
+          type: string
+          format: date-time
+        value:
+          description: Data value of resource
+          type: number
+      additionalProperties: false
+    TariffApplicabilityAnswerSchema:
+      required:
+      - question_id
+      - value
+      - data_type
+      properties:
+        question_id:
+          type: string
+          description: String identifier for the applicability question
+          example: LOW_INCOME
+        value:
+          type: boolean
+          description: User response to the tariff applicability question
+          example: true
+        data_type:
+          type: string
+          description: Type of answer expected to be returned for this tariff applicability question
+          example: YES_NO
+      additionalProperties: false
+    TariffScenarioDeviceRemovedEvChargingParams:
+      description: Parameters for charging level and EV operation schedule
+      properties:
+        device:
+          type: string
+          description: The `REMOVED_EV_CHARGING` parameter is used to remove (disaggregate) simulated existing EV load, eg to simulate effects of adding smart charging by removing effects of basic charging.
+          example: REMOVED_EV_CHARGING
+          enum:
+          - REMOVED_EV_CHARGING
+        charging_availability:
+          type: array
+          description: Schedule of when the car is at home and able to be charged. `BASIC` charging will simulate a charging schedule assuming charging starts at the specified window start times (for example, at 18:00 when the driver comes home). `SMART` charging will simulate a charging schedule using our Calculate Smart Charging Schedule endpoint logic to charge during the cheapest hours on this tariff in the provided windows.
+          items:
+            $ref: '#/components/schemas/EvChargePlan'
+        charging_power_kw:
+          type: number
+          example: 1.8
+          description: This helps to determine the EVSE (electric vehicle supply equipment) level. 0.0 indicates no charging at home. 1.8kW or 2.4kW chargers are typical power levels for wall outlets (Level 1). 7.2kW or 9.6kW are typical charging powers for a Level 2 charger.
+        operation_schedule:
+          type: string
+          enum:
+          - BASIC
+          - SMART
+          example: SMART
+          description: An operation schedule of `BASIC` charging will simulate a charging schedule assuming charging starts at the specified window start times (for example, at 18:00 when the driver comes home). `SMART` charging will simulate a charging schedule using our Calculate Smart Charging Schedule endpoint logic to charge during the cheapest hours on this tariff in the provided windows.
+      additionalProperties: false
+    ChargeCostFeatureAvailabilityError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - The charge_cost feature is not available for this UtilityAccount.
+              - The charge_cost feature is not ready yet. Please refer to UtilityAccount#FeatureAvailability for updates.
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+            details:
+              type:
+              - object
+              - 'null'
+      additionalProperties: false
+    OptimizedTariffRecommendationsResponse:
+      required:
+      - country
+      - lse_id
+      - zip_code
+      - recommendations
+      properties:
+        country:
+          type: string
+          description: The country used for determining tariff applicability
+          example: US
+        lse_id:
+          type: string
+          description: The Genability 'lseId' unique identifier for this load serving entity. See [Genability documentation](https://developer.genability.com/api-reference/tariff-api/load-serving-entity/) for details.
+          example: gen_lse_734
+        zip_code:
+          type: string
+          description: The zip code used for determining tariff applicability
+          example: '94706'
+        recommendations:
+          type: array
+          description: List of tariffs that best fit the submitted applicability question answers. Used to define Tariff-Scenarios for the Calculate Tariff-Scenario Cost endpoint
+          items:
+            $ref: '#/components/schemas/Tariff'
+      additionalProperties: false
+    StorageOptimizationSchedulesRequestParams:
+      type: object
+      properties:
+        main_tariff_id:
+          description: The Genability 'masterTariffId' unique identifier for this tariff, prefixed with `gen_mtid_`. See [Genability documentation](https://developer.genability.com/api-reference/tariff-api/tariff/) for details.
+          example: gen_mtid_3424821
+          type: string
+        tariff_property_inputs:
+          description: Genability `propertyInputs` applicable to the specified tariff that may affect the cost structure being optimized against. See [Genability documentation](https://developer.genability.com/api-reference/calculation-api/cost-calculation) for details on how to set these inputs for specific tariffs. Use Genability-defined input format.
+          type: array
+          items:
+            type: object
+            required:
+            - keyName
+            - dataValue
+            properties:
+              keyName:
+                type: string
+                example: accPlusAdderCustomerType
+              dataValue:
+                type:
+                - boolean
+                - number
+                - string
+                example: nonLowIncome
+        from_date_time:
+          description: Start time of the consumption and solar curves. Must be the start of an hour (i.e. `:00:00`).
+          example: '2021-03-18T00:00:00-07:00'
+          type: string
+          format: date-time
+        consumption_curve_kwh_ac:
+          description: Timeseries representing how much AC consumption needs to be met at each timestep (kWh AC).
+          example:
+          - 0.8
+          - 1
+          - 1.2
+          - 1
+          minItems: 1
+          type: array
+          items:
+            type: number
+            minimum: 0
+        solar_generation_curve_kwh_dc:
+          description: Timeseries representing how much DC solar production occurs at each timestep (kWh DC). If absent, assumed to be 0. If present, must have the same length as `consumption_curve_kwh_ac`. Note that DC to AC conversion is specified with `solar_dc_to_ac_efficiency`.
+          example:
+          - 0.5
+          - 2.4
+          - 1.3
+          - 0.4
+          type: array
+          items:
+            type: number
+            minimum: 0
+        dispatch_strategy:
+          description: 'Parameters controlling how to compute dispatch curves. Defaults to `{ ''optimize'': true }`, which uses constrained optimization to determine a best-case schedule. Also supports `charge_on_surplus` and `fixed_schedule` strategies.'
+          allOf:
+          - $ref: '#/components/schemas/DispatchStrategy'
+        solar_dc_to_ac_efficiency:
+          description: How efficiently the solar inverter converts outgoing DC power to AC (`0.0` - `1.0`).
+          default: 0.96
+          minimum: 0
+          maximum: 1
+          type: number
+          example: 0.96
+        allow_grid_to_battery:
+          description: Allow the battery to be charged from the grid (`true`/`false`, defaults to `true`). DC-coupled batteries only chargable via solar should set this to `false`.
+          default: true
+          type: boolean
+          example: true
+        allow_solar_to_battery:
+          description: Allow the battery to be charged from solar (`true`/`false`, defaults to `true`). AC-coupled batteries may want to set this to `false` if indirect AC charging from converted solar is not possible.
+          default: true
+          type: boolean
+          example: true
+        allow_solar_to_grid:
+          description: Allow excess solar to be sold back to the grid (`true`/`false`, defaults to `true`). Solar tied exclusively to the battery and/or the site should set this to `false`, which may cause curtailment in the result.
+          default: true
+          type: boolean
+          example: true
+        allow_battery_to_grid:
+          description: Allow battery to export energy to the grid (`true`/`false`, defaults to `true`). Batteries configured exclusively for self-consumption should set this to `false`.
+          default: true
+          type: boolean
+          example: true
+        battery_dc_coupled:
+          description: Whether the battery is DC coupled (`true`/`false`). If `false`, solar power must be converted from DC to AC and then back to DC before it can be stored.
+          default: true
+          type: boolean
+          example: true
+        battery_ac_to_dc_efficiency:
+          description: How efficiently the battery inverter converts incoming AC power to DC (`0.0` - `1.0`).
+          default: 0.96
+          minimum: 0
+          maximum: 1
+          type: number
+          example: 0.96
+        battery_dc_to_ac_efficiency:
+          description: How efficiently the battery inverter converts outgoing DC power to AC (`0.0` - `1.0`)
+          default: 0.96
+          minimum: 0
+          maximum: 1
+          type: number
+          example: 0.96
+        battery_input_efficiency:
+          description: Coulombic efficiency of the battery, i.e. ratio of input kWh for a full charge to output kWh for a full discharge (`0.0` - `1.0`).
+          default: 0.975
+          minimum: 0
+          maximum: 1
+          type: number
+          example: 0.975
+        battery_nameplate_power:
+          description: The maximum amount of power that can instantaneously flow into or out of the battery (kW DC).
+          default: 3
+          exclusiveMinimum: 0
+          type: number
+          example: 3
+        battery_nameplate_capacity:
+          description: Maximum charge that the battery can hold (kWh DC).
+          default: 6
+          exclusiveMinimum: 0
+          type: number
+          example: 6
+        battery_min_soc:
+          description: Minimum state of charge of the battery (`0.0` - `1.0`).
+          default: 0.1
+          minimum: 0
+          maximum: 1
+          type: number
+          example: 0.1
+        battery_max_soc:
+          description: Maximum state of charge of the battery (`0.0` - `1.0`).
+          default: 1
+          minimum: 0
+          maximum: 1
+          type: number
+          example: 1
+        battery_initial_soc:
+          description: Initial state of charge of the battery (`0.0` - `1.0`).
+          default: 0.5
+          minimum: 0
+          maximum: 1
+          type: number
+          example: 0.5
+        battery_degradation_cost_per_discharge_kwh:
+          description: Optionally impose a cost on total discharge from the battery as a simplified degradation model ($/kWh).
+          default: 0
+          minimum: 0
+          type: number
+          example: 0
+        export_limit_kwh_ac:
+          description: Maximum energy that can be exported to the grid at any given timestep (kWh AC). Leave unspecified for unlimited exports, or set to `0` to forbid them.
+          minimum: 0
+          type: number
+      required:
+      - main_tariff_id
+      - from_date_time
+      - consumption_curve_kwh_ac
+      additionalProperties: false
+      definitions:
+        TouSeason:
+          title: TouSeason
+          type: object
+          properties:
+            seasonFromDay:
+              title: Seasonfromday
+              description: Day of the month on which this season begins (1 - 31).
+              minimum: 1
+              maximum: 31
+              type: integer
+            seasonToDay:
+              title: Seasontoday
+              description: Day of the month after which this season ends (1 - 31).
+              minimum: 1
+              maximum: 31
+              type: integer
+            seasonFromMonth:
+              title: Seasonfrommonth
+              description: Month of the year on which this season begins (1 - 12).
+              minimum: 1
+              maximum: 12
+              type: integer
+            seasonToMonth:
+              title: Seasontomonth
+              description: Month of the year after which this season ends (1 - 12). End month is included in the season.
+              minimum: 1
+              maximum: 12
+              type: integer
+          required:
+          - seasonFromMonth
+          - seasonToMonth
+        TouPeriod:
+          title: TouPeriod
+          type: object
+          properties:
+            fromDayOfWeek:
+              title: Fromdayofweek
+              description: Day of the week on which this period begins (0 - 6, Monday - Sunday).
+              default: 0
+              minimum: 0
+              maximum: 6
+              type: integer
+            toDayOfWeek:
+              title: Todayofweek
+              description: Day of the week after which this period ends (0 - 6, Monday - Sunday). End day is included in the period.
+              default: 6
+              minimum: 0
+              maximum: 6
+              type: integer
+            fromHour:
+              title: Fromhour
+              description: Hour of the day on which this period begins (0 - 23).
+              exclusiveMaximum: 24
+              minimum: 0
+              type: integer
+            toHour:
+              title: Tohour
+              description: Hour of the day before which this period ends (0 - 24). End hour is not included in the period.
+              minimum: 0
+              maximum: 24
+              type: integer
+          required:
+          - fromHour
+          - toHour
+        TimeOfUse:
+          title: TimeOfUse
+          type: object
+          properties:
+            season:
+              title: Season
+              description: Season to which this TOU schedule applies.
+              allOf:
+              - $ref: '#/components/schemas/TouSeason'
+            touPeriods:
+              title: Touperiods
+              description: Set of TOU periods defining the schedule.
+              type: array
+              items:
+                $ref: '#/components/schemas/TouPeriod'
+          required:
+          - touPeriods
+        FixedSchedule:
+          title: FixedSchedule
+          type: object
+          properties:
+            chargeTous:
+              title: Chargetous
+              description: TOU schedule for charging the storage system.
+              type: array
+              items:
+                $ref: '#/components/schemas/TimeOfUse'
+            dischargeTous:
+              title: Dischargetous
+              description: TOU schedule for discharging the storage system.
+              type: array
+              items:
+                $ref: '#/components/schemas/TimeOfUse'
+            timezone:
+              title: Timezone
+              description: Timezone in which the schedule is defined. Defaults to tariff timezone.
+              type: string
+          required:
+          - chargeTous
+          - dischargeTous
+        DispatchStrategy:
+          title: DispatchStrategy
+          type: object
+          properties:
+            optimize:
+              title: Optimize
+              description: If `true`, find the optimal dispatch schedule for the given tariff, solar, and consumption curves, assuming perfect forecasts.
+              type: boolean
+            chargeOnSurplus:
+              title: Chargeonsurplus
+              description: If `true`, charge whenever solar production exceeds consumption and discharge to meet consumption otherwise.
+              type: boolean
+            fixedSchedule:
+              title: Fixedschedule
+              description: If specified, use a fixed schedule to control battery dispatch, charging as much as possible during `charge_tous` and discharging as much as possible during `discharge_tous`. Times of use (TOUs) should be specified using [Genability format](https://developer.genability.com/api-reference/tariff-api/time-of-use/), in either camel or snake case.
+              allOf:
+              - $ref: '#/components/schemas/FixedSchedule'
+    Tariff:
+      description: Information about a tariff.
+      required:
+      - main_tariff_id
+      - tariff_code
+      - tariff_name
+      - utility_name
+      properties:
+        main_tariff_id:
+          type: string
+          description: The Genability 'masterTariffId' unique identifier for this tariff. See [Genability documentation](https://developer.genability.com/api-reference/tariff-api/tariff/) for details.
+          example: gen_mtid_3331108
+        property_inputs:
+          description: Properties applied to this tariff which may affect the calculated cost of electricity.
+          type: array
+          items:
+            type: object
+            required:
+            - id
+            - value
+            properties:
+              id:
+                type: string
+                example: territoryId
+              value:
+                type:
+                - boolean
+                - number
+                - string
+                example: 3
+        supplier_name:
+          description: The name of the retail electricity supplier or the community choice aggregator. If there is no retail electricity supplier or community choice aggregator, this field is null.
+          example: East Bay Community Energy
+          type:
+          - string
+          - 'null'
+        tariff_code:
+          type: string
+          description: Abbreviation code of the tariff used for this calculation.
+          example: EV-2A-TOU
+        tariff_name:
+          type: string
+          description: Full name of the tariff used for this calculation.
+          example: Residential - Time of Use - Plug-In Electric Vehicle 2
+        utility_name:
+          type: string
+          description: Name of the utility associated with this tariff
+          example: Pacific Gas & Electric
+    TariffApplicabilityQuestionSchema:
+      required:
+      - id
+      - user_question
+      - answer_data_type
+      properties:
+        id:
+          type: string
+          description: String identifier for the applicability question
+          example: LOW_INCOME
+        user_question:
+          type: string
+          description: The user question corresponding to this tariff applicability
+          example: Do you qualify for your utility's low income assistance program?
+        user_question_details:
+          description: The user question details corresponding to this tariff applicability
+          example: Contact your utility for specific qualifications, but common criteria include Supplemental Security Income, Temporary Assistance to Needy Persons/Families, Safety Net Assistance, Food Stamps, or receiving a Home Energy Assistance Program grant in the preceding 12 months.
+          type:
+          - string
+          - 'null'
+        answer_data_type:
+          type: string
+          description: Type of answer expected to be returned for this tariff applicability question
+          example: YES_NO
+      additionalProperties: false
+    MostRecentTariff:
+      allOf:
+      - $ref: '#/components/schemas/Tariff'
+      - description: The most recent Tariff seen on this utility account.
+        required:
+        - tariff_as_of_date
+        properties:
+          tariff_as_of_date:
+            type:
+            - string
+            - 'null'
+            format: date
+            description: The statement date of the utility statement that reported use of this tariff.
+            example: '2021-03-01'
+    StorageOptimizationSchedulesResponse:
+      type: object
+      properties:
+        from_date_time:
+          description: Start time corresponding to the beginning of the hour when the consumption and solar curves start. Echoed back from request parameters.
+          example: '2021-03-18T00:00:00-07:00'
+          type: string
+          format: date-time
+        grid_to_site_kwh_ac:
+          description: Amount of electricity flowing to site load from the grid (kWh AC).
+          example:
+          - 1.3
+          - 1.1
+          - 0
+          - 0
+          type: array
+          items:
+            type: number
+            minimum: 0
+        grid_to_battery_kwh_ac:
+          description: Amount of electricity flowing to the battery from the grid, before conversion with `battery_ac_to_dc_efficiency` (kWh AC).
+          example:
+          - 1.56
+          - 0
+          - 0
+          - 0
+          type: array
+          items:
+            type: number
+            minimum: 0
+        solar_to_battery_kwh_dc:
+          description: Amount of electricity flowing to the battery from PV solar generation, either without any conversion if `battery_dc_coupled` or after double-conversion with `solar_dc_to_ac_efficiency` * `battery_ac_to_dc_efficiency` if not (kWh DC).
+          example:
+          - 0
+          - 1.5
+          - 0
+          - 0
+          type: array
+          items:
+            type: number
+            minimum: 0
+        solar_to_site_kwh_ac:
+          description: Amount of electricity flowing to site load from PV solar generation, after conversion with `solar_dc_to_ac_efficiency` (kWh AC).
+          example:
+          - 0
+          - 0.1
+          - 1.3
+          - 1.5
+          type: array
+          items:
+            type: number
+            minimum: 0
+        solar_to_grid_kwh_ac:
+          description: Amount of electricity flowing to the grid from PV solar generation, after conversion with `solar_dc_to_ac_efficiency` (kWh AC).
+          example:
+          - 0
+          - 0
+          - 0.4
+          - 1.4
+          type: array
+          items:
+            type: number
+            minimum: 0
+        solar_curtailed_kwh_dc:
+          description: Amount of electricity from solar that goes unused (kWh DC).
+          example:
+          - 0
+          - 0
+          - 0
+          - 0
+          type: array
+          items:
+            type: number
+            minimum: 0
+        battery_to_site_kwh_ac:
+          description: Amount of electricity flowing to site load from the battery, after conversion with `battery_dc_to_ac_efficiency` (kWh AC).
+          example:
+          - 0
+          - 0
+          - 0.1
+          - 0.2
+          type: array
+          items:
+            type: number
+            minimum: 0
+        battery_to_grid_kwh_ac:
+          description: Amount of electricity flowing to the grid from battery, after conversion with `battery_dc_to_ac_efficiency` (kWh AC).
+          example:
+          - 0
+          - 0
+          - 0.1
+          - 0.2
+          type: array
+          items:
+            type: number
+            minimum: 0
+        net_load_kwh_ac:
+          description: Amount of electricity flowing from the grid if positive or to the grid if negative (kWh AC). Equals `grid_to_site_kwh_ac` + `grid_to_battery_kwh_ac` - `battery_to_grid_kwh_ac` - `solar_to_grid_kwh_ac`.
+          example:
+          - 1.86
+          - 1.1
+          - -0.5
+          - -1.6
+          type: array
+          items:
+            type: number
+        battery_soc:
+          description: Hourly battery state of charge (`0.0` - `1.0`, though in practice, all values will be between `battery_min_soc` and `battery_max_soc`). Multiply by `battery_nameplate_capacity` to get a timeseries of kWh DC stored.
+          example:
+          - 0.75
+          - 1
+          - 0.8
+          - 0.4
+          type: array
+          items:
+            type: number
+            minimum: 0
+            maximum: 1
+      required:
+      - from_date_time
+      - grid_to_site_kwh_ac
+      - grid_to_battery_kwh_ac
+      - solar_to_battery_kwh_dc
+      - solar_to_site_kwh_ac
+      - solar_to_grid_kwh_ac
+      - solar_curtailed_kwh_dc
+      - battery_to_site_kwh_ac
+      - battery_to_grid_kwh_ac
+      - battery_soc
+      additionalProperties: false
+    ChargeCostRequestBodyParams:
+      required:
+      - start_time
+      - energy_usage_kwh
+      properties:
+        utility_account_id:
+          description: (Beta - due to limited coverage) The unique ID of the utility account that this calculation is being run against. Either a `utility_account_id` or `main_tariff_id` is required for a valid request.
+          type: integer
+        main_tariff_id:
+          type: string
+          description: The Genability 'masterTariffId' unique identifier for this tariff. See [Genability documentation](https://developer.genability.com/api-reference/tariff-api/tariff/) for details. Either a `utility_account_id` or `main_tariff_id` is required for a valid request.
+          example: gen_mtid_3331108
+        start_time:
+          description: 'ISO8601 timestamp of when the charge begins. Note that the timestamp will be normalized down to the start of latest charge block resolution.
+
+            For example, if the `charge_block_resolution` is `1h` and the charging session starts at `2021-06-24T14:59:59Z`, the `start_time` used to calculate the curve''s cost will be normalized to `2021-06-24T14:00:00Z`. If the `charge_block_resolution` is `15m`, the `start_time` would be normalized to `2021-06-24T14:45:00Z`.
+
+            This normalization technique eliminates ambiguity around charging that occurs across time-of-use on/mid/off-peak window boundaries.
+
+            '
+          type: string
+          format: date-time
+          example: '2021-03-18T22:00:00-07:00'
+        charge_block_resolution:
+          description: The duration of the charge blocks provided in the `energy_usage_kwh` param.
+          type: string
+          enum:
+          - 5m
+          - 10m
+          - 15m
+          - 30m
+          - 1h
+          default: 1h
+        energy_usage_kwh:
+          description: The load curve being priced. An array of charge blocks with each block representing the kWh of power consumed or to be consumed in that block.
+          type: array
+          items:
+            type: number
+          example:
+          - 0
+          - 0
+          - 7.2
+          - 0
+          - 7.2
+          - 2.9
+      additionalProperties: false
+    ChargeCurvesTariffParamError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              example: No tariff found matching ID
+              enum:
+              - No tariff found matching ID
+              - 'Invalid tariff ID: must be of the form "gen_mtid_3220724"'
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+            details:
+              type: object
+              required:
+              - main_tariff_id
+              properties:
+                main_tariff_id:
+                  type: string
+                  example: gen_tariff_000000
+      additionalProperties: false
+    TariffApplicabilityQuestionsResponse:
+      required:
+      - country
+      - lse_id
+      - zip_code
+      - applicability_questions
+      properties:
+        country:
+          type: string
+          description: The country used for determining tariff applicability
+          example: US
+        lse_id:
+          type: string
+          example: gen_lse_734
+          description: The Genability 'lseId' unique identifier for this load serving entity. See [Genability documentation](https://developer.genability.com/api-reference/tariff-api/load-serving-entity/) for details.
+        zip_code:
+          type: string
+          description: The zip code used for determining tariff applicability
+          example: '94706'
+        applicability_questions:
+          type: array
+          description: List of applicability questions that will determine optimization-eligible tariffs in this LSE.
+          items:
+            $ref: '#/components/schemas/TariffApplicabilityQuestionSchema'
+          example:
+          - id: EV
+            user_question: Do you have an electric vehicle (EV)?
+            user_question_details: null
+            answer_data_type: YES_NO
+          - id: SOLAR
+            user_question: Do you have a rooftop solar system installed?
+            user_question_details: null
+            answer_data_type: YES_NO
+          - id: ELECTRIC_HEAT
+            user_question: Is your primary home heating electric?
+            user_question_details: null
+            answer_data_type: YES_NO
+          - id: ELECTRIC_WATER
+            user_question: Is your primary hot water heater electric?
+            user_question_details: null
+            answer_data_type: YES_NO
+          - id: HEAT_PUMP
+            user_question: Do you have a heat pump for home heating and cooling?
+            user_question_details: null
+            answer_data_type: YES_NO
+          - id: SENIOR_CITIZEN
+            user_question: Is the electric account owner a senior citizen?
+            user_question_details: null
+            answer_data_type: YES_NO
+          - id: LOW_INCOME
+            user_question: Do you qualify for your utility's low income assistance program?
+            user_question_details: 'Contact your utility for specific qualifications, but common criteria include: Supplemental Security Income, Temporary Assistance to Needy Persons/Families, Safety Net Assistance, Food Stamps, or receiving a Home Energy Assistance Program grant in the preceding 12 months.'
+            answer_data_type: YES_NO
+          - id: MEDICAL
+            user_question: Do you have medical equipment or a condition that qualifies for electricity assistance?
+            user_question_details: Contact your utility for specific qualifications, but this commonly includes equipment like ventilators.
+            answer_data_type: YES_NO
+          - id: CA_CARE_CUSTOMER
+            user_question: Do you qualify for the California Alternate Rates for Energy (CARE) program?
+            user_question_details: CARE provides qualifying residential applicants with reduced energy charges.
+            answer_data_type: YES_NO
+          - id: CA_FERA
+            user_question: Do you qualify for the Family Electric Rate Assistance program (FERA)?
+            user_question_details: FERA is the rate reduction program in California for household with maximum annual income of between 200% and 250% of federal poverty guidelines and have three or more persons residing full time in their household. Additional eligibility criteria may apply.
+            answer_data_type: YES_NO
+      additionalProperties: false
+    SparkParamValidationError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - Validation Error
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+            details:
+              type:
+              - object
+              - 'null'
+      additionalProperties: false
+    SearchLoadServingEntitiesResponse:
+      required:
+      - data
+      - total_count
+      properties:
+        data:
+          type: array
+          description: Results
+          items:
+            $ref: '#/components/schemas/LoadServingEntitySchema'
+          example:
+          - lse_id: gen_lse_734
+            name: Pacific Gas & Electric
+            code: '14328'
+            num_customers: 5069189
+          - lse_id: gen_lse_1074
+            name: San Francisco City & County of
+            code: '16612'
+            num_customers: 2173
+        total_count:
+          type: integer
+          description: Number of results
+          example: 2
+      additionalProperties: false
+    EvChargePlan:
+      description: Specifies a time window where the EV is at home and available for charging.
+      required:
+      - start_day_of_week
+      - start_time
+      - end_day_of_week
+      - end_time
+      - expected_consumption_kwh
+      properties:
+        start_day_of_week:
+          type: integer
+          description: Day of the week the available charging block begins. ISO format -- 1 is Monday, 7 is Sunday.
+          example: 1
+        start_time:
+          type: string
+          description: Time when the EV is available to begin charging. For example, when the driver comes home in the evening.
+          example: '15:00:00'
+        end_day_of_week:
+          type: integer
+          description: Day of the week the available charging block ends. ISO format -- 1 is Monday, 7 is Sunday.
+          example: 2
+        end_time:
+          type: string
+          description: Time when the EV is no longer available for charging. For example, when the driver leaves for their morning commute.
+          example: 06:00:00
+        expected_consumption_kwh:
+          type: number
+          description: Expected kwh consumption until the next EvChargePlan residential charging event.
+          example: 15
+      additionalProperties: false
+    TariffScenarioCostResponse:
+      description: Parameters for a rooftop solar system
+      properties:
+        cost:
+          type: number
+          description: Costs from multiple Tariff-Scenarios can be compared to find the optimal combination of tariff and device-scenarios. A baseline Tariff-Scenario cost can be calculated to present potential savings of each what-if Tariff-Scenario. Plug endpoints can be used to further compare to actual utility costs.
+          example: 150
+        start_date:
+          type: string
+          format: date
+          description: The start date of the calculated simulation. If using `baseline_load=TYPICALS`, this will be one year in the past.
+          example: '2021-02-03'
+        end_date:
+          type: string
+          format: date
+          description: The end date of the calculated simulation. If using `baseline_load=TYPICALS`, this will be the current time.
+          example: '2022-02-03'
+      additionalProperties: false
+    TimeOfUse:
+      title: TimeOfUse
+      type: object
+      properties:
+        season:
+          title: Season
+          description: Season to which this TOU schedule applies.
+          allOf:
+          - $ref: '#/components/schemas/TouSeason'
+        touPeriods:
+          title: Touperiods
+          description: Set of TOU periods defining the schedule.
+          type: array
+          items:
+            $ref: '#/components/schemas/TouPeriod'
+      required:
+      - touPeriods
+    LoadServingEntitySchema:
+      required:
+      - lse_id
+      - name
+      - code
+      - num_customers
+      properties:
+        lse_id:
+          type: string
+          description: Genability ID of the load serving entity, prefixed with `gen_lse_`.
+          example: gen_lse_734
+        name:
+          type: string
+          description: Name of the load serving entity.
+          example: Pacific Gas & Electric
+        code:
+          type: string
+          description: Alternate key identifying the load serving entity. For US companies, this is the EIA ID.
+          example: '14328'
+        num_customers:
+          type: integer
+          description: Total customer count for the load serving entity. Results will be sorted by this value in descending order (so the first result will be the most likely LSE).
+          example: 5069189
+      additionalProperties: false
+    TariffScenarioDeviceEvChargingParams:
+      description: Parameters for charging level and EV operation schedule
+      required:
+      - device
+      - charging_availability
+      - charging_power_kw
+      - operation_schedule
+      properties:
+        device:
+          type: string
+          description: A value of `EV_CHARGING` indicates a future EV purchase.
+          example: EV_CHARGING
+          enum:
+          - EV_CHARGING
+        charging_availability:
+          type: array
+          description: Schedule of when the car is at home and able to be charged. `BASIC` charging will simulate a charging schedule assuming charging starts at the specified window start times (for example, at 18:00 when the driver comes home). `SMART` charging will simulate a charging schedule using our Calculate Smart Charging Schedule endpoint logic to charge during the cheapest hours on this tariff in the provided windows.
+          items:
+            $ref: '#/components/schemas/EvChargePlan'
+        charging_power_kw:
+          type: number
+          example: 1.8
+          description: This helps to determine the EVSE (electric vehicle supply equipment) level. 0.0 indicates no charging at home. 1.8kW or 2.4kW chargers are typical power levels for wall outlets (Level 1). 7.2kW or 9.6kW are typical charging powers for a Level 2 charger.
+        operation_schedule:
+          type: string
+          enum:
+          - BASIC
+          - SMART
+          example: SMART
+          description: An operation schedule of `BASIC` charging will simulate a charging schedule assuming charging starts at the specified window start times (for example, at 18:00 when the driver comes home). `SMART` charging will simulate a charging schedule using our Calculate Smart Charging Schedule endpoint logic to charge during the cheapest hours on this tariff in the provided windows.
+      additionalProperties: false
+    DispatchStrategy:
+      title: DispatchStrategy
+      type: object
+      properties:
+        optimize:
+          title: Optimize
+          description: If `true`, find the optimal dispatch schedule for the given tariff, solar, and consumption curves, assuming perfect forecasts.
+          type: boolean
+        chargeOnSurplus:
+          title: Chargeonsurplus
+          description: If `true`, charge whenever solar production exceeds consumption and discharge to meet consumption otherwise.
+          type: boolean
+        fixedSchedule:
+          title: Fixedschedule
+          description: If specified, use a fixed schedule to control battery dispatch, charging as much as possible during `charge_tous` and discharging as much as possible during `discharge_tous`. Times of use (TOUs) should be specified using [Genability format](https://developer.genability.com/api-reference/tariff-api/time-of-use/), in either camel or snake case.
+          allOf:
+          - $ref: '#/components/schemas/FixedSchedule'
+    TariffScenarioDeviceSolarParams:
+      required:
+      - device
+      - solar_system_kw
+      properties:
+        device:
+          type: string
+          description: Identifies this device as a rooftop solar system
+          example: SOLAR
+          enum:
+          - SOLAR
+        solar_system_kw:
+          type: number
+          description: Size of solar system in kW
+          example: 5
+      additionalProperties: false
+    UtilityAccountNotFoundError:
+      required:
+      - error
+      properties:
+        error:
+          type: string
+          enum:
+          - Couldn't find UtilityAccount
+      additionalProperties: false
+    TariffResolutionError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - Tariff information is not yet available for this utility account
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+            details:
+              type:
+              - object
+              - 'null'
+      additionalProperties: false
+    TariffScenarioCostRequestParams:
+      required:
+      - baseline_load
+      - device_loads
+      properties:
+        utility_account_id:
+          description: (Beta - due to limited coverage) The unique ID of the utility account that this calculation is being run against. Optional if calculating costs by Genability `main_tariff_id`/`zip_code`.
+          type: integer
+        main_tariff_id:
+          type: string
+          description: The Genability 'masterTariffId' unique identifier for this tariff. See [Genability documentation](https://developer.genability.com/api-reference/tariff-api/tariff/) for details. Must be provided if calculating costs by Genability `main_tariff_id`/`zip_code`.
+          example: gen_mtid_3331108
+        zip_code:
+          type: string
+          description: The zip code of the scenario. Must be provided if calculating costs by Genability `main_tariff_id`/`zip_code`.
+          example: '94105'
+        applicability_answers:
+          type: array
+          description: Answers to tariff applicability questions
+          items:
+            $ref: '#/components/schemas/TariffApplicabilityAnswerSchema'
+          example:
+          - question_id: EV
+            value: true
+            data_type: YES_NO
+          - question_id: SOLAR
+            value: true
+            data_type: YES_NO
+          - question_id: ELECTRIC_HEAT
+            value: false
+            data_type: YES_NO
+          - question_id: ELECTRIC_WATER
+            value: false
+            data_type: YES_NO
+          - question_id: HEAT_PUMP
+            value: false
+            data_type: YES_NO
+          - question_id: SENIOR_CITIZEN
+            value: false
+            data_type: YES_NO
+          - question_id: LOW_INCOME
+            value: false
+            data_type: YES_NO
+          - question_id: CA_CARE_CUSTOMER
+            value: false
+            data_type: YES_NO
+          - question_id: CA_FERA
+            value: false
+            data_type: YES_NO
+        baseline_load:
+          type: string
+          description: A `TYPICALS` `baseline_load` uses the typical hourly energy usage for the end-user's zip code.
+          default: TYPICALS
+          enum:
+          - TYPICALS
+        device_loads:
+          type: array
+          description: List of device simulations to add additional synthetic load curves on top of the `baseline_load`
+          items:
+            anyOf:
+            - $ref: '#/components/schemas/TariffScenarioDeviceSolarParams'
+            - $ref: '#/components/schemas/TariffScenarioDeviceEvChargingParams'
+            - $ref: '#/components/schemas/TariffScenarioDeviceRemovedEvChargingParams'
+          example:
+          - device: EV_CHARGING
+            charging_power_kw: 7.2
+            operation_schedule: SMART
+            charging_availability:
+            - start_day_of_week: 1
+              start_time: '18:00:00'
+              end_day_of_week: 2
+              end_time: 09:00:00
+              expected_consumption_kwh: 10.4
+            - start_day_of_week: 2
+              start_time: '18:00:00'
+              end_day_of_week: 3
+              end_time: 09:00:00
+              expected_consumption_kwh: 10.4
+            - start_day_of_week: 3
+              start_time: '18:00:00'
+              end_day_of_week: 4
+              end_time: 09:00:00
+              expected_consumption_kwh: 10.4
+            - start_day_of_week: 4
+              start_time: '18:00:00'
+              end_day_of_week: 5
+              end_time: 09:00:00
+              expected_consumption_kwh: 10.4
+            - start_day_of_week: 5
+              start_time: '18:00:00'
+              end_day_of_week: 6
+              end_time: '10:00:00'
+              expected_consumption_kwh: 10.4
+            - start_day_of_week: 6
+              start_time: '16:00:00'
+              end_day_of_week: 7
+              end_time: '10:00:00'
+              expected_consumption_kwh: 5
+            - start_day_of_week: 7
+              start_time: '16:00:00'
+              end_day_of_week: 1
+              end_time: 09:00:00
+              expected_consumption_kwh: 5
+          - device: SOLAR
+            solar_system_kw: 5
+      additionalProperties: false
+    TariffRatesResponse:
+      required:
+      - tariff
+      - rates_cost_per_kwh
+      properties:
+        tariff:
+          $ref: '#/components/schemas/Tariff'
+        rates_cost_per_kwh:
+          description: Timeseries with data array of $/kWh rates
+          type: object
+          required:
+          - data
+          - freq
+          properties:
+            data:
+              description: Array of TimeSeriesItems indicating $/kWh rates for each requested time period
+              type: array
+              items:
+                $ref: '#/components/schemas/TimeSeriesItem'
+            freq:
+              description: The interval of the TimeSeriesItems in the data array
+              type: string
+              enum:
+              - 5m
+              - 10m
+              - 15m
+              - 30m
+              - 1h
+      additionalProperties: false
+    SmartChargeScheduleRequestBodyParams:
+      required:
+      - start_time
+      - end_time
+      - minutes_to_charge_complete
+      properties:
+        utility_account_id:
+          description: (Beta - due to limited coverage) The unique ID of the utility account that this calculation is being run against. Either a `utility_account_id` or `main_tariff_id` is required for a valid request.
+          type: integer
+        main_tariff_id:
+          type: string
+          description: The Genability 'masterTariffId' unique identifier for this tariff. See [Genability documentation](https://developer.genability.com/api-reference/tariff-api/tariff/) for details. Either a `utility_account_id` or `main_tariff_id` is required for a valid request.
+          example: gen_mtid_3331108
+        start_time:
+          description: 'ISO8601 timestamp of when the charge begins. Note that the timestamp will be rounded down to the start of latest charge block resolution.
+
+            For example, if the `charge_block_resolution` is `1h` and the charging session starts at `2021-06-24T14:59:59Z`, the `start_time` used to calculate the curve''s cost will be normalized to `2021-06-24T14:00:00Z`. If the `charge_block_resolution` is `15m`, the `start_time` would be normalized to `2021-06-24T14:45:00Z`.
+
+            This rounding technique eliminates ambiguity around charging that occurs across time-of-use on/mid/off-peak window boundaries.
+
+            '
+          type: string
+          format: date-time
+          example: '2021-03-18T22:00:00-07:00'
+        end_time:
+          description: ISO8601 datetime by which the charge must be complete.
+          type: string
+          format: date-time
+          example: '2021-03-19T08:00:00-07:00'
+        minutes_to_charge_complete:
+          description: The number of minutes of charging required to complete a charge.
+          type: integer
+          example: 330
+        charge_block_resolution:
+          description: The duration of the charge blocks to use in the returned `charge_block_active` param.
+          type: string
+          enum:
+          - 5m
+          - 10m
+          - 15m
+          - 30m
+          - 1h
+          default: 1h
+      additionalProperties: false
+    TouPeriod:
+      title: TouPeriod
+      type: object
+      properties:
+        fromDayOfWeek:
+          title: Fromdayofweek
+          description: Day of the week on which this period begins (0 - 6, Monday - Sunday).
+          default: 0
+          minimum: 0
+          maximum: 6
+          type: integer
+        toDayOfWeek:
+          title: Todayofweek
+          description: Day of the week after which this period ends (0 - 6, Monday - Sunday). End day is included in the period.
+          default: 6
+          minimum: 0
+          maximum: 6
+          type: integer
+        fromHour:
+          title: Fromhour
+          description: Hour of the day on which this period begins (0 - 23).
+          exclusiveMaximum: 24
+          minimum: 0
+          type: integer
+        toHour:
+          title: Tohour
+          description: Hour of the day before which this period ends (0 - 24). End hour is not included in the period.
+          minimum: 0
+          maximum: 24
+          type: integer
+      required:
+      - fromHour
+      - toHour
+    TariffRatesRequestBodyParams:
+      required:
+      - start_time
+      properties:
+        utility_account_id:
+          description: (Beta - due to limited coverage) The unique ID of the utility account that this calculation is being run against. Either a `utility_account_id` or `main_tariff_id` is required for a valid request.
+          type: integer
+        main_tariff_id:
+          type: string
+          description: The Genability 'masterTariffId' unique identifier for this tariff. See [Genability documentation](https://developer.genability.com/api-reference/tariff-api/tariff/) for details. Either a `utility_account_id` or `main_tariff_id` is required for a valid request.
+          example: gen_mtid_3331108
+        start_time:
+          description: 'ISO8601 timestamp indicating start time. Note that the timestamp will be rounded down to the start of latest time_block_resolution
+
+            '
+          type: string
+          format: date-time
+          example: '2021-03-18T22:00:00-07:00'
+        end_time:
+          description: 'ISO8601 timestamp indicating end of time period. Note that the timestamp will be rounded down to the start of latest time_block_resolution
+
+            '
+          type: string
+          format: date-time
+          example: '2021-03-19T08:00:00-07:00'
+        time_block_resolution:
+          description: Requested time resolution
+          type: string
+          enum:
+          - 5m
+          - 10m
+          - 15m
+          - 30m
+          - 1h
+          default: 1h
+      additionalProperties: false
+  parameters:
+    arcVersionInHeaderParam:
+      name: Arcadia-Version
+      in: header
+      example: '2022-10-13'
+      description: The Arcadia-Version for the request
+      required: true
+      schema:
+        type: string
+        default: '2022-10-13'
+  headers:
+    ArcVersion:
+      description: The Arcadia-Version for the response
+      schema:
+        type: string
+      example: '2022-10-13'
+      required: true
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+x-readme:
+  proxy-enabled: false
+  headers:
+  - key: from-readme
+    value: true
+x-tagGroups:
+- name: General
+  tags:
+  - Auth
+  - Webhooks
+  - Webhook Events
+- name: Connections
+  tags:
+  - Utility Credentials
+  - Utility Accounts
+  - Utility Meters (Beta)
+  - Users
+- name: Products
+  tags:
+  - Plug
+  - Spark

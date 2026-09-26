@@ -1,0 +1,424 @@
+generated: '2026-09-26'
+method: derived
+generator: derive-vocabulary.py
+source: openapi/arcadiapower2-openapi.yaml
+vocabulary:
+  name: Arcadiapower2 Domain Vocabulary
+  description: 'Terms declared by Arcadiapower2''s own API contract: its resource groups, objects and enumerations, with the contract''s definitions.
+    Derived, not authored.'
+  version: '2026-09-26'
+  terms:
+  - term: AccessTokenResponse
+    definition: 'Object declared by the contract with fields: access_token, expires_in, token_type, scope, created_at.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/AccessTokenResponse
+  - term: AccessTokenUnauthorizedError
+    definition: 'Object declared by the contract with fields: error.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/AccessTokenUnauthorizedError
+  - term: ConnectUrlResponse
+    definition: 'Object declared by the contract with fields: connect_url.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/ConnectUrlResponse
+  - term: ConnectTokenUnauthorizedError
+    definition: 'Object declared by the contract with fields: error.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/ConnectTokenUnauthorizedError
+  - term: UtilityCredentialNotFoundError
+    definition: 'Object declared by the contract with fields: error.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/UtilityCredentialNotFoundError
+  - term: ConnectTokenUnprocessableEntityError
+    definition: 'Object declared by the contract with fields: error.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/ConnectTokenUnprocessableEntityError
+  - term: ConnectTokenTooManyParametersError
+    definition: 'Object declared by the contract with fields: error.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/ConnectTokenTooManyParametersError
+  - term: ConnectUrlVariantError
+    definition: 'Object declared by the contract with fields: error.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/ConnectUrlVariantError
+  - term: PingResponse
+    definition: 'Object declared by the contract with fields: pong.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/PingResponse
+  - term: PingUnauthorizedError
+    definition: 'Object declared by the contract with fields: error.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/PingUnauthorizedError
+  - term: Tariff
+    definition: Information about a tariff.
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/Tariff
+  - term: Availability
+    definition: 'Enumeration declared by the contract with values: AVAILABLE, NOT_AVAILABLE, NOT_READY.'
+    tags:
+    - Enumeration
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/Availability
+  - term: FeatureAvailability
+    definition: 'Object declared by the contract with fields: charge_cost, smart_charge, utility_statements, hosted_payments, utility_remittance.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/FeatureAvailability
+  - term: UtilityMeter
+    definition: 'Object declared by the contract with fields: id, client_user_id, utility_credential_id, utility_account_id, meter_number, service_type,
+      created_at, updated_at, sandboxed.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/UtilityMeter
+  - term: UtilityAccount
+    definition: 'Object declared by the contract with fields: id, client_user_id, utility_name, utility_long_name, utility_credential_id, account_number,
+      service_address_street_one, service_address_street_two, service_address_city, service_address_state, service_address_zip, service_customer_name.
+      (10 more)'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/UtilityAccount
+  - term: PaginatedUtilityAccounts
+    definition: 'Object declared by the contract with fields: data, total_count.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/PaginatedUtilityAccounts
+  - term: PaginatedUsers
+    definition: 'Object declared by the contract with fields: data, total_count.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/PaginatedUsers
+  - term: UtilityCredential
+    definition: 'Object declared by the contract with fields: id, client_user_id, utility_name, utility_long_name, username, verification_status,
+      accounts_load_in_progress, verification_updated_at, created_at, updated_at, sandboxed, uses_test_scenario.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/UtilityCredential
+  - term: User
+    definition: 'Object declared by the contract with fields: client_user_id, created_at, utility_credentials.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/User
+  - term: UserDataExceedsLimitsError
+    definition: 'Object declared by the contract with fields: error.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/UserDataExceedsLimitsError
+  - term: UserNotFoundError
+    definition: 'Object declared by the contract with fields: error.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/UserNotFoundError
+  - term: DeleteUserError
+    definition: 'Object declared by the contract with fields: error.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/DeleteUserError
+  - term: PaginatedUtilityCredentials
+    definition: 'Object declared by the contract with fields: data, total_count.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/PaginatedUtilityCredentials
+  - term: PaginatedUtilityMeters
+    definition: 'Object declared by the contract with fields: data, total_count.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/PaginatedUtilityMeters
+  - term: MalformedParametersError
+    definition: 'Object declared by the contract with fields: error.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/MalformedParametersError
+  - term: UtilityStatement
+    definition: 'Object declared by the contract with fields: id, client_user_id, tariff, utility_name, utility_long_name, utility_account_id,
+      statement_date, due_date, service_start_date, service_end_date, kwh, utility_charge. (14 more)'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/UtilityStatement
+  - term: PaginatedUtilityStatements
+    definition: 'Object declared by the contract with fields: data, total_count.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/PaginatedUtilityStatements
+  - term: UtilityAccountNotFoundError
+    definition: 'Object declared by the contract with fields: error.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/UtilityAccountNotFoundError
+  - term: UtilityStatementsFeatureAvailabilityError
+    definition: 'Object declared by the contract with fields: error.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/UtilityStatementsFeatureAvailabilityError
+  - term: ChargeCostRequestBodyParams
+    definition: 'Object declared by the contract with fields: utility_account_id, main_tariff_id, start_time, charge_block_resolution, energy_usage_kwh.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/ChargeCostRequestBodyParams
+  - term: ChargeCostResponse
+    definition: 'Object declared by the contract with fields: utility_account_id, tariff, normalized_start_time, normalized_consumption_kwh, cost_cents.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/ChargeCostResponse
+  - term: TariffResolutionError
+    definition: 'Object declared by the contract with fields: error.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/TariffResolutionError
+  - term: ChargeCurvesTariffParamError
+    definition: 'Object declared by the contract with fields: error.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/ChargeCurvesTariffParamError
+  - term: ChargeCostFeatureAvailabilityError
+    definition: 'Object declared by the contract with fields: error.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/ChargeCostFeatureAvailabilityError
+  - term: SparkParamValidationError
+    definition: 'Object declared by the contract with fields: error.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/SparkParamValidationError
+  - term: SmartChargeScheduleRequestBodyParams
+    definition: 'Object declared by the contract with fields: utility_account_id, main_tariff_id, start_time, end_time, minutes_to_charge_complete,
+      charge_block_resolution.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/SmartChargeScheduleRequestBodyParams
+  - term: TimeSeriesItem
+    definition: 'Object declared by the contract with fields: timestamp, value.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/TimeSeriesItem
+  - term: SmartChargeScheduleResponse
+    definition: 'Object declared by the contract with fields: start_time, charge_block_resolution, charge_block_active.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/SmartChargeScheduleResponse
+  - term: SmartChargeFeatureAvailabilityError
+    definition: 'Object declared by the contract with fields: error.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/SmartChargeFeatureAvailabilityError
+  - term: TariffRatesRequestBodyParams
+    definition: 'Object declared by the contract with fields: utility_account_id, main_tariff_id, start_time, end_time, time_block_resolution.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/TariffRatesRequestBodyParams
+  - term: TariffRatesResponse
+    definition: 'Object declared by the contract with fields: tariff, rates_cost_per_kwh.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/TariffRatesResponse
+  - term: LoadServingEntitySchema
+    definition: 'Object declared by the contract with fields: lse_id, name, code, num_customers.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/LoadServingEntitySchema
+  - term: SearchLoadServingEntitiesResponse
+    definition: 'Object declared by the contract with fields: data, total_count.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/SearchLoadServingEntitiesResponse
+  - term: TariffApplicabilityQuestionSchema
+    definition: 'Object declared by the contract with fields: id, user_question, user_question_details, answer_data_type.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/TariffApplicabilityQuestionSchema
+  - term: TariffApplicabilityQuestionsResponse
+    definition: 'Object declared by the contract with fields: country, lse_id, zip_code, applicability_questions.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/TariffApplicabilityQuestionsResponse
+  - term: OptimizedTariffRecommendationsLseIdentificationParamError
+    definition: 'Object declared by the contract with fields: error.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/OptimizedTariffRecommendationsLseIdentificationParamError
+  - term: TariffApplicabilityAnswerSchema
+    definition: 'Object declared by the contract with fields: question_id, value, data_type.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/TariffApplicabilityAnswerSchema
+  - term: TariffApplicabilityAnswersRequestParams
+    definition: 'Object declared by the contract with fields: utility_account_id, zip_code, lse_id, applicability_answers.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/TariffApplicabilityAnswersRequestParams
+  - term: OptimizedTariffRecommendationsResponse
+    definition: 'Object declared by the contract with fields: country, lse_id, zip_code, recommendations.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/OptimizedTariffRecommendationsResponse
+  - term: TariffScenarioDeviceSolarParams
+    definition: 'Object declared by the contract with fields: device, solar_system_kw.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/TariffScenarioDeviceSolarParams
+  - term: EvChargePlan
+    definition: Specifies a time window where the EV is at home and available for charging.
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/EvChargePlan
+  - term: TariffScenarioDeviceEvChargingParams
+    definition: Parameters for charging level and EV operation schedule
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/TariffScenarioDeviceEvChargingParams
+  - term: TariffScenarioDeviceRemovedEvChargingParams
+    definition: Parameters for charging level and EV operation schedule
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/TariffScenarioDeviceRemovedEvChargingParams
+  - term: TariffScenarioCostRequestParams
+    definition: 'Object declared by the contract with fields: utility_account_id, main_tariff_id, zip_code, applicability_answers, baseline_load,
+      device_loads.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/TariffScenarioCostRequestParams
+  - term: TariffScenarioCostResponse
+    definition: Parameters for a rooftop solar system
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/TariffScenarioCostResponse
+  - term: TariffScenarioCostRequestTariffIdentificationParamError
+    definition: 'Object declared by the contract with fields: error.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/TariffScenarioCostRequestTariffIdentificationParamError
+  - term: TouSeason
+    definition: 'Object declared by the contract with fields: seasonFromDay, seasonToDay, seasonFromMonth, seasonToMonth.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/TouSeason
+  - term: TouPeriod
+    definition: 'Object declared by the contract with fields: fromDayOfWeek, toDayOfWeek, fromHour, toHour.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/TouPeriod
+  - term: TimeOfUse
+    definition: 'Object declared by the contract with fields: season, touPeriods.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/TimeOfUse
+  - term: FixedSchedule
+    definition: 'Object declared by the contract with fields: chargeTous, dischargeTous, timezone.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/FixedSchedule
+  - term: DispatchStrategy
+    definition: 'Object declared by the contract with fields: optimize, chargeOnSurplus, fixedSchedule.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/DispatchStrategy
+  - term: StorageOptimizationSchedulesRequestParams
+    definition: 'Object declared by the contract with fields: main_tariff_id, tariff_property_inputs, from_date_time, consumption_curve_kwh_ac,
+      solar_generation_curve_kwh_dc, dispatch_strategy, solar_dc_to_ac_efficiency, allow_grid_to_battery, allow_solar_to_battery, allow_solar_to_grid,
+      allow_battery_to_grid, battery_dc_coupled. (10 more)'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/StorageOptimizationSchedulesRequestParams
+  - term: StorageOptimizationSchedulesResponse
+    definition: 'Object declared by the contract with fields: from_date_time, grid_to_site_kwh_ac, grid_to_battery_kwh_ac, solar_to_battery_kwh_dc,
+      solar_to_site_kwh_ac, solar_to_grid_kwh_ac, solar_curtailed_kwh_dc, battery_to_site_kwh_ac, battery_to_grid_kwh_ac, net_load_kwh_ac, battery_soc.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/StorageOptimizationSchedulesResponse
+  - term: BundleEnrollmentRequestBodyParams
+    definition: 'Object declared by the contract with fields: utility_account_ids.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/BundleEnrollmentRequestBodyParams
+  - term: IneligibilityReasonEnum
+    definition: 'Enumeration declared by the contract with values: 2fa, ebill_ineligible_incorrect_credentials, ebill_ineligible_third_party,
+      gas_only, inactive_utility_account, incomplete_utility_account, missing_payment_method, past_due, payment_arrangement, sdg&e_paperless_gas_account,
+      sibling_account_ineligible, solar_non_approved_utility. (1 more)'
+    tags:
+    - Enumeration
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/IneligibilityReasonEnum
+  - term: IneligibilityReason
+    definition: 'Object declared by the contract with fields: resolvable, reason.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/IneligibilityReason
+  - term: BundleEnrollment
+    definition: 'Object declared by the contract with fields: client_user_id, utility_account_id, product_key, status, ineligibility_reasons,
+      removal_reason, start_date, override_email, sandboxed.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/BundleEnrollment
+  - term: UtilityRemittanceEnrollError
+    definition: 'Object declared by the contract with fields: error.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/UtilityRemittanceEnrollError
+  - term: BundleEnrollmentInvalidUtilityAccountIdsError
+    definition: 'Object declared by the contract with fields: error.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/BundleEnrollmentInvalidUtilityAccountIdsError
+  - term: BundleEnrollmentMissingUtilityAccountIdsError
+    definition: 'Object declared by the contract with fields: error.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/BundleEnrollmentMissingUtilityAccountIdsError
+  - term: UnpermittedParametersError
+    definition: 'Object declared by the contract with fields: error.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/UnpermittedParametersError
+  - term: InvalidResourceError
+    definition: 'Object declared by the contract with fields: error.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/InvalidResourceError
+  - term: BundleUnenrollError
+    definition: 'Object declared by the contract with fields: error.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/BundleUnenrollError
+  - term: BundleUtilityRemittanceItemCreateRequestBodyParams
+    definition: 'Object declared by the contract with fields: scheduled_at, amount_cents.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/BundleUtilityRemittanceItemCreateRequestBodyParams
+  - term: UtilityRemittanceItem
+    definition: 'Object declared by the contract with fields: id, utility_statement_id, client_user_id, amount_cents, status, created_at, updated_at,
+      scheduled_at, remitted_at, sandboxed.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/UtilityRemittanceItem
+  - term: ForbiddenError
+    definition: 'Object declared by the contract with fields: error.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/ForbiddenError
+  - term: UtilityStatementNotFoundError
+    definition: 'Object declared by the contract with fields: error.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/UtilityStatementNotFoundError
+  - term: UtilityRemittanceItemCreateError
+    definition: 'Object declared by the contract with fields: error.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/UtilityRemittanceItemCreateError
+  - term: ThrottledError
+    definition: 'Object declared by the contract with fields: error.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/ThrottledError
+  - term: WebhookEndpoint
+    definition: 'Object declared by the contract with fields: created_at, updated_at, id, signing_key, url, sandboxed, enabled, arc_version.'
+    tags:
+    - Object
+    source: openapi/arcadiapower2-openapi.yaml#/components/schemas/WebhookEndpoint

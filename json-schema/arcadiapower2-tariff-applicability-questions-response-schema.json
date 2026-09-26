@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/arcadiapower2/main/json-schema/arcadiapower2-tariff-applicability-questions-response-schema.json",
+  "title": "TariffApplicabilityQuestionsResponse",
+  "x-generated": "2026-09-26",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/arcadiapower2-openapi.yaml#/components/schemas/TariffApplicabilityQuestionsResponse",
+  "required": [
+    "country",
+    "lse_id",
+    "zip_code",
+    "applicability_questions"
+  ],
+  "properties": {
+    "country": {
+      "type": "string",
+      "description": "The country used for determining tariff applicability"
+    },
+    "lse_id": {
+      "type": "string",
+      "description": "The Genability 'lseId' unique identifier for this load serving entity. See [Genability documentation](https://developer.genability.com/api-reference/tariff-api/load-serving-entity/) for details."
+    },
+    "zip_code": {
+      "type": "string",
+      "description": "The zip code used for determining tariff applicability"
+    },
+    "applicability_questions": {
+      "type": "array",
+      "description": "List of applicability questions that will determine optimization-eligible tariffs in this LSE.",
+      "items": {
+        "$ref": "#/$defs/TariffApplicabilityQuestionSchema"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "TariffApplicabilityQuestionSchema": {
+      "required": [
+        "id",
+        "user_question",
+        "answer_data_type"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "String identifier for the applicability question"
+        },
+        "user_question": {
+          "type": "string",
+          "description": "The user question corresponding to this tariff applicability"
+        },
+        "user_question_details": {
+          "description": "The user question details corresponding to this tariff applicability",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "answer_data_type": {
+          "type": "string",
+          "description": "Type of answer expected to be returned for this tariff applicability question"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/arcadiapower2/main/json-schema/arcadiapower2-storage-optimization-schedules-response-schema.json",
+  "title": "StorageOptimizationSchedulesResponse",
+  "x-generated": "2026-09-26",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/arcadiapower2-openapi.yaml#/components/schemas/StorageOptimizationSchedulesResponse",
+  "type": "object",
+  "properties": {
+    "from_date_time": {
+      "description": "Start time corresponding to the beginning of the hour when the consumption and solar curves start. Echoed back from request parameters.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "grid_to_site_kwh_ac": {
+      "description": "Amount of electricity flowing to site load from the grid (kWh AC).",
+      "type": "array",
+      "items": {
+        "type": "number",
+        "minimum": 0
+      }
+    },
+    "grid_to_battery_kwh_ac": {
+      "description": "Amount of electricity flowing to the battery from the grid, before conversion with `battery_ac_to_dc_efficiency` (kWh AC).",
+      "type": "array",
+      "items": {
+        "type": "number",
+        "minimum": 0
+      }
+    },
+    "solar_to_battery_kwh_dc": {
+      "description": "Amount of electricity flowing to the battery from PV solar generation, either without any conversion if `battery_dc_coupled` or after double-conversion with `solar_dc_to_ac_efficiency` * `battery_ac_to_dc_efficiency` if not (kWh DC).",
+      "type": "array",
+      "items": {
+        "type": "number",
+        "minimum": 0
+      }
+    },
+    "solar_to_site_kwh_ac": {
+      "description": "Amount of electricity flowing to site load from PV solar generation, after conversion with `solar_dc_to_ac_efficiency` (kWh AC).",
+      "type": "array",
+      "items": {
+        "type": "number",
+        "minimum": 0
+      }
+    },
+    "solar_to_grid_kwh_ac": {
+      "description": "Amount of electricity flowing to the grid from PV solar generation, after conversion with `solar_dc_to_ac_efficiency` (kWh AC).",
+      "type": "array",
+      "items": {
+        "type": "number",
+        "minimum": 0
+      }
+    },
+    "solar_curtailed_kwh_dc": {
+      "description": "Amount of electricity from solar that goes unused (kWh DC).",
+      "type": "array",
+      "items": {
+        "type": "number",
+        "minimum": 0
+      }
+    },
+    "battery_to_site_kwh_ac": {
+      "description": "Amount of electricity flowing to site load from the battery, after conversion with `battery_dc_to_ac_efficiency` (kWh AC).",
+      "type": "array",
+      "items": {
+        "type": "number",
+        "minimum": 0
+      }
+    },
+    "battery_to_grid_kwh_ac": {
+      "description": "Amount of electricity flowing to the grid from battery, after conversion with `battery_dc_to_ac_efficiency` (kWh AC).",
+      "type": "array",
+      "items": {
+        "type": "number",
+        "minimum": 0
+      }
+    },
+    "net_load_kwh_ac": {
+      "description": "Amount of electricity flowing from the grid if positive or to the grid if negative (kWh AC). Equals `grid_to_site_kwh_ac` + `grid_to_battery_kwh_ac` - `battery_to_grid_kwh_ac` - `solar_to_grid_kwh_ac`.",
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "battery_soc": {
+      "description": "Hourly battery state of charge (`0.0` - `1.0`, though in practice, all values will be between `battery_min_soc` and `battery_max_soc`). Multiply by `battery_nameplate_capacity` to get a timeseries of kWh DC stored.",
+      "type": "array",
+      "items": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 1
+      }
+    }
+  },
+  "required": [
+    "from_date_time",
+    "grid_to_site_kwh_ac",
+    "grid_to_battery_kwh_ac",
+    "solar_to_battery_kwh_dc",
+    "solar_to_site_kwh_ac",
+    "solar_to_grid_kwh_ac",
+    "solar_curtailed_kwh_dc",
+    "battery_to_site_kwh_ac",
+    "battery_to_grid_kwh_ac",
+    "battery_soc"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,30 @@
+generated: '2026-09-25'
+method: searched
+generator: extract-docs-artifacts.py (local)
+source: https://docs.arcadia.com/reference/pagination.md
+sources:
+- https://docs.arcadia.com/reference/pagination.md
+- https://docs.arcadia.com/docs/dashboard-quick-start-guide.md
+- https://docs.arcadia.com/docs/api-quick-start-guide.md
+- https://docs.arcadia.com/docs/mcp.md
+idempotency:
+  coverage: none
+  evidence: The documentation does not describe any idempotency key header or mechanism for write operations.
+pagination:
+  style: page‑number based
+  params:
+  - '`page` – 0‑indexed page number (default 0)'
+  - '`size` – page size (default 20, max 100 for most resources, 5000 for providers, 100 for listed resources)'
+  - '`sort` – optional sort expression, e.g. `sort=accountNumber,desc`'
+  response_fields:
+  - '`page.number` – index of the page returned'
+  - '`page.size` – number of elements on the page'
+  - '`page.totalElements` – total elements across all pages'
+  - '`page.totalPages` – total number of pages'
+  evidence: Pagination defaults to 20 records per page, with limits per resource type and a hard cap of 10,000 results for list endpoints.
+versioning: 'The API uses a request header `Arcadia-Version` (e.g., `Arcadia-Version: 2024-02-21`) to specify API version.'
+error_envelope: Errors are returned as a JSON object with an `errors` array; each entry contains `message`, `type`, optional `param`, and a `details`
+  object with `errorId`.
+authentication: 'Bearer token authentication via the `Authorization: Bearer {accessToken}` header.'
+request_tracing: Responses include a `correlationIds` array (e.g., `{correlationId}`) that can be used for tracing requests.
+docs: https://docs.arcadia.com/reference/pagination.md

@@ -1,0 +1,104 @@
+generated: '2026-09-26'
+method: derived
+source: the pre-flight dossier, apis.yml pointers, spec servers, well-known, vendors -- nothing fetched here
+generator: derive-hosts.py
+summary:
+  hosts: 7
+  own: 6
+  other_domain: 1
+  platform: 0
+  roles:
+  - api
+  - docs
+  - other
+  - portal
+  - website
+hosts:
+- host: api.arcadia.com
+  found_by:
+  - apis[]
+  - contract-discovery
+  types: []
+  serves:
+  - api
+  registrable_domain: arcadia.com
+  role: api
+  relation: own
+- host: developers.arcadia.com
+  found_by:
+  - probed
+  - site-links
+  - namespace-probe
+  - well-known
+  types: []
+  serves: []
+  title: Arcadia
+  status: 200
+  registrable_domain: arcadia.com
+  role: portal
+  relation: own
+- host: discover.arcadia.com
+  found_by:
+  - probed
+  - site-links
+  - contract-discovery
+  - well-known
+  types: []
+  serves: []
+  registrable_domain: arcadia.com
+  role: other
+  relation: own
+- host: docs.arcadia.com
+  found_by:
+  - pointer
+  - apis[]
+  - probed
+  - site-links
+  - docs-index
+  - contract-discovery
+  - well-known
+  types:
+  - GettingStarted
+  - Documentation
+  serves:
+  - docs
+  registrable_domain: arcadia.com
+  role: docs
+  relation: own
+- host: docs.arcadia.com:443
+  found_by:
+  - docs-index
+  types: []
+  serves:
+  - docs
+  registrable_domain: arcadia.com:443
+  role: docs
+  relation: other-domain
+- host: platform-legal.arcadia.com
+  found_by:
+  - probed
+  - site-links
+  - contract-discovery
+  - well-known
+  types: []
+  serves: []
+  registrable_domain: arcadia.com
+  role: other
+  relation: own
+- host: www.arcadia.com
+  found_by:
+  - pointer
+  - probed
+  - contract-discovery
+  - well-known
+  types:
+  - Compliance
+  - Security
+  - Newsroom
+  - Login
+  - Blog
+  - Website
+  serves: []
+  registrable_domain: arcadia.com
+  role: website
+  relation: own

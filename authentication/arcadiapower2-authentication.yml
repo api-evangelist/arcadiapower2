@@ -1,0 +1,21 @@
+generated: '2026-09-25'
+method: searched
+generator: extract-docs-artifacts.py (local)
+source: https://docs.arcadia.com/docs/mfa.md
+sources:
+- https://docs.arcadia.com/docs/mfa.md
+- https://docs.arcadia.com/docs/api-authentication.md
+- https://docs.arcadia.com/reference/list-api-keys.md
+- https://docs.arcadia.com/reference/create-api-key.md
+description: Authentication for the Plug API uses OAuth2 with the client credentials flow.
+schemes:
+- type: oauth2
+  name: OAuth2
+  evidence: This API uses OAuth2 with the client credentials flow using the ['Create an Access Token'](https://docs.arcadia.com/reference/create-access-token)
+    endpoint.
+  flows:
+  - client_credentials
+  token_url: https://api.arcadia.com/oauth2/token
+  how_to_obtain: Retrieve an API key from the Dashboard and use it with the Create Access Token endpoint to obtain a time‑limited access token.
+note: No other authentication schemes (apiKey, http‑bearer, etc.) are documented for API calls.
+docs: https://docs.arcadia.com/docs/mfa.md

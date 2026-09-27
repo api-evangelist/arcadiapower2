@@ -100,6 +100,24 @@ webhooks:
               $ref: '#/components/schemas/UtilityRemittanceItemScheduledWebhookEvent'
 components:
   schemas:
+    UtilityRemittancePendingEnrollmentWebhookEvent:
+      required:
+      - created_at
+      - data
+      - type
+      properties:
+        type:
+          type: string
+          enum:
+          - utility_remittance_pending_enrollment
+        created_at:
+          description: Date and time this Webhook Event was generated. Given in UTC.
+          type: string
+          format: date-time
+        data:
+          description: Data relevant to this Webhook Event.
+          $ref: '#/components/schemas/BundleEnrollment'
+      additionalProperties: false
     BundleEnrollment:
       required:
       - client_user_id
@@ -168,6 +186,78 @@ components:
           description: If `true`, this resource is in the sandboxed environment. If `false`, this resource is in the live environment.
           type: boolean
           example: false
+      additionalProperties: false
+    UtilityRemittanceEnrolledWebhookEvent:
+      required:
+      - created_at
+      - data
+      - type
+      properties:
+        type:
+          type: string
+          enum:
+          - utility_remittance_enrolled
+        created_at:
+          description: Date and time this Webhook Event was generated. Given in UTC.
+          type: string
+          format: date-time
+        data:
+          description: Data relevant to this Webhook Event.
+          $ref: '#/components/schemas/BundleEnrollment'
+      additionalProperties: false
+    UtilityRemittanceIneligibleWebhookEvent:
+      required:
+      - created_at
+      - data
+      - type
+      properties:
+        type:
+          type: string
+          enum:
+          - utility_remittance_ineligible
+        created_at:
+          description: Date and time this Webhook Event was generated. Given in UTC.
+          type: string
+          format: date-time
+        data:
+          description: Data relevant to this Webhook Event.
+          $ref: '#/components/schemas/BundleEnrollment'
+      additionalProperties: false
+    UtilityRemittanceItemRemittedWebhookEvent:
+      required:
+      - type
+      - created_at
+      - data
+      properties:
+        type:
+          type: string
+          enum:
+          - utility_remittance_item_remitted
+        created_at:
+          description: Date and time this Webhook Event was generated. Given in UTC.
+          type: string
+          format: date-time
+        data:
+          description: Data relevant to this Webhook Event.
+          $ref: '#/components/schemas/UtilityRemittanceItem'
+      additionalProperties: false
+    UtilityRemittancePendingRemovalWebhookEvent:
+      required:
+      - created_at
+      - data
+      - type
+      properties:
+        type:
+          type: string
+          enum:
+          - utility_remittance_pending_removal
+        created_at:
+          description: Date and time this Webhook Event was generated. Given in UTC.
+          type: string
+          format: date-time
+        data:
+          description: Data relevant to this Webhook Event.
+          $ref: '#/components/schemas/BundleEnrollment'
       additionalProperties: false
     IneligibilityReasonEnum:
       type: string
@@ -242,54 +332,6 @@ components:
           type: boolean
           example: 'false'
       additionalProperties: false
-    IneligibilityReason:
-      required:
-      - resolvable
-      - reason
-      properties:
-        resolvable:
-          type: boolean
-          description: If `true`, signifies that corrective action can be taken to resolve this Ineligibility Reason. If `false`, this Ineligibility Reason cannot be resolved
-          example: false
-        reason:
-          $ref: '#/components/schemas/IneligibilityReasonEnum'
-      additionalProperties: false
-    UtilityRemittanceIneligibleWebhookEvent:
-      required:
-      - created_at
-      - data
-      - type
-      properties:
-        type:
-          type: string
-          enum:
-          - utility_remittance_ineligible
-        created_at:
-          description: Date and time this Webhook Event was generated. Given in UTC.
-          type: string
-          format: date-time
-        data:
-          description: Data relevant to this Webhook Event.
-          $ref: '#/components/schemas/BundleEnrollment'
-      additionalProperties: false
-    UtilityRemittanceRemovedWebhookEvent:
-      required:
-      - created_at
-      - data
-      - type
-      properties:
-        type:
-          type: string
-          enum:
-          - utility_remittance_removed
-        created_at:
-          description: Date and time this Webhook Event was generated. Given in UTC.
-          type: string
-          format: date-time
-        data:
-          description: Data relevant to this Webhook Event.
-          $ref: '#/components/schemas/BundleEnrollment'
-      additionalProperties: false
     UtilityRemittanceItemScheduledWebhookEvent:
       required:
       - type
@@ -308,25 +350,19 @@ components:
           description: Data relevant to this Webhook Event.
           $ref: '#/components/schemas/UtilityRemittanceItem'
       additionalProperties: false
-    UtilityRemittanceItemRemittedWebhookEvent:
+    IneligibilityReason:
       required:
-      - type
-      - created_at
-      - data
+      - resolvable
+      - reason
       properties:
-        type:
-          type: string
-          enum:
-          - utility_remittance_item_remitted
-        created_at:
-          description: Date and time this Webhook Event was generated. Given in UTC.
-          type: string
-          format: date-time
-        data:
-          description: Data relevant to this Webhook Event.
-          $ref: '#/components/schemas/UtilityRemittanceItem'
+        resolvable:
+          type: boolean
+          description: If `true`, signifies that corrective action can be taken to resolve this Ineligibility Reason. If `false`, this Ineligibility Reason cannot be resolved
+          example: false
+        reason:
+          $ref: '#/components/schemas/IneligibilityReasonEnum'
       additionalProperties: false
-    UtilityRemittanceEnrolledWebhookEvent:
+    UtilityRemittanceRemovedWebhookEvent:
       required:
       - created_at
       - data
@@ -335,43 +371,7 @@ components:
         type:
           type: string
           enum:
-          - utility_remittance_enrolled
-        created_at:
-          description: Date and time this Webhook Event was generated. Given in UTC.
-          type: string
-          format: date-time
-        data:
-          description: Data relevant to this Webhook Event.
-          $ref: '#/components/schemas/BundleEnrollment'
-      additionalProperties: false
-    UtilityRemittancePendingRemovalWebhookEvent:
-      required:
-      - created_at
-      - data
-      - type
-      properties:
-        type:
-          type: string
-          enum:
-          - utility_remittance_pending_removal
-        created_at:
-          description: Date and time this Webhook Event was generated. Given in UTC.
-          type: string
-          format: date-time
-        data:
-          description: Data relevant to this Webhook Event.
-          $ref: '#/components/schemas/BundleEnrollment'
-      additionalProperties: false
-    UtilityRemittancePendingEnrollmentWebhookEvent:
-      required:
-      - created_at
-      - data
-      - type
-      properties:
-        type:
-          type: string
-          enum:
-          - utility_remittance_pending_enrollment
+          - utility_remittance_removed
         created_at:
           description: Date and time this Webhook Event was generated. Given in UTC.
           type: string

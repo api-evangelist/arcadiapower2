@@ -71,64 +71,6 @@ paths:
                 $ref: '#/components/schemas/UtilityMeter'
 components:
   parameters:
-    serviceTypesQueryParam:
-      in: query
-      name: service_types
-      required: false
-      description: A list of service types to filter the list of returns items by.
-      schema:
-        type: array
-        items:
-          type: string
-          enum:
-          - electric
-          - gas
-          - water
-    arcVersionInHeaderParam:
-      name: Arcadia-Version
-      in: header
-      example: '2022-10-13'
-      description: The Arcadia-Version for the request
-      required: true
-      schema:
-        type: string
-        default: '2022-10-13'
-    utilityAccountIdQueryParam:
-      in: query
-      name: utility_account_id
-      required: false
-      description: A utility account id to filter the list of returned items by.
-      schema:
-        type: integer
-    paginationUpdatedAfterParam:
-      in: query
-      name: updated_after
-      required: false
-      description: ISO8601 datetime, used to traverse paginated responses. Use of this parameter is mutually exclusive with `updated_before`.
-      schema:
-        type: string
-        format: date-time
-    utilityMeterIdInPathParam:
-      name: utility_meter_id
-      in: path
-      required: true
-      schema:
-        type: integer
-    paginationLimitParam:
-      in: query
-      name: limit
-      required: false
-      schema:
-        type: integer
-        minimum: 1
-        default: 10
-    clientUserIdQueryParam:
-      in: query
-      name: client_user_id
-      required: false
-      description: A client_user_id to filter the list of returned items by.
-      schema:
-        type: string
     paginationOrderParam:
       in: query
       name: order
@@ -148,44 +90,65 @@ components:
       schema:
         type: string
         format: date-time
+    arcVersionInHeaderParam:
+      name: Arcadia-Version
+      in: header
+      example: '2022-10-13'
+      description: The Arcadia-Version for the request
+      required: true
+      schema:
+        type: string
+        default: '2022-10-13'
+    paginationUpdatedAfterParam:
+      in: query
+      name: updated_after
+      required: false
+      description: ISO8601 datetime, used to traverse paginated responses. Use of this parameter is mutually exclusive with `updated_before`.
+      schema:
+        type: string
+        format: date-time
+    serviceTypesQueryParam:
+      in: query
+      name: service_types
+      required: false
+      description: A list of service types to filter the list of returns items by.
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+          - electric
+          - gas
+          - water
+    utilityMeterIdInPathParam:
+      name: utility_meter_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    utilityAccountIdQueryParam:
+      in: query
+      name: utility_account_id
+      required: false
+      description: A utility account id to filter the list of returned items by.
+      schema:
+        type: integer
+    clientUserIdQueryParam:
+      in: query
+      name: client_user_id
+      required: false
+      description: A client_user_id to filter the list of returned items by.
+      schema:
+        type: string
+    paginationLimitParam:
+      in: query
+      name: limit
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
   schemas:
-    MalformedParametersError:
-      required:
-      - error
-      properties:
-        error:
-          type: object
-          required:
-          - description
-          - type
-          - details
-          properties:
-            description:
-              type: string
-              enum:
-              - Request included malformed parameters
-            type:
-              type: string
-              enum:
-              - BAD_REQUEST
-            details:
-              type: object
-              required: []
-              properties:
-                service_types:
-                  type: array
-                  items:
-                    type: string
-                    enum:
-                    - must be an array
-                amount_cents:
-                  type: array
-                  items:
-                    type: string
-                    enum:
-                    - must be an integer
-                    - must not exceed 3000000 cents
-      additionalProperties: false
     UtilityMeter:
       required:
       - id
@@ -228,6 +191,43 @@ components:
         sandboxed:
           type: boolean
           example: false
+      additionalProperties: false
+    MalformedParametersError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - Request included malformed parameters
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+            details:
+              type: object
+              required: []
+              properties:
+                service_types:
+                  type: array
+                  items:
+                    type: string
+                    enum:
+                    - must be an array
+                amount_cents:
+                  type: array
+                  items:
+                    type: string
+                    enum:
+                    - must be an integer
+                    - must not exceed 3000000 cents
       additionalProperties: false
     PaginatedUtilityMeters:
       required:

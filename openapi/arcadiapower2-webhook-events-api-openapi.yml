@@ -138,7 +138,50 @@ webhooks:
               $ref: '#/components/schemas/TestWebhookEvent'
 components:
   schemas:
-    UtilityCredentialRevokedWebhookEvent:
+    UtilityMeter:
+      required:
+      - id
+      - client_user_id
+      - utility_credential_id
+      - utility_account_id
+      - meter_number
+      - service_type
+      - created_at
+      - updated_at
+      - sandboxed
+      properties:
+        id:
+          type: integer
+          example: 12345
+        client_user_id:
+          type: string
+          example: fff57dc7-3a2b-4395-8a62-e3486d46dabe
+        utility_credential_id:
+          type: integer
+          example: 54321
+        utility_account_id:
+          type: integer
+          example: 65432
+        meter_number:
+          type: string
+          example: 12300000045 67
+        service_type:
+          type: string
+          enum:
+          - electric
+          - gas
+          - water
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        sandboxed:
+          type: boolean
+          example: false
+      additionalProperties: false
+    HistoricalUtilityStatementsDiscoveredWebhookEvent:
       required:
       - type
       - created_at
@@ -147,12 +190,59 @@ components:
         type:
           type: string
           enum:
-          - utility_credential_revoked
+          - historical_utility_statements_discovered
         created_at:
           type: string
           format: date-time
         data:
-          $ref: '#/components/schemas/UtilityCredential'
+          type: object
+          required:
+          - client_user_id
+          - utility_account_id
+          - utility_statements
+          properties:
+            client_user_id:
+              type: string
+              example: fff57dc7-3a2b-4395-8a62-e3486d46dabe
+            utility_account_id:
+              type: integer
+              example: 1234
+            utility_statements:
+              type: array
+              items:
+                $ref: '#/components/schemas/UtilityStatement'
+      additionalProperties: false
+    NewUtilityStatementAvailableWebhookEvent:
+      required:
+      - type
+      - created_at
+      - data
+      properties:
+        type:
+          type: string
+          enum:
+          - new_utility_statement_available
+        created_at:
+          type: string
+          format: date-time
+        data:
+          $ref: '#/components/schemas/UtilityStatement'
+      additionalProperties: false
+    UtilityAccountUpdatedWebhookEvent:
+      required:
+      - type
+      - created_at
+      - data
+      properties:
+        type:
+          type: string
+          enum:
+          - utility_account_updated
+        created_at:
+          type: string
+          format: date-time
+        data:
+          $ref: '#/components/schemas/UtilityAccount'
       additionalProperties: false
     UtilityCredential:
       required:
@@ -229,6 +319,123 @@ components:
           type: boolean
           example: false
           description: Indicates if the utility credential was created using a designated test username and password.
+    FeatureAvailability:
+      required:
+      - charge_cost
+      - hosted_payments
+      - utility_remittance
+      - smart_charge
+      - utility_statements
+      properties:
+        charge_cost:
+          $ref: '#/components/schemas/Availability'
+        smart_charge:
+          $ref: '#/components/schemas/Availability'
+        utility_statements:
+          $ref: '#/components/schemas/Availability'
+        hosted_payments:
+          $ref: '#/components/schemas/Availability'
+        utility_remittance:
+          $ref: '#/components/schemas/Availability'
+      additionalProperties: false
+    UtilityAccountsDiscoveryErrorWebhookEvent:
+      required:
+      - type
+      - created_at
+      - data
+      properties:
+        type:
+          type: string
+          enum:
+          - utility_accounts_discovery_error
+        created_at:
+          type: string
+          format: date-time
+        data:
+          $ref: '#/components/schemas/UtilityCredential'
+      additionalProperties: false
+    TestWebhookEvent:
+      required:
+      - type
+      - created_at
+      properties:
+        type:
+          type: string
+          enum:
+          - test
+        created_at:
+          type: string
+          format: date-time
+      additionalProperties: false
+    UtilityCredentialRejectedWebhookEvent:
+      required:
+      - type
+      - created_at
+      - data
+      properties:
+        type:
+          type: string
+          enum:
+          - utility_credential_rejected
+        created_at:
+          type: string
+          format: date-time
+        data:
+          $ref: '#/components/schemas/UtilityCredential'
+      additionalProperties: false
+    Availability:
+      type: string
+      enum:
+      - AVAILABLE
+      - NOT_AVAILABLE
+      - NOT_READY
+    UtilityCredentialRevokedWebhookEvent:
+      required:
+      - type
+      - created_at
+      - data
+      properties:
+        type:
+          type: string
+          enum:
+          - utility_credential_revoked
+        created_at:
+          type: string
+          format: date-time
+        data:
+          $ref: '#/components/schemas/UtilityCredential'
+      additionalProperties: false
+    UtilityAccountsDiscoveredWebhookEvent:
+      required:
+      - type
+      - created_at
+      - data
+      properties:
+        type:
+          type: string
+          enum:
+          - utility_accounts_discovered
+        created_at:
+          type: string
+          format: date-time
+        data:
+          type: object
+          required:
+          - client_user_id
+          - utility_credential_id
+          - utility_accounts
+          properties:
+            client_user_id:
+              type: string
+              example: fff57dc7-3a2b-4395-8a62-e3486d46dabe
+            utility_credential_id:
+              type: integer
+              example: 1234
+            utility_accounts:
+              type: array
+              items:
+                $ref: '#/components/schemas/UtilityAccount'
+      additionalProperties: false
     Tariff:
       description: Information about a tariff.
       required:
@@ -407,7 +614,7 @@ components:
           type: boolean
           example: false
       additionalProperties: false
-    NewUtilityStatementAvailableWebhookEvent:
+    UtilityCredentialVerificationErrorWebhookEvent:
       required:
       - type
       - created_at
@@ -416,12 +623,12 @@ components:
         type:
           type: string
           enum:
-          - new_utility_statement_available
+          - utility_credential_verification_error
         created_at:
           type: string
           format: date-time
         data:
-          $ref: '#/components/schemas/UtilityStatement'
+          $ref: '#/components/schemas/UtilityCredential'
       additionalProperties: false
     MostRecentTariff:
       allOf:
@@ -437,48 +644,21 @@ components:
             format: date
             description: The statement date of the utility statement that reported use of this tariff.
             example: '2021-03-01'
-    UtilityMeter:
+    UtilityCredentialVerifiedWebhookEvent:
       required:
-      - id
-      - client_user_id
-      - utility_credential_id
-      - utility_account_id
-      - meter_number
-      - service_type
+      - type
       - created_at
-      - updated_at
-      - sandboxed
+      - data
       properties:
-        id:
-          type: integer
-          example: 12345
-        client_user_id:
-          type: string
-          example: fff57dc7-3a2b-4395-8a62-e3486d46dabe
-        utility_credential_id:
-          type: integer
-          example: 54321
-        utility_account_id:
-          type: integer
-          example: 65432
-        meter_number:
-          type: string
-          example: 12300000045 67
-        service_type:
+        type:
           type: string
           enum:
-          - electric
-          - gas
-          - water
+          - utility_credential_verified
         created_at:
           type: string
           format: date-time
-        updated_at:
-          type: string
-          format: date-time
-        sandboxed:
-          type: boolean
-          example: false
+        data:
+          $ref: '#/components/schemas/UtilityCredential'
       additionalProperties: false
     UtilityStatement:
       required:
@@ -860,186 +1040,6 @@ components:
                   conflicting_utility_statment_id:
                     type: integer
       additionalProperties: false
-    UtilityCredentialRejectedWebhookEvent:
-      required:
-      - type
-      - created_at
-      - data
-      properties:
-        type:
-          type: string
-          enum:
-          - utility_credential_rejected
-        created_at:
-          type: string
-          format: date-time
-        data:
-          $ref: '#/components/schemas/UtilityCredential'
-      additionalProperties: false
-    UtilityAccountUpdatedWebhookEvent:
-      required:
-      - type
-      - created_at
-      - data
-      properties:
-        type:
-          type: string
-          enum:
-          - utility_account_updated
-        created_at:
-          type: string
-          format: date-time
-        data:
-          $ref: '#/components/schemas/UtilityAccount'
-      additionalProperties: false
-    TestWebhookEvent:
-      required:
-      - type
-      - created_at
-      properties:
-        type:
-          type: string
-          enum:
-          - test
-        created_at:
-          type: string
-          format: date-time
-      additionalProperties: false
-    UtilityAccountsDiscoveredWebhookEvent:
-      required:
-      - type
-      - created_at
-      - data
-      properties:
-        type:
-          type: string
-          enum:
-          - utility_accounts_discovered
-        created_at:
-          type: string
-          format: date-time
-        data:
-          type: object
-          required:
-          - client_user_id
-          - utility_credential_id
-          - utility_accounts
-          properties:
-            client_user_id:
-              type: string
-              example: fff57dc7-3a2b-4395-8a62-e3486d46dabe
-            utility_credential_id:
-              type: integer
-              example: 1234
-            utility_accounts:
-              type: array
-              items:
-                $ref: '#/components/schemas/UtilityAccount'
-      additionalProperties: false
-    UtilityCredentialVerifiedWebhookEvent:
-      required:
-      - type
-      - created_at
-      - data
-      properties:
-        type:
-          type: string
-          enum:
-          - utility_credential_verified
-        created_at:
-          type: string
-          format: date-time
-        data:
-          $ref: '#/components/schemas/UtilityCredential'
-      additionalProperties: false
-    UtilityAccountsDiscoveryErrorWebhookEvent:
-      required:
-      - type
-      - created_at
-      - data
-      properties:
-        type:
-          type: string
-          enum:
-          - utility_accounts_discovery_error
-        created_at:
-          type: string
-          format: date-time
-        data:
-          $ref: '#/components/schemas/UtilityCredential'
-      additionalProperties: false
-    FeatureAvailability:
-      required:
-      - charge_cost
-      - hosted_payments
-      - utility_remittance
-      - smart_charge
-      - utility_statements
-      properties:
-        charge_cost:
-          $ref: '#/components/schemas/Availability'
-        smart_charge:
-          $ref: '#/components/schemas/Availability'
-        utility_statements:
-          $ref: '#/components/schemas/Availability'
-        hosted_payments:
-          $ref: '#/components/schemas/Availability'
-        utility_remittance:
-          $ref: '#/components/schemas/Availability'
-      additionalProperties: false
-    HistoricalUtilityStatementsDiscoveredWebhookEvent:
-      required:
-      - type
-      - created_at
-      - data
-      properties:
-        type:
-          type: string
-          enum:
-          - historical_utility_statements_discovered
-        created_at:
-          type: string
-          format: date-time
-        data:
-          type: object
-          required:
-          - client_user_id
-          - utility_account_id
-          - utility_statements
-          properties:
-            client_user_id:
-              type: string
-              example: fff57dc7-3a2b-4395-8a62-e3486d46dabe
-            utility_account_id:
-              type: integer
-              example: 1234
-            utility_statements:
-              type: array
-              items:
-                $ref: '#/components/schemas/UtilityStatement'
-      additionalProperties: false
-    UtilityCredentialVerificationErrorWebhookEvent:
-      required:
-      - type
-      - created_at
-      - data
-      properties:
-        type:
-          type: string
-          enum:
-          - utility_credential_verification_error
-        created_at:
-          type: string
-          format: date-time
-        data:
-          $ref: '#/components/schemas/UtilityCredential'
-      additionalProperties: false
-    Availability:
-      type: string
-      enum:
-      - AVAILABLE
-      - NOT_AVAILABLE
-      - NOT_READY
   securitySchemes:
     bearerAuth:
       type: http

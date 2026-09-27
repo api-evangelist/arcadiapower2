@@ -184,12 +184,165 @@ components:
           type: boolean
           example: false
           description: Indicates if the utility credential was created using a designated test username and password.
-    Availability:
-      type: string
-      enum:
-      - AVAILABLE
-      - NOT_AVAILABLE
-      - NOT_READY
+    FeatureAvailability:
+      required:
+      - charge_cost
+      - hosted_payments
+      - utility_remittance
+      - smart_charge
+      - utility_statements
+      properties:
+        charge_cost:
+          $ref: '#/components/schemas/Availability'
+        smart_charge:
+          $ref: '#/components/schemas/Availability'
+        utility_statements:
+          $ref: '#/components/schemas/Availability'
+        hosted_payments:
+          $ref: '#/components/schemas/Availability'
+        utility_remittance:
+          $ref: '#/components/schemas/Availability'
+      additionalProperties: false
+    PaginatedUsers:
+      required:
+      - data
+      - total_count
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            required:
+            - client_user_id
+            - created_at
+            - updated_at
+            properties:
+              client_user_id:
+                type: string
+                example: fff57dc7-3a2b-4395-8a62-e3712d46dafl
+              created_at:
+                type: string
+                format: date-time
+              updated_at:
+                type: string
+                format: date-time
+        total_count:
+          type: integer
+          example: 1
+      additionalProperties: false
+    UtilityMeter:
+      required:
+      - id
+      - client_user_id
+      - utility_credential_id
+      - utility_account_id
+      - meter_number
+      - service_type
+      - created_at
+      - updated_at
+      - sandboxed
+      properties:
+        id:
+          type: integer
+          example: 12345
+        client_user_id:
+          type: string
+          example: fff57dc7-3a2b-4395-8a62-e3486d46dabe
+        utility_credential_id:
+          type: integer
+          example: 54321
+        utility_account_id:
+          type: integer
+          example: 65432
+        meter_number:
+          type: string
+          example: 12300000045 67
+        service_type:
+          type: string
+          enum:
+          - electric
+          - gas
+          - water
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        sandboxed:
+          type: boolean
+          example: false
+      additionalProperties: false
+    UserDataExceedsLimitsError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+            details:
+              type:
+              - object
+              - 'null'
+      additionalProperties: false
+    MostRecentTariff:
+      allOf:
+      - $ref: '#/components/schemas/Tariff'
+      - description: The most recent Tariff seen on this utility account.
+        required:
+        - tariff_as_of_date
+        properties:
+          tariff_as_of_date:
+            type:
+            - string
+            - 'null'
+            format: date
+            description: The statement date of the utility statement that reported use of this tariff.
+            example: '2021-03-01'
+    UserNotFoundError:
+      required:
+      - error
+      properties:
+        error:
+          type: string
+          enum:
+          - Couldn't find User
+      additionalProperties: false
+    User:
+      required:
+      - client_user_id
+      - created_at
+      - utility_credentials
+      properties:
+        client_user_id:
+          type: string
+          example: fff57dc7-3a2b-4395-8a62-e3712d46dafl
+        created_at:
+          type: string
+          format: date-time
+        utility_credentials:
+          type: array
+          items:
+            allOf:
+            - $ref: '#/components/schemas/UtilityCredential'
+            - type: object
+              required:
+              - utility_accounts
+              properties:
+                utility_accounts:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/UtilityAccount'
     Tariff:
       description: Information about a tariff.
       required:
@@ -238,20 +391,12 @@ components:
           type: string
           description: Name of the utility associated with this tariff
           example: Pacific Gas & Electric
-    MostRecentTariff:
-      allOf:
-      - $ref: '#/components/schemas/Tariff'
-      - description: The most recent Tariff seen on this utility account.
-        required:
-        - tariff_as_of_date
-        properties:
-          tariff_as_of_date:
-            type:
-            - string
-            - 'null'
-            format: date
-            description: The statement date of the utility statement that reported use of this tariff.
-            example: '2021-03-01'
+    Availability:
+      type: string
+      enum:
+      - AVAILABLE
+      - NOT_AVAILABLE
+      - NOT_READY
     DeleteUserError:
       required:
       - error
@@ -267,132 +412,6 @@ components:
               type: string
               enum:
               - Cannot delete a User who is pending_enrollment, enrolled, or pending unenrollment in a Bundle Product
-            type:
-              type: string
-              enum:
-              - BAD_REQUEST
-            details:
-              type:
-              - object
-              - 'null'
-      additionalProperties: false
-    UtilityMeter:
-      required:
-      - id
-      - client_user_id
-      - utility_credential_id
-      - utility_account_id
-      - meter_number
-      - service_type
-      - created_at
-      - updated_at
-      - sandboxed
-      properties:
-        id:
-          type: integer
-          example: 12345
-        client_user_id:
-          type: string
-          example: fff57dc7-3a2b-4395-8a62-e3486d46dabe
-        utility_credential_id:
-          type: integer
-          example: 54321
-        utility_account_id:
-          type: integer
-          example: 65432
-        meter_number:
-          type: string
-          example: 12300000045 67
-        service_type:
-          type: string
-          enum:
-          - electric
-          - gas
-          - water
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-        sandboxed:
-          type: boolean
-          example: false
-      additionalProperties: false
-    PaginatedUsers:
-      required:
-      - data
-      - total_count
-      properties:
-        data:
-          type: array
-          items:
-            type: object
-            required:
-            - client_user_id
-            - created_at
-            - updated_at
-            properties:
-              client_user_id:
-                type: string
-                example: fff57dc7-3a2b-4395-8a62-e3712d46dafl
-              created_at:
-                type: string
-                format: date-time
-              updated_at:
-                type: string
-                format: date-time
-        total_count:
-          type: integer
-          example: 1
-      additionalProperties: false
-    UserNotFoundError:
-      required:
-      - error
-      properties:
-        error:
-          type: string
-          enum:
-          - Couldn't find User
-      additionalProperties: false
-    User:
-      required:
-      - client_user_id
-      - created_at
-      - utility_credentials
-      properties:
-        client_user_id:
-          type: string
-          example: fff57dc7-3a2b-4395-8a62-e3712d46dafl
-        created_at:
-          type: string
-          format: date-time
-        utility_credentials:
-          type: array
-          items:
-            allOf:
-            - $ref: '#/components/schemas/UtilityCredential'
-            - type: object
-              required:
-              - utility_accounts
-              properties:
-                utility_accounts:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/UtilityAccount'
-    UserDataExceedsLimitsError:
-      required:
-      - error
-      properties:
-        error:
-          type: object
-          required:
-          - description
-          - type
-          - details
-          properties:
-            description:
-              type: string
             type:
               type: string
               enum:
@@ -532,26 +551,49 @@ components:
           type: boolean
           example: false
       additionalProperties: false
-    FeatureAvailability:
-      required:
-      - charge_cost
-      - hosted_payments
-      - utility_remittance
-      - smart_charge
-      - utility_statements
-      properties:
-        charge_cost:
-          $ref: '#/components/schemas/Availability'
-        smart_charge:
-          $ref: '#/components/schemas/Availability'
-        utility_statements:
-          $ref: '#/components/schemas/Availability'
-        hosted_payments:
-          $ref: '#/components/schemas/Availability'
-        utility_remittance:
-          $ref: '#/components/schemas/Availability'
-      additionalProperties: false
+  headers:
+    ArcVersion:
+      description: The Arcadia-Version for the response
+      schema:
+        type: string
+      example: '2022-10-13'
+      required: true
   parameters:
+    paginationUpdatedAfterParam:
+      in: query
+      name: updated_after
+      required: false
+      description: ISO8601 datetime, used to traverse paginated responses. Use of this parameter is mutually exclusive with `updated_before`.
+      schema:
+        type: string
+        format: date-time
+    paginationOrderParam:
+      in: query
+      name: order
+      required: false
+      description: Used to specify the order in which records should be returned. Currently ordered by `updated_at` timestamp.
+      schema:
+        type: string
+        enum:
+        - asc
+        - desc
+        default: desc
+    paginationUpdatedBeforeParam:
+      in: query
+      name: updated_before
+      required: false
+      description: ISO8601 datetime, used to traverse paginated responses. Use of this parameter is mutually exclusive with `updated_after`.
+      schema:
+        type: string
+        format: date-time
+    paginationLimitParam:
+      in: query
+      name: limit
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
     arcVersionInHeaderParam:
       name: Arcadia-Version
       in: header
@@ -567,48 +609,6 @@ components:
       required: true
       schema:
         type: string
-    paginationLimitParam:
-      in: query
-      name: limit
-      required: false
-      schema:
-        type: integer
-        minimum: 1
-        default: 10
-    paginationUpdatedAfterParam:
-      in: query
-      name: updated_after
-      required: false
-      description: ISO8601 datetime, used to traverse paginated responses. Use of this parameter is mutually exclusive with `updated_before`.
-      schema:
-        type: string
-        format: date-time
-    paginationUpdatedBeforeParam:
-      in: query
-      name: updated_before
-      required: false
-      description: ISO8601 datetime, used to traverse paginated responses. Use of this parameter is mutually exclusive with `updated_after`.
-      schema:
-        type: string
-        format: date-time
-    paginationOrderParam:
-      in: query
-      name: order
-      required: false
-      description: Used to specify the order in which records should be returned. Currently ordered by `updated_at` timestamp.
-      schema:
-        type: string
-        enum:
-        - asc
-        - desc
-        default: desc
-  headers:
-    ArcVersion:
-      description: The Arcadia-Version for the response
-      schema:
-        type: string
-      example: '2022-10-13'
-      required: true
   securitySchemes:
     bearerAuth:
       type: http

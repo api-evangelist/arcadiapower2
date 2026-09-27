@@ -288,118 +288,66 @@ paths:
               schema:
                 $ref: '#/components/schemas/WebhookTriggerError'
 components:
+  parameters:
+    paginationOrderParam:
+      in: query
+      name: order
+      required: false
+      description: Used to specify the order in which records should be returned. Currently ordered by `updated_at` timestamp.
+      schema:
+        type: string
+        enum:
+        - asc
+        - desc
+        default: desc
+    paginationUpdatedBeforeParam:
+      in: query
+      name: updated_before
+      required: false
+      description: ISO8601 datetime, used to traverse paginated responses. Use of this parameter is mutually exclusive with `updated_after`.
+      schema:
+        type: string
+        format: date-time
+    arcVersionInHeaderParam:
+      name: Arcadia-Version
+      in: header
+      example: '2022-10-13'
+      description: The Arcadia-Version for the request
+      required: true
+      schema:
+        type: string
+        default: '2022-10-13'
+    paginationUpdatedAfterParam:
+      in: query
+      name: updated_after
+      required: false
+      description: ISO8601 datetime, used to traverse paginated responses. Use of this parameter is mutually exclusive with `updated_before`.
+      schema:
+        type: string
+        format: date-time
+    webhookEndpointIdInPathParam:
+      name: webhook_endpoint_id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: 3847dd41-8c90-499a-ac6e-10a027dd231f
+    webhookEventIdInPathParam:
+      name: webhook_event_id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: ff95f020-8ef9-409d-bff6-8489e880359c
+    paginationLimitParam:
+      in: query
+      name: limit
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
   schemas:
-    UpdateWebhookBodyParams:
-      properties:
-        enabled:
-          type: boolean
-          description: 'Determines whether this webhook endpoint will receive webhook events. Webhook endpoints that are `enabled: true` will  receive webhook events. Webhook endpoints that are `enabled: false` will not receive webhook events'
-          example: 'true'
-        arc_version:
-          type: string
-          description: The version of the Arcadia API this endpoint is designed to understand. The JSON body corresponding to a webhook event type may change across versions. Arcadia will continue to send events to this endpoint using the event schemas as they existed in the selected version, insulating you from breaking changes.
-          example: '2022-10-13'
-      additionalProperties: false
-    WebhookDeliveryAttempt:
-      required:
-      - id
-      - created_at
-      - updated_at
-      - response_body
-      - response_status_code
-      - webhook_event_id
-      - sandboxed
-      properties:
-        id:
-          type: string
-          format: uuid
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-        response_body:
-          example: '{\"message\":\"ok\"}'
-          type:
-          - string
-          - 'null'
-        response_status_code:
-          example: 200
-          type:
-          - integer
-          - 'null'
-        webhook_event_id:
-          type: string
-          format: uuid
-          example: 3847dd41-8c90-499a-ac6e-10a027dd231f
-        sandboxed:
-          type: boolean
-          example: false
-      additionalProperties: false
-    PaginatedWebhookEndpoints:
-      required:
-      - data
-      - total_count
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/WebhookEndpoint'
-        total_count:
-          type: integer
-          example: 1
-      additionalProperties: false
-    CreateWebhookBodyParams:
-      required:
-      - url
-      properties:
-        url:
-          type: string
-          description: The URL that webhook events should be POSTed to.
-          example: https://example.com/webhook-endpoint
-        arc_version:
-          type: string
-          description: The version of the Arcadia API this endpoint is designed to understand. The JSON body corresponding to a webhook event type may change across versions. Arcadia will continue to send events to this endpoint using the event schemas as they existed in the selected version, insulating you from breaking changes.
-          example: '2022-10-13'
-      additionalProperties: false
-    WebhookEndpointUnprocessableEntityError:
-      required:
-      - error
-      properties:
-        error:
-          type: object
-          required:
-          - description
-          - type
-          - details
-          properties:
-            description:
-              type: string
-              enum:
-              - Provided url is not valid, see details for validation errors
-              - Provided arc_version is not valid, see details for validation errors
-            type:
-              type: string
-              enum:
-              - BAD_REQUEST
-            details:
-              type: object
-              oneOf:
-              - required:
-                - url
-              - required:
-                - arc_version
-              properties:
-                url:
-                  type: array
-                  items:
-                    type: string
-                arc_version:
-                  type: array
-                  items:
-                    type: string
-      additionalProperties: false
     WebhookEndpoint:
       required:
       - created_at
@@ -436,6 +384,31 @@ components:
         arc_version:
           type: string
           example: '2022-10-13'
+      additionalProperties: false
+    WebhookTriggerError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - This endpoint is only supported in the sandboxed API mode
+              - This endpoint is only supported in the sandboxed API mode using a UtilityAccount with test scenario interval data
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+            details:
+              type:
+              - object
+              - 'null'
       additionalProperties: false
     WebhookEventSummary:
       required:
@@ -530,20 +503,68 @@ components:
           items:
             $ref: '#/components/schemas/WebhookDeliveryAttempt'
       additionalProperties: false
-    PaginatedWebhookEvents:
+    WebhookDeliveryAttempt:
       required:
-      - data
-      - total_count
+      - id
+      - created_at
+      - updated_at
+      - response_body
+      - response_status_code
+      - webhook_event_id
+      - sandboxed
       properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/WebhookEventSummary'
-        total_count:
-          type: integer
-          example: 1
+        id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        response_body:
+          example: '{\"message\":\"ok\"}'
+          type:
+          - string
+          - 'null'
+        response_status_code:
+          example: 200
+          type:
+          - integer
+          - 'null'
+        webhook_event_id:
+          type: string
+          format: uuid
+          example: 3847dd41-8c90-499a-ac6e-10a027dd231f
+        sandboxed:
+          type: boolean
+          example: false
       additionalProperties: false
-    WebhookTriggerError:
+    UpdateWebhookBodyParams:
+      properties:
+        enabled:
+          type: boolean
+          description: 'Determines whether this webhook endpoint will receive webhook events. Webhook endpoints that are `enabled: true` will  receive webhook events. Webhook endpoints that are `enabled: false` will not receive webhook events'
+          example: 'true'
+        arc_version:
+          type: string
+          description: The version of the Arcadia API this endpoint is designed to understand. The JSON body corresponding to a webhook event type may change across versions. Arcadia will continue to send events to this endpoint using the event schemas as they existed in the selected version, insulating you from breaking changes.
+          example: '2022-10-13'
+      additionalProperties: false
+    CreateWebhookBodyParams:
+      required:
+      - url
+      properties:
+        url:
+          type: string
+          description: The URL that webhook events should be POSTed to.
+          example: https://example.com/webhook-endpoint
+        arc_version:
+          type: string
+          description: The version of the Arcadia API this endpoint is designed to understand. The JSON body corresponding to a webhook event type may change across versions. Arcadia will continue to send events to this endpoint using the event schemas as they existed in the selected version, insulating you from breaking changes.
+          example: '2022-10-13'
+      additionalProperties: false
+    WebhookEndpointUnprocessableEntityError:
       required:
       - error
       properties:
@@ -557,76 +578,55 @@ components:
             description:
               type: string
               enum:
-              - This endpoint is only supported in the sandboxed API mode
-              - This endpoint is only supported in the sandboxed API mode using a UtilityAccount with test scenario interval data
+              - Provided url is not valid, see details for validation errors
+              - Provided arc_version is not valid, see details for validation errors
             type:
               type: string
               enum:
               - BAD_REQUEST
             details:
-              type:
-              - object
-              - 'null'
+              type: object
+              oneOf:
+              - required:
+                - url
+              - required:
+                - arc_version
+              properties:
+                url:
+                  type: array
+                  items:
+                    type: string
+                arc_version:
+                  type: array
+                  items:
+                    type: string
       additionalProperties: false
-  parameters:
-    webhookEndpointIdInPathParam:
-      name: webhook_endpoint_id
-      in: path
-      required: true
-      schema:
-        type: string
-        example: 3847dd41-8c90-499a-ac6e-10a027dd231f
-    arcVersionInHeaderParam:
-      name: Arcadia-Version
-      in: header
-      example: '2022-10-13'
-      description: The Arcadia-Version for the request
-      required: true
-      schema:
-        type: string
-        default: '2022-10-13'
-    paginationUpdatedAfterParam:
-      in: query
-      name: updated_after
-      required: false
-      description: ISO8601 datetime, used to traverse paginated responses. Use of this parameter is mutually exclusive with `updated_before`.
-      schema:
-        type: string
-        format: date-time
-    paginationLimitParam:
-      in: query
-      name: limit
-      required: false
-      schema:
-        type: integer
-        minimum: 1
-        default: 10
-    paginationOrderParam:
-      in: query
-      name: order
-      required: false
-      description: Used to specify the order in which records should be returned. Currently ordered by `updated_at` timestamp.
-      schema:
-        type: string
-        enum:
-        - asc
-        - desc
-        default: desc
-    webhookEventIdInPathParam:
-      name: webhook_event_id
-      in: path
-      required: true
-      schema:
-        type: string
-        example: ff95f020-8ef9-409d-bff6-8489e880359c
-    paginationUpdatedBeforeParam:
-      in: query
-      name: updated_before
-      required: false
-      description: ISO8601 datetime, used to traverse paginated responses. Use of this parameter is mutually exclusive with `updated_after`.
-      schema:
-        type: string
-        format: date-time
+    PaginatedWebhookEvents:
+      required:
+      - data
+      - total_count
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhookEventSummary'
+        total_count:
+          type: integer
+          example: 1
+      additionalProperties: false
+    PaginatedWebhookEndpoints:
+      required:
+      - data
+      - total_count
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhookEndpoint'
+        total_count:
+          type: integer
+          example: 1
+      additionalProperties: false
   headers:
     ArcVersion:
       description: The Arcadia-Version for the response

@@ -249,98 +249,14 @@ paths:
                 $ref: '#/components/schemas/PingUnauthorizedError'
 components:
   schemas:
-    PingUnauthorizedError:
+    ConnectUrlResponse:
       required:
-      - error
+      - connect_url
       properties:
-        error:
+        connect_url:
           type: string
-          enum:
-          - Unknown or invalid access token
-      additionalProperties: false
-    ConnectUrlVariantError:
-      required:
-      - error
-      properties:
-        error:
-          type: object
-          required:
-          - description
-          - type
-          - details
-          properties:
-            description:
-              type: string
-              enum:
-              - You can only pass in 'connect' or 'tariff' as the variant.
-            type:
-              type: string
-              enum:
-              - INVALID_VARIANT
-            details:
-              type:
-              - object
-              - 'null'
-      additionalProperties: false
-    ConnectTokenTooManyParametersError:
-      required:
-      - error
-      properties:
-        error:
-          type: object
-          required:
-          - description
-          - type
-          - details
-          properties:
-            description:
-              type: string
-              enum:
-              - You cannot pass both client_user_id and utility_credential_id. Please only pass one
-            type:
-              type: string
-              enum:
-              - INVALID_PARAMATERS
-            details:
-              type:
-              - object
-              - 'null'
-      additionalProperties: false
-    PingResponse:
-      required:
-      - pong
-      properties:
-        pong:
-          type: boolean
-          description: Always true
-          example: true
-      additionalProperties: false
-    AccessTokenUnauthorizedError:
-      required:
-      - error
-      properties:
-        error:
-          type: string
-          enum:
-          - The supplied credentials are invalid.
-      additionalProperties: false
-    UtilityCredentialNotFoundError:
-      required:
-      - error
-      properties:
-        error:
-          type: string
-          enum:
-          - Couldn't find UtilityCredential
-      additionalProperties: false
-    ConnectTokenUnauthorizedError:
-      required:
-      - error
-      properties:
-        error:
-          type: string
-          enum:
-          - Unknown or invalid access token
+          description: The url to be used for initializing standalone Connect.
+          example: https://connect.arcadia.com?token=QYEPoBOJWc4bV_XpIzJdr8BLG4RdK6h68AP672nab4f
       additionalProperties: false
     AccessTokenResponse:
       required:
@@ -376,6 +292,66 @@ components:
           description: When the token was created. Provided in Unix timestamp format.
           example: 1611205026
       additionalProperties: false
+    AccessTokenUnauthorizedError:
+      required:
+      - error
+      properties:
+        error:
+          type: string
+          enum:
+          - The supplied credentials are invalid.
+      additionalProperties: false
+    ConnectUrlVariantError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - You can only pass in 'connect' or 'tariff' as the variant.
+            type:
+              type: string
+              enum:
+              - INVALID_VARIANT
+            details:
+              type:
+              - object
+              - 'null'
+      additionalProperties: false
+    PingUnauthorizedError:
+      required:
+      - error
+      properties:
+        error:
+          type: string
+          enum:
+          - Unknown or invalid access token
+      additionalProperties: false
+    ConnectTokenUnauthorizedError:
+      required:
+      - error
+      properties:
+        error:
+          type: string
+          enum:
+          - Unknown or invalid access token
+      additionalProperties: false
+    UtilityCredentialNotFoundError:
+      required:
+      - error
+      properties:
+        error:
+          type: string
+          enum:
+          - Couldn't find UtilityCredential
+      additionalProperties: false
     ConnectTokenUnprocessableEntityError:
       required:
       - error
@@ -385,14 +361,38 @@ components:
           enum:
           - 'Param is missing or the value is empty: client_user_id or utility_credential_id'
       additionalProperties: false
-    ConnectUrlResponse:
+    ConnectTokenTooManyParametersError:
       required:
-      - connect_url
+      - error
       properties:
-        connect_url:
-          type: string
-          description: The url to be used for initializing standalone Connect.
-          example: https://connect.arcadia.com?token=QYEPoBOJWc4bV_XpIzJdr8BLG4RdK6h68AP672nab4f
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - You cannot pass both client_user_id and utility_credential_id. Please only pass one
+            type:
+              type: string
+              enum:
+              - INVALID_PARAMATERS
+            details:
+              type:
+              - object
+              - 'null'
+      additionalProperties: false
+    PingResponse:
+      required:
+      - pong
+      properties:
+        pong:
+          type: boolean
+          description: Always true
+          example: true
       additionalProperties: false
   parameters:
     arcVersionInHeaderParam:

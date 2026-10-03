@@ -77,28 +77,97 @@ paths:
               schema:
                 $ref: '#/components/schemas/UtilityStatement'
 components:
+  parameters:
+    utilityAccountIdQueryParam:
+      in: query
+      name: utility_account_id
+      required: false
+      description: A utility account id to filter the list of returned items by.
+      schema:
+        type: integer
+    arcVersionInHeaderParam:
+      name: Arcadia-Version
+      in: header
+      example: '2022-10-13'
+      description: The Arcadia-Version for the request
+      required: true
+      schema:
+        type: string
+        default: '2022-10-13'
+    paginationOrderParam:
+      in: query
+      name: order
+      required: false
+      description: Used to specify the order in which records should be returned. Currently ordered by `updated_at` timestamp.
+      schema:
+        type: string
+        enum:
+        - asc
+        - desc
+        default: desc
+    paginationUpdatedAfterParam:
+      in: query
+      name: updated_after
+      required: false
+      description: ISO8601 datetime, used to traverse paginated responses. Use of this parameter is mutually exclusive with `updated_before`.
+      schema:
+        type: string
+        format: date-time
+    deprecatedClientUserIdQueryParam:
+      in: query
+      name: client_user_id
+      required: false
+      deprecated: true
+      description: A client_user_id to filter the list of returned items by. This field is deprecated, prefer to use `utility_account_id` instead.
+      schema:
+        type: string
+    paginationLimitParam:
+      in: query
+      name: limit
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
+    paginationUpdatedBeforeParam:
+      in: query
+      name: updated_before
+      required: false
+      description: ISO8601 datetime, used to traverse paginated responses. Use of this parameter is mutually exclusive with `updated_after`.
+      schema:
+        type: string
+        format: date-time
+    utilityStatementIdInPathParam:
+      name: utility_statement_id
+      in: path
+      required: true
+      schema:
+        type: integer
   schemas:
-    PaginatedUtilityStatements:
-      required:
-      - data
-      - total_count
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/UtilityStatement'
-        total_count:
-          type: integer
-          example: 1
-      additionalProperties: false
-    UtilityAccountNotFoundError:
+    UtilityStatementsFeatureAvailabilityError:
       required:
       - error
       properties:
         error:
-          type: string
-          enum:
-          - Couldn't find UtilityAccount
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - The utility_statements feature is not available for this UtilityAccount.
+              - The utility_statements feature is not ready yet. Please refer to UtilityAccount#FeatureAvailability for updates.
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+            details:
+              type:
+              - object
+              - 'null'
       additionalProperties: false
     Tariff:
       description: Information about a tariff.
@@ -148,30 +217,14 @@ components:
           type: string
           description: Name of the utility associated with this tariff
           example: Pacific Gas & Electric
-    UtilityStatementsFeatureAvailabilityError:
+    UtilityAccountNotFoundError:
       required:
       - error
       properties:
         error:
-          type: object
-          required:
-          - description
-          - type
-          - details
-          properties:
-            description:
-              type: string
-              enum:
-              - The utility_statements feature is not available for this UtilityAccount.
-              - The utility_statements feature is not ready yet. Please refer to UtilityAccount#FeatureAvailability for updates.
-            type:
-              type: string
-              enum:
-              - BAD_REQUEST
-            details:
-              type:
-              - object
-              - 'null'
+          type: string
+          enum:
+          - Couldn't find UtilityAccount
       additionalProperties: false
     UtilityStatement:
       required:
@@ -553,72 +606,19 @@ components:
                   conflicting_utility_statment_id:
                     type: integer
       additionalProperties: false
-  parameters:
-    paginationUpdatedBeforeParam:
-      in: query
-      name: updated_before
-      required: false
-      description: ISO8601 datetime, used to traverse paginated responses. Use of this parameter is mutually exclusive with `updated_after`.
-      schema:
-        type: string
-        format: date-time
-    paginationOrderParam:
-      in: query
-      name: order
-      required: false
-      description: Used to specify the order in which records should be returned. Currently ordered by `updated_at` timestamp.
-      schema:
-        type: string
-        enum:
-        - asc
-        - desc
-        default: desc
-    arcVersionInHeaderParam:
-      name: Arcadia-Version
-      in: header
-      example: '2022-10-13'
-      description: The Arcadia-Version for the request
-      required: true
-      schema:
-        type: string
-        default: '2022-10-13'
-    paginationUpdatedAfterParam:
-      in: query
-      name: updated_after
-      required: false
-      description: ISO8601 datetime, used to traverse paginated responses. Use of this parameter is mutually exclusive with `updated_before`.
-      schema:
-        type: string
-        format: date-time
-    deprecatedClientUserIdQueryParam:
-      in: query
-      name: client_user_id
-      required: false
-      deprecated: true
-      description: A client_user_id to filter the list of returned items by. This field is deprecated, prefer to use `utility_account_id` instead.
-      schema:
-        type: string
-    utilityStatementIdInPathParam:
-      name: utility_statement_id
-      in: path
-      required: true
-      schema:
-        type: integer
-    utilityAccountIdQueryParam:
-      in: query
-      name: utility_account_id
-      required: false
-      description: A utility account id to filter the list of returned items by.
-      schema:
-        type: integer
-    paginationLimitParam:
-      in: query
-      name: limit
-      required: false
-      schema:
-        type: integer
-        minimum: 1
-        default: 10
+    PaginatedUtilityStatements:
+      required:
+      - data
+      - total_count
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/UtilityStatement'
+        total_count:
+          type: integer
+          example: 1
+      additionalProperties: false
   headers:
     ArcVersion:
       description: The Arcadia-Version for the response

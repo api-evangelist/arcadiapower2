@@ -330,76 +330,6 @@ paths:
       - Spark
 components:
   schemas:
-    TariffScenarioDeviceSolarParams:
-      required:
-      - device
-      - solar_system_kw
-      properties:
-        device:
-          type: string
-          description: Identifies this device as a rooftop solar system
-          example: SOLAR
-          enum:
-          - SOLAR
-        solar_system_kw:
-          type: number
-          description: Size of solar system in kW
-          example: 5
-      additionalProperties: false
-    ChargeCurvesTariffParamError:
-      required:
-      - error
-      properties:
-        error:
-          type: object
-          required:
-          - description
-          - type
-          - details
-          properties:
-            description:
-              type: string
-              example: No tariff found matching ID
-              enum:
-              - No tariff found matching ID
-              - 'Invalid tariff ID: must be of the form "gen_mtid_3220724"'
-            type:
-              type: string
-              enum:
-              - BAD_REQUEST
-            details:
-              type: object
-              required:
-              - main_tariff_id
-              properties:
-                main_tariff_id:
-                  type: string
-                  example: gen_tariff_000000
-      additionalProperties: false
-    LoadServingEntitySchema:
-      required:
-      - lse_id
-      - name
-      - code
-      - num_customers
-      properties:
-        lse_id:
-          type: string
-          description: Genability ID of the load serving entity, prefixed with `gen_lse_`.
-          example: gen_lse_734
-        name:
-          type: string
-          description: Name of the load serving entity.
-          example: Pacific Gas & Electric
-        code:
-          type: string
-          description: Alternate key identifying the load serving entity. For US companies, this is the EIA ID.
-          example: '14328'
-        num_customers:
-          type: integer
-          description: Total customer count for the load serving entity. Results will be sorted by this value in descending order (so the first result will be the most likely LSE).
-          example: 5069189
-      additionalProperties: false
     SearchLoadServingEntitiesResponse:
       required:
       - data
@@ -445,6 +375,79 @@ components:
               - BAD_REQUEST
             details:
               type: 'null'
+      additionalProperties: false
+    TimeSeriesItem:
+      required:
+      - timestamp
+      - value
+      properties:
+        timestamp:
+          description: ISO8601 timestamp indicating time of data collection
+          type: string
+          format: date-time
+        value:
+          description: Data value of resource
+          type: number
+      additionalProperties: false
+    ChargeCostResponse:
+      required:
+      - tariff
+      - normalized_start_time
+      - normalized_consumption_kwh
+      - cost_cents
+      properties:
+        utility_account_id:
+          example: 12345
+          type:
+          - integer
+          - 'null'
+        tariff:
+          $ref: '#/components/schemas/MostRecentTariff'
+        normalized_start_time:
+          type: string
+          format: date-time
+          description: The start_time normalized down to the resolution that lines up with any TOU periods on the tariff (generally hourly).
+          example: '2021-03-18T22:00:00-07:00'
+        normalized_consumption_kwh:
+          type: array
+          items:
+            type: number
+          description: The `energy_usage_kwh` aggregated into periods that line up with any TOU periods on the tariff (generally hourly).
+          example:
+          - 0
+          - 0
+          - 7.2
+          - 0
+          - 7.2
+          - 2.9
+        cost_cents:
+          type: integer
+          example: 525
+          description: Cost of the charging curve on the utility account's tariff, in cents.
+      additionalProperties: false
+    TariffResolutionError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - Tariff information is not yet available for this utility account
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+            details:
+              type:
+              - object
+              - 'null'
       additionalProperties: false
     StorageOptimizationSchedulesResponse:
       type: object
@@ -576,104 +579,186 @@ components:
       - battery_to_grid_kwh_ac
       - battery_soc
       additionalProperties: false
-    ChargeCostRequestBodyParams:
+    Tariff:
+      description: Information about a tariff.
       required:
-      - start_time
-      - energy_usage_kwh
+      - main_tariff_id
+      - tariff_code
+      - tariff_name
+      - utility_name
       properties:
-        utility_account_id:
-          description: (Beta - due to limited coverage) The unique ID of the utility account that this calculation is being run against. Either a `utility_account_id` or `main_tariff_id` is required for a valid request.
-          type: integer
         main_tariff_id:
           type: string
-          description: The Genability 'masterTariffId' unique identifier for this tariff. See [Genability documentation](https://developer.genability.com/api-reference/tariff-api/tariff/) for details. Either a `utility_account_id` or `main_tariff_id` is required for a valid request.
+          description: The Genability 'masterTariffId' unique identifier for this tariff. See [Genability documentation](https://developer.genability.com/api-reference/tariff-api/tariff/) for details.
           example: gen_mtid_3331108
-        start_time:
-          description: 'ISO8601 timestamp of when the charge begins. Note that the timestamp will be normalized down to the start of latest charge block resolution.
-
-            For example, if the `charge_block_resolution` is `1h` and the charging session starts at `2021-06-24T14:59:59Z`, the `start_time` used to calculate the curve''s cost will be normalized to `2021-06-24T14:00:00Z`. If the `charge_block_resolution` is `15m`, the `start_time` would be normalized to `2021-06-24T14:45:00Z`.
-
-            This normalization technique eliminates ambiguity around charging that occurs across time-of-use on/mid/off-peak window boundaries.
-
-            '
-          type: string
-          format: date-time
-          example: '2021-03-18T22:00:00-07:00'
-        charge_block_resolution:
-          description: The duration of the charge blocks provided in the `energy_usage_kwh` param.
-          type: string
-          enum:
-          - 5m
-          - 10m
-          - 15m
-          - 30m
-          - 1h
-          default: 1h
-        energy_usage_kwh:
-          description: The load curve being priced. An array of charge blocks with each block representing the kWh of power consumed or to be consumed in that block.
+        property_inputs:
+          description: Properties applied to this tariff which may affect the calculated cost of electricity.
           type: array
           items:
-            type: number
-          example:
-          - 0
-          - 0
-          - 7.2
-          - 0
-          - 7.2
-          - 2.9
-      additionalProperties: false
-    TariffApplicabilityAnswerSchema:
-      required:
-      - question_id
-      - value
-      - data_type
-      properties:
-        question_id:
+            type: object
+            required:
+            - id
+            - value
+            properties:
+              id:
+                type: string
+                example: territoryId
+              value:
+                type:
+                - boolean
+                - number
+                - string
+                example: 3
+        supplier_name:
+          description: The name of the retail electricity supplier or the community choice aggregator. If there is no retail electricity supplier or community choice aggregator, this field is null.
+          example: East Bay Community Energy
+          type:
+          - string
+          - 'null'
+        tariff_code:
           type: string
-          description: String identifier for the applicability question
-          example: LOW_INCOME
-        value:
-          type: boolean
-          description: User response to the tariff applicability question
-          example: true
-        data_type:
+          description: Abbreviation code of the tariff used for this calculation.
+          example: EV-2A-TOU
+        tariff_name:
           type: string
-          description: Type of answer expected to be returned for this tariff applicability question
-          example: YES_NO
-      additionalProperties: false
-    TouPeriod:
-      title: TouPeriod
-      type: object
-      properties:
-        fromDayOfWeek:
-          title: Fromdayofweek
-          description: Day of the week on which this period begins (0 - 6, Monday - Sunday).
-          default: 0
-          minimum: 0
-          maximum: 6
-          type: integer
-        toDayOfWeek:
-          title: Todayofweek
-          description: Day of the week after which this period ends (0 - 6, Monday - Sunday). End day is included in the period.
-          default: 6
-          minimum: 0
-          maximum: 6
-          type: integer
-        fromHour:
-          title: Fromhour
-          description: Hour of the day on which this period begins (0 - 23).
-          exclusiveMaximum: 24
-          minimum: 0
-          type: integer
-        toHour:
-          title: Tohour
-          description: Hour of the day before which this period ends (0 - 24). End hour is not included in the period.
-          minimum: 0
-          maximum: 24
-          type: integer
+          description: Full name of the tariff used for this calculation.
+          example: Residential - Time of Use - Plug-In Electric Vehicle 2
+        utility_name:
+          type: string
+          description: Name of the utility associated with this tariff
+          example: Pacific Gas & Electric
+    SmartChargeFeatureAvailabilityError:
       required:
-      - fromHour
-      - toHour
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - The smart_charge feature is not available for this UtilityAccount.
+              - The smart_charge feature is not ready yet. Please refer to UtilityAccount#FeatureAvailability for updates.
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+            details:
+              type:
+              - object
+              - 'null'
+      additionalProperties: false
+    TariffRatesResponse:
+      required:
+      - tariff
+      - rates_cost_per_kwh
+      properties:
+        tariff:
+          $ref: '#/components/schemas/Tariff'
+        rates_cost_per_kwh:
+          description: Timeseries with data array of $/kWh rates
+          type: object
+          required:
+          - data
+          - freq
+          properties:
+            data:
+              description: Array of TimeSeriesItems indicating $/kWh rates for each requested time period
+              type: array
+              items:
+                $ref: '#/components/schemas/TimeSeriesItem'
+            freq:
+              description: The interval of the TimeSeriesItems in the data array
+              type: string
+              enum:
+              - 5m
+              - 10m
+              - 15m
+              - 30m
+              - 1h
+      additionalProperties: false
+    OptimizedTariffRecommendationsResponse:
+      required:
+      - country
+      - lse_id
+      - zip_code
+      - recommendations
+      properties:
+        country:
+          type: string
+          description: The country used for determining tariff applicability
+          example: US
+        lse_id:
+          type: string
+          description: The Genability 'lseId' unique identifier for this load serving entity. See [Genability documentation](https://developer.genability.com/api-reference/tariff-api/load-serving-entity/) for details.
+          example: gen_lse_734
+        zip_code:
+          type: string
+          description: The zip code used for determining tariff applicability
+          example: '94706'
+        recommendations:
+          type: array
+          description: List of tariffs that best fit the submitted applicability question answers. Used to define Tariff-Scenarios for the Calculate Tariff-Scenario Cost endpoint
+          items:
+            $ref: '#/components/schemas/Tariff'
+      additionalProperties: false
+    OptimizedTariffRecommendationsLseIdentificationParamError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - Either utility_account_id or zip_code/lse_id must be specified
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+            details:
+              type: 'null'
+      additionalProperties: false
+    TariffScenarioDeviceEvChargingParams:
+      description: Parameters for charging level and EV operation schedule
+      required:
+      - device
+      - charging_availability
+      - charging_power_kw
+      - operation_schedule
+      properties:
+        device:
+          type: string
+          description: A value of `EV_CHARGING` indicates a future EV purchase.
+          example: EV_CHARGING
+          enum:
+          - EV_CHARGING
+        charging_availability:
+          type: array
+          description: Schedule of when the car is at home and able to be charged. `BASIC` charging will simulate a charging schedule assuming charging starts at the specified window start times (for example, at 18:00 when the driver comes home). `SMART` charging will simulate a charging schedule using our Calculate Smart Charging Schedule endpoint logic to charge during the cheapest hours on this tariff in the provided windows.
+          items:
+            $ref: '#/components/schemas/EvChargePlan'
+        charging_power_kw:
+          type: number
+          example: 1.8
+          description: This helps to determine the EVSE (electric vehicle supply equipment) level. 0.0 indicates no charging at home. 1.8kW or 2.4kW chargers are typical power levels for wall outlets (Level 1). 7.2kW or 9.6kW are typical charging powers for a Level 2 charger.
+        operation_schedule:
+          type: string
+          enum:
+          - BASIC
+          - SMART
+          example: SMART
+          description: An operation schedule of `BASIC` charging will simulate a charging schedule assuming charging starts at the specified window start times (for example, at 18:00 when the driver comes home). `SMART` charging will simulate a charging schedule using our Calculate Smart Charging Schedule endpoint logic to charge during the cheapest hours on this tariff in the provided windows.
+      additionalProperties: false
     TariffApplicabilityQuestionsResponse:
       required:
       - country
@@ -740,30 +825,217 @@ components:
             user_question_details: FERA is the rate reduction program in California for household with maximum annual income of between 200% and 250% of federal poverty guidelines and have three or more persons residing full time in their household. Additional eligibility criteria may apply.
             answer_data_type: YES_NO
       additionalProperties: false
-    OptimizedTariffRecommendationsResponse:
-      required:
-      - country
-      - lse_id
-      - zip_code
-      - recommendations
+    TariffApplicabilityAnswersRequestParams:
+      required: []
       properties:
-        country:
-          type: string
-          description: The country used for determining tariff applicability
-          example: US
-        lse_id:
-          type: string
-          description: The Genability 'lseId' unique identifier for this load serving entity. See [Genability documentation](https://developer.genability.com/api-reference/tariff-api/load-serving-entity/) for details.
-          example: gen_lse_734
+        utility_account_id:
+          type: integer
+          example: 12345
+          description: The unique ID of the Utility Account for this tariff search. Optional if searching for tariffs by Genability `lse_id`/`zip_code`.
         zip_code:
           type: string
-          description: The zip code used for determining tariff applicability
           example: '94706'
-        recommendations:
+          description: The zip code of the site inside the LSE's territory. Must be provided if searching for tariffs by Genability `lse_id`/`zip_code`.
+        lse_id:
+          type: string
+          example: gen_lse_734
+          description: The ID of the Genability [load serving entity](https://developer.genability.com/api-reference/tariff-api/load-serving-entity/) prefixed with `gen_lse_`. Must be provided if searching for tariffs by Genability `lse_id`/`zip_code`.
+        applicability_answers:
           type: array
-          description: List of tariffs that best fit the submitted applicability question answers. Used to define Tariff-Scenarios for the Calculate Tariff-Scenario Cost endpoint
+          description: Site or customer-specific answers to applicability questions to determine tariff eligibility.
           items:
-            $ref: '#/components/schemas/Tariff'
+            $ref: '#/components/schemas/TariffApplicabilityAnswerSchema'
+          example:
+          - question_id: EV
+            value: true
+            data_type: YES_NO
+          - question_id: SOLAR
+            value: true
+            data_type: YES_NO
+          - question_id: ELECTRIC_HEAT
+            value: false
+            data_type: YES_NO
+          - question_id: ELECTRIC_WATER
+            value: false
+            data_type: YES_NO
+          - question_id: HEAT_PUMP
+            value: false
+            data_type: YES_NO
+          - question_id: SENIOR_CITIZEN
+            value: false
+            data_type: YES_NO
+          - question_id: LOW_INCOME
+            value: false
+            data_type: YES_NO
+          - question_id: CA_CARE_CUSTOMER
+            value: false
+            data_type: YES_NO
+          - question_id: CA_FERA
+            value: false
+            data_type: YES_NO
+      additionalProperties: false
+    LoadServingEntitySchema:
+      required:
+      - lse_id
+      - name
+      - code
+      - num_customers
+      properties:
+        lse_id:
+          type: string
+          description: Genability ID of the load serving entity, prefixed with `gen_lse_`.
+          example: gen_lse_734
+        name:
+          type: string
+          description: Name of the load serving entity.
+          example: Pacific Gas & Electric
+        code:
+          type: string
+          description: Alternate key identifying the load serving entity. For US companies, this is the EIA ID.
+          example: '14328'
+        num_customers:
+          type: integer
+          description: Total customer count for the load serving entity. Results will be sorted by this value in descending order (so the first result will be the most likely LSE).
+          example: 5069189
+      additionalProperties: false
+    TimeOfUse:
+      title: TimeOfUse
+      type: object
+      properties:
+        season:
+          title: Season
+          description: Season to which this TOU schedule applies.
+          allOf:
+          - $ref: '#/components/schemas/TouSeason'
+        touPeriods:
+          title: Touperiods
+          description: Set of TOU periods defining the schedule.
+          type: array
+          items:
+            $ref: '#/components/schemas/TouPeriod'
+      required:
+      - touPeriods
+    TariffRatesRequestBodyParams:
+      required:
+      - start_time
+      properties:
+        utility_account_id:
+          description: (Beta - due to limited coverage) The unique ID of the utility account that this calculation is being run against. Either a `utility_account_id` or `main_tariff_id` is required for a valid request.
+          type: integer
+        main_tariff_id:
+          type: string
+          description: The Genability 'masterTariffId' unique identifier for this tariff. See [Genability documentation](https://developer.genability.com/api-reference/tariff-api/tariff/) for details. Either a `utility_account_id` or `main_tariff_id` is required for a valid request.
+          example: gen_mtid_3331108
+        start_time:
+          description: 'ISO8601 timestamp indicating start time. Note that the timestamp will be rounded down to the start of latest time_block_resolution
+
+            '
+          type: string
+          format: date-time
+          example: '2021-03-18T22:00:00-07:00'
+        end_time:
+          description: 'ISO8601 timestamp indicating end of time period. Note that the timestamp will be rounded down to the start of latest time_block_resolution
+
+            '
+          type: string
+          format: date-time
+          example: '2021-03-19T08:00:00-07:00'
+        time_block_resolution:
+          description: Requested time resolution
+          type: string
+          enum:
+          - 5m
+          - 10m
+          - 15m
+          - 30m
+          - 1h
+          default: 1h
+      additionalProperties: false
+    SmartChargeScheduleRequestBodyParams:
+      required:
+      - start_time
+      - end_time
+      - minutes_to_charge_complete
+      properties:
+        utility_account_id:
+          description: (Beta - due to limited coverage) The unique ID of the utility account that this calculation is being run against. Either a `utility_account_id` or `main_tariff_id` is required for a valid request.
+          type: integer
+        main_tariff_id:
+          type: string
+          description: The Genability 'masterTariffId' unique identifier for this tariff. See [Genability documentation](https://developer.genability.com/api-reference/tariff-api/tariff/) for details. Either a `utility_account_id` or `main_tariff_id` is required for a valid request.
+          example: gen_mtid_3331108
+        start_time:
+          description: 'ISO8601 timestamp of when the charge begins. Note that the timestamp will be rounded down to the start of latest charge block resolution.
+
+            For example, if the `charge_block_resolution` is `1h` and the charging session starts at `2021-06-24T14:59:59Z`, the `start_time` used to calculate the curve''s cost will be normalized to `2021-06-24T14:00:00Z`. If the `charge_block_resolution` is `15m`, the `start_time` would be normalized to `2021-06-24T14:45:00Z`.
+
+            This rounding technique eliminates ambiguity around charging that occurs across time-of-use on/mid/off-peak window boundaries.
+
+            '
+          type: string
+          format: date-time
+          example: '2021-03-18T22:00:00-07:00'
+        end_time:
+          description: ISO8601 datetime by which the charge must be complete.
+          type: string
+          format: date-time
+          example: '2021-03-19T08:00:00-07:00'
+        minutes_to_charge_complete:
+          description: The number of minutes of charging required to complete a charge.
+          type: integer
+          example: 330
+        charge_block_resolution:
+          description: The duration of the charge blocks to use in the returned `charge_block_active` param.
+          type: string
+          enum:
+          - 5m
+          - 10m
+          - 15m
+          - 30m
+          - 1h
+          default: 1h
+      additionalProperties: false
+    SmartChargeScheduleResponse:
+      required:
+      - start_time
+      - charge_block_active
+      - charge_block_resolution
+      properties:
+        start_time:
+          type: string
+          format: date-time
+          example: '2021-03-18T22:00:00-07:00'
+        charge_block_resolution:
+          description: The duration of the charge blocks returned in the `charge_block_active` array.
+          type: string
+          enum:
+          - 5m
+          - 10m
+          - 15m
+          - 30m
+          - 1h
+          example: 1h
+        charge_block_active:
+          type: object
+          required:
+          - frequency
+          - data
+          properties:
+            frequency:
+              description: The duration of the charge blocks returned in the `charge_block_active` array.
+              type: string
+              enum:
+              - 5m
+              - 10m
+              - 15m
+              - 30m
+              - 1h
+              example: 1h
+            data:
+              type: array
+              description: Whether or not the vehicle should be actively charging during each charging bucket, starting at the `start_time`.
+              items:
+                $ref: '#/components/schemas/TimeSeriesItem'
       additionalProperties: false
     StorageOptimizationSchedulesRequestParams:
       type: object
@@ -1045,466 +1317,6 @@ components:
               description: If specified, use a fixed schedule to control battery dispatch, charging as much as possible during `charge_tous` and discharging as much as possible during `discharge_tous`. Times of use (TOUs) should be specified using [Genability format](https://developer.genability.com/api-reference/tariff-api/time-of-use/), in either camel or snake case.
               allOf:
               - $ref: '#/components/schemas/FixedSchedule'
-    SmartChargeScheduleRequestBodyParams:
-      required:
-      - start_time
-      - end_time
-      - minutes_to_charge_complete
-      properties:
-        utility_account_id:
-          description: (Beta - due to limited coverage) The unique ID of the utility account that this calculation is being run against. Either a `utility_account_id` or `main_tariff_id` is required for a valid request.
-          type: integer
-        main_tariff_id:
-          type: string
-          description: The Genability 'masterTariffId' unique identifier for this tariff. See [Genability documentation](https://developer.genability.com/api-reference/tariff-api/tariff/) for details. Either a `utility_account_id` or `main_tariff_id` is required for a valid request.
-          example: gen_mtid_3331108
-        start_time:
-          description: 'ISO8601 timestamp of when the charge begins. Note that the timestamp will be rounded down to the start of latest charge block resolution.
-
-            For example, if the `charge_block_resolution` is `1h` and the charging session starts at `2021-06-24T14:59:59Z`, the `start_time` used to calculate the curve''s cost will be normalized to `2021-06-24T14:00:00Z`. If the `charge_block_resolution` is `15m`, the `start_time` would be normalized to `2021-06-24T14:45:00Z`.
-
-            This rounding technique eliminates ambiguity around charging that occurs across time-of-use on/mid/off-peak window boundaries.
-
-            '
-          type: string
-          format: date-time
-          example: '2021-03-18T22:00:00-07:00'
-        end_time:
-          description: ISO8601 datetime by which the charge must be complete.
-          type: string
-          format: date-time
-          example: '2021-03-19T08:00:00-07:00'
-        minutes_to_charge_complete:
-          description: The number of minutes of charging required to complete a charge.
-          type: integer
-          example: 330
-        charge_block_resolution:
-          description: The duration of the charge blocks to use in the returned `charge_block_active` param.
-          type: string
-          enum:
-          - 5m
-          - 10m
-          - 15m
-          - 30m
-          - 1h
-          default: 1h
-      additionalProperties: false
-    ChargeCostResponse:
-      required:
-      - tariff
-      - normalized_start_time
-      - normalized_consumption_kwh
-      - cost_cents
-      properties:
-        utility_account_id:
-          example: 12345
-          type:
-          - integer
-          - 'null'
-        tariff:
-          $ref: '#/components/schemas/MostRecentTariff'
-        normalized_start_time:
-          type: string
-          format: date-time
-          description: The start_time normalized down to the resolution that lines up with any TOU periods on the tariff (generally hourly).
-          example: '2021-03-18T22:00:00-07:00'
-        normalized_consumption_kwh:
-          type: array
-          items:
-            type: number
-          description: The `energy_usage_kwh` aggregated into periods that line up with any TOU periods on the tariff (generally hourly).
-          example:
-          - 0
-          - 0
-          - 7.2
-          - 0
-          - 7.2
-          - 2.9
-        cost_cents:
-          type: integer
-          example: 525
-          description: Cost of the charging curve on the utility account's tariff, in cents.
-      additionalProperties: false
-    SparkParamValidationError:
-      required:
-      - error
-      properties:
-        error:
-          type: object
-          required:
-          - description
-          - type
-          - details
-          properties:
-            description:
-              type: string
-              enum:
-              - Validation Error
-            type:
-              type: string
-              enum:
-              - BAD_REQUEST
-            details:
-              type:
-              - object
-              - 'null'
-      additionalProperties: false
-    SmartChargeScheduleResponse:
-      required:
-      - start_time
-      - charge_block_active
-      - charge_block_resolution
-      properties:
-        start_time:
-          type: string
-          format: date-time
-          example: '2021-03-18T22:00:00-07:00'
-        charge_block_resolution:
-          description: The duration of the charge blocks returned in the `charge_block_active` array.
-          type: string
-          enum:
-          - 5m
-          - 10m
-          - 15m
-          - 30m
-          - 1h
-          example: 1h
-        charge_block_active:
-          type: object
-          required:
-          - frequency
-          - data
-          properties:
-            frequency:
-              description: The duration of the charge blocks returned in the `charge_block_active` array.
-              type: string
-              enum:
-              - 5m
-              - 10m
-              - 15m
-              - 30m
-              - 1h
-              example: 1h
-            data:
-              type: array
-              description: Whether or not the vehicle should be actively charging during each charging bucket, starting at the `start_time`.
-              items:
-                $ref: '#/components/schemas/TimeSeriesItem'
-      additionalProperties: false
-    TariffRatesResponse:
-      required:
-      - tariff
-      - rates_cost_per_kwh
-      properties:
-        tariff:
-          $ref: '#/components/schemas/Tariff'
-        rates_cost_per_kwh:
-          description: Timeseries with data array of $/kWh rates
-          type: object
-          required:
-          - data
-          - freq
-          properties:
-            data:
-              description: Array of TimeSeriesItems indicating $/kWh rates for each requested time period
-              type: array
-              items:
-                $ref: '#/components/schemas/TimeSeriesItem'
-            freq:
-              description: The interval of the TimeSeriesItems in the data array
-              type: string
-              enum:
-              - 5m
-              - 10m
-              - 15m
-              - 30m
-              - 1h
-      additionalProperties: false
-    TariffResolutionError:
-      required:
-      - error
-      properties:
-        error:
-          type: object
-          required:
-          - description
-          - type
-          - details
-          properties:
-            description:
-              type: string
-              enum:
-              - Tariff information is not yet available for this utility account
-            type:
-              type: string
-              enum:
-              - BAD_REQUEST
-            details:
-              type:
-              - object
-              - 'null'
-      additionalProperties: false
-    MostRecentTariff:
-      allOf:
-      - $ref: '#/components/schemas/Tariff'
-      - description: The most recent Tariff seen on this utility account.
-        required:
-        - tariff_as_of_date
-        properties:
-          tariff_as_of_date:
-            type:
-            - string
-            - 'null'
-            format: date
-            description: The statement date of the utility statement that reported use of this tariff.
-            example: '2021-03-01'
-    TariffApplicabilityQuestionSchema:
-      required:
-      - id
-      - user_question
-      - answer_data_type
-      properties:
-        id:
-          type: string
-          description: String identifier for the applicability question
-          example: LOW_INCOME
-        user_question:
-          type: string
-          description: The user question corresponding to this tariff applicability
-          example: Do you qualify for your utility's low income assistance program?
-        user_question_details:
-          description: The user question details corresponding to this tariff applicability
-          example: Contact your utility for specific qualifications, but common criteria include Supplemental Security Income, Temporary Assistance to Needy Persons/Families, Safety Net Assistance, Food Stamps, or receiving a Home Energy Assistance Program grant in the preceding 12 months.
-          type:
-          - string
-          - 'null'
-        answer_data_type:
-          type: string
-          description: Type of answer expected to be returned for this tariff applicability question
-          example: YES_NO
-      additionalProperties: false
-    FixedSchedule:
-      title: FixedSchedule
-      type: object
-      properties:
-        chargeTous:
-          title: Chargetous
-          description: TOU schedule for charging the storage system.
-          type: array
-          items:
-            $ref: '#/components/schemas/TimeOfUse'
-        dischargeTous:
-          title: Dischargetous
-          description: TOU schedule for discharging the storage system.
-          type: array
-          items:
-            $ref: '#/components/schemas/TimeOfUse'
-        timezone:
-          title: Timezone
-          description: Timezone in which the schedule is defined. Defaults to tariff timezone.
-          type: string
-      required:
-      - chargeTous
-      - dischargeTous
-    OptimizedTariffRecommendationsLseIdentificationParamError:
-      required:
-      - error
-      properties:
-        error:
-          type: object
-          required:
-          - description
-          - type
-          - details
-          properties:
-            description:
-              type: string
-              enum:
-              - Either utility_account_id or zip_code/lse_id must be specified
-            type:
-              type: string
-              enum:
-              - BAD_REQUEST
-            details:
-              type: 'null'
-      additionalProperties: false
-    DispatchStrategy:
-      title: DispatchStrategy
-      type: object
-      properties:
-        optimize:
-          title: Optimize
-          description: If `true`, find the optimal dispatch schedule for the given tariff, solar, and consumption curves, assuming perfect forecasts.
-          type: boolean
-        chargeOnSurplus:
-          title: Chargeonsurplus
-          description: If `true`, charge whenever solar production exceeds consumption and discharge to meet consumption otherwise.
-          type: boolean
-        fixedSchedule:
-          title: Fixedschedule
-          description: If specified, use a fixed schedule to control battery dispatch, charging as much as possible during `charge_tous` and discharging as much as possible during `discharge_tous`. Times of use (TOUs) should be specified using [Genability format](https://developer.genability.com/api-reference/tariff-api/time-of-use/), in either camel or snake case.
-          allOf:
-          - $ref: '#/components/schemas/FixedSchedule'
-    SmartChargeFeatureAvailabilityError:
-      required:
-      - error
-      properties:
-        error:
-          type: object
-          required:
-          - description
-          - type
-          - details
-          properties:
-            description:
-              type: string
-              enum:
-              - The smart_charge feature is not available for this UtilityAccount.
-              - The smart_charge feature is not ready yet. Please refer to UtilityAccount#FeatureAvailability for updates.
-            type:
-              type: string
-              enum:
-              - BAD_REQUEST
-            details:
-              type:
-              - object
-              - 'null'
-      additionalProperties: false
-    TariffScenarioDeviceRemovedEvChargingParams:
-      description: Parameters for charging level and EV operation schedule
-      properties:
-        device:
-          type: string
-          description: The `REMOVED_EV_CHARGING` parameter is used to remove (disaggregate) simulated existing EV load, eg to simulate effects of adding smart charging by removing effects of basic charging.
-          example: REMOVED_EV_CHARGING
-          enum:
-          - REMOVED_EV_CHARGING
-        charging_availability:
-          type: array
-          description: Schedule of when the car is at home and able to be charged. `BASIC` charging will simulate a charging schedule assuming charging starts at the specified window start times (for example, at 18:00 when the driver comes home). `SMART` charging will simulate a charging schedule using our Calculate Smart Charging Schedule endpoint logic to charge during the cheapest hours on this tariff in the provided windows.
-          items:
-            $ref: '#/components/schemas/EvChargePlan'
-        charging_power_kw:
-          type: number
-          example: 1.8
-          description: This helps to determine the EVSE (electric vehicle supply equipment) level. 0.0 indicates no charging at home. 1.8kW or 2.4kW chargers are typical power levels for wall outlets (Level 1). 7.2kW or 9.6kW are typical charging powers for a Level 2 charger.
-        operation_schedule:
-          type: string
-          enum:
-          - BASIC
-          - SMART
-          example: SMART
-          description: An operation schedule of `BASIC` charging will simulate a charging schedule assuming charging starts at the specified window start times (for example, at 18:00 when the driver comes home). `SMART` charging will simulate a charging schedule using our Calculate Smart Charging Schedule endpoint logic to charge during the cheapest hours on this tariff in the provided windows.
-      additionalProperties: false
-    Tariff:
-      description: Information about a tariff.
-      required:
-      - main_tariff_id
-      - tariff_code
-      - tariff_name
-      - utility_name
-      properties:
-        main_tariff_id:
-          type: string
-          description: The Genability 'masterTariffId' unique identifier for this tariff. See [Genability documentation](https://developer.genability.com/api-reference/tariff-api/tariff/) for details.
-          example: gen_mtid_3331108
-        property_inputs:
-          description: Properties applied to this tariff which may affect the calculated cost of electricity.
-          type: array
-          items:
-            type: object
-            required:
-            - id
-            - value
-            properties:
-              id:
-                type: string
-                example: territoryId
-              value:
-                type:
-                - boolean
-                - number
-                - string
-                example: 3
-        supplier_name:
-          description: The name of the retail electricity supplier or the community choice aggregator. If there is no retail electricity supplier or community choice aggregator, this field is null.
-          example: East Bay Community Energy
-          type:
-          - string
-          - 'null'
-        tariff_code:
-          type: string
-          description: Abbreviation code of the tariff used for this calculation.
-          example: EV-2A-TOU
-        tariff_name:
-          type: string
-          description: Full name of the tariff used for this calculation.
-          example: Residential - Time of Use - Plug-In Electric Vehicle 2
-        utility_name:
-          type: string
-          description: Name of the utility associated with this tariff
-          example: Pacific Gas & Electric
-    EvChargePlan:
-      description: Specifies a time window where the EV is at home and available for charging.
-      required:
-      - start_day_of_week
-      - start_time
-      - end_day_of_week
-      - end_time
-      - expected_consumption_kwh
-      properties:
-        start_day_of_week:
-          type: integer
-          description: Day of the week the available charging block begins. ISO format -- 1 is Monday, 7 is Sunday.
-          example: 1
-        start_time:
-          type: string
-          description: Time when the EV is available to begin charging. For example, when the driver comes home in the evening.
-          example: '15:00:00'
-        end_day_of_week:
-          type: integer
-          description: Day of the week the available charging block ends. ISO format -- 1 is Monday, 7 is Sunday.
-          example: 2
-        end_time:
-          type: string
-          description: Time when the EV is no longer available for charging. For example, when the driver leaves for their morning commute.
-          example: 06:00:00
-        expected_consumption_kwh:
-          type: number
-          description: Expected kwh consumption until the next EvChargePlan residential charging event.
-          example: 15
-      additionalProperties: false
-    TariffScenarioDeviceEvChargingParams:
-      description: Parameters for charging level and EV operation schedule
-      required:
-      - device
-      - charging_availability
-      - charging_power_kw
-      - operation_schedule
-      properties:
-        device:
-          type: string
-          description: A value of `EV_CHARGING` indicates a future EV purchase.
-          example: EV_CHARGING
-          enum:
-          - EV_CHARGING
-        charging_availability:
-          type: array
-          description: Schedule of when the car is at home and able to be charged. `BASIC` charging will simulate a charging schedule assuming charging starts at the specified window start times (for example, at 18:00 when the driver comes home). `SMART` charging will simulate a charging schedule using our Calculate Smart Charging Schedule endpoint logic to charge during the cheapest hours on this tariff in the provided windows.
-          items:
-            $ref: '#/components/schemas/EvChargePlan'
-        charging_power_kw:
-          type: number
-          example: 1.8
-          description: This helps to determine the EVSE (electric vehicle supply equipment) level. 0.0 indicates no charging at home. 1.8kW or 2.4kW chargers are typical power levels for wall outlets (Level 1). 7.2kW or 9.6kW are typical charging powers for a Level 2 charger.
-        operation_schedule:
-          type: string
-          enum:
-          - BASIC
-          - SMART
-          example: SMART
-          description: An operation schedule of `BASIC` charging will simulate a charging schedule assuming charging starts at the specified window start times (for example, at 18:00 when the driver comes home). `SMART` charging will simulate a charging schedule using our Calculate Smart Charging Schedule endpoint logic to charge during the cheapest hours on this tariff in the provided windows.
-      additionalProperties: false
     ChargeCostFeatureAvailabilityError:
       required:
       - error
@@ -1530,42 +1342,116 @@ components:
               - object
               - 'null'
       additionalProperties: false
-    TariffRatesRequestBodyParams:
+    ChargeCurvesTariffParamError:
       required:
-      - start_time
+      - error
       properties:
-        utility_account_id:
-          description: (Beta - due to limited coverage) The unique ID of the utility account that this calculation is being run against. Either a `utility_account_id` or `main_tariff_id` is required for a valid request.
-          type: integer
-        main_tariff_id:
-          type: string
-          description: The Genability 'masterTariffId' unique identifier for this tariff. See [Genability documentation](https://developer.genability.com/api-reference/tariff-api/tariff/) for details. Either a `utility_account_id` or `main_tariff_id` is required for a valid request.
-          example: gen_mtid_3331108
-        start_time:
-          description: 'ISO8601 timestamp indicating start time. Note that the timestamp will be rounded down to the start of latest time_block_resolution
-
-            '
-          type: string
-          format: date-time
-          example: '2021-03-18T22:00:00-07:00'
-        end_time:
-          description: 'ISO8601 timestamp indicating end of time period. Note that the timestamp will be rounded down to the start of latest time_block_resolution
-
-            '
-          type: string
-          format: date-time
-          example: '2021-03-19T08:00:00-07:00'
-        time_block_resolution:
-          description: Requested time resolution
-          type: string
-          enum:
-          - 5m
-          - 10m
-          - 15m
-          - 30m
-          - 1h
-          default: 1h
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              example: No tariff found matching ID
+              enum:
+              - No tariff found matching ID
+              - 'Invalid tariff ID: must be of the form "gen_mtid_3220724"'
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+            details:
+              type: object
+              required:
+              - main_tariff_id
+              properties:
+                main_tariff_id:
+                  type: string
+                  example: gen_tariff_000000
       additionalProperties: false
+    FixedSchedule:
+      title: FixedSchedule
+      type: object
+      properties:
+        chargeTous:
+          title: Chargetous
+          description: TOU schedule for charging the storage system.
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeOfUse'
+        dischargeTous:
+          title: Dischargetous
+          description: TOU schedule for discharging the storage system.
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeOfUse'
+        timezone:
+          title: Timezone
+          description: Timezone in which the schedule is defined. Defaults to tariff timezone.
+          type: string
+      required:
+      - chargeTous
+      - dischargeTous
+    TariffScenarioDeviceSolarParams:
+      required:
+      - device
+      - solar_system_kw
+      properties:
+        device:
+          type: string
+          description: Identifies this device as a rooftop solar system
+          example: SOLAR
+          enum:
+          - SOLAR
+        solar_system_kw:
+          type: number
+          description: Size of solar system in kW
+          example: 5
+      additionalProperties: false
+    SparkParamValidationError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - Validation Error
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+            details:
+              type:
+              - object
+              - 'null'
+      additionalProperties: false
+    DispatchStrategy:
+      title: DispatchStrategy
+      type: object
+      properties:
+        optimize:
+          title: Optimize
+          description: If `true`, find the optimal dispatch schedule for the given tariff, solar, and consumption curves, assuming perfect forecasts.
+          type: boolean
+        chargeOnSurplus:
+          title: Chargeonsurplus
+          description: If `true`, charge whenever solar production exceeds consumption and discharge to meet consumption otherwise.
+          type: boolean
+        fixedSchedule:
+          title: Fixedschedule
+          description: If specified, use a fixed schedule to control battery dispatch, charging as much as possible during `charge_tous` and discharging as much as possible during `discharge_tous`. Times of use (TOUs) should be specified using [Genability format](https://developer.genability.com/api-reference/tariff-api/time-of-use/), in either camel or snake case.
+          allOf:
+          - $ref: '#/components/schemas/FixedSchedule'
     TariffScenarioCostRequestParams:
       required:
       - baseline_load
@@ -1672,76 +1558,57 @@ components:
           - device: SOLAR
             solar_system_kw: 5
       additionalProperties: false
-    UtilityAccountNotFoundError:
-      required:
-      - error
+    TouPeriod:
+      title: TouPeriod
+      type: object
       properties:
-        error:
-          type: string
-          enum:
-          - Couldn't find UtilityAccount
-      additionalProperties: false
-    TimeSeriesItem:
-      required:
-      - timestamp
-      - value
-      properties:
-        timestamp:
-          description: ISO8601 timestamp indicating time of data collection
-          type: string
-          format: date-time
-        value:
-          description: Data value of resource
-          type: number
-      additionalProperties: false
-    TariffApplicabilityAnswersRequestParams:
-      required: []
-      properties:
-        utility_account_id:
+        fromDayOfWeek:
+          title: Fromdayofweek
+          description: Day of the week on which this period begins (0 - 6, Monday - Sunday).
+          default: 0
+          minimum: 0
+          maximum: 6
           type: integer
-          example: 12345
-          description: The unique ID of the Utility Account for this tariff search. Optional if searching for tariffs by Genability `lse_id`/`zip_code`.
-        zip_code:
+        toDayOfWeek:
+          title: Todayofweek
+          description: Day of the week after which this period ends (0 - 6, Monday - Sunday). End day is included in the period.
+          default: 6
+          minimum: 0
+          maximum: 6
+          type: integer
+        fromHour:
+          title: Fromhour
+          description: Hour of the day on which this period begins (0 - 23).
+          exclusiveMaximum: 24
+          minimum: 0
+          type: integer
+        toHour:
+          title: Tohour
+          description: Hour of the day before which this period ends (0 - 24). End hour is not included in the period.
+          minimum: 0
+          maximum: 24
+          type: integer
+      required:
+      - fromHour
+      - toHour
+    TariffApplicabilityAnswerSchema:
+      required:
+      - question_id
+      - value
+      - data_type
+      properties:
+        question_id:
           type: string
-          example: '94706'
-          description: The zip code of the site inside the LSE's territory. Must be provided if searching for tariffs by Genability `lse_id`/`zip_code`.
-        lse_id:
+          description: String identifier for the applicability question
+          example: LOW_INCOME
+        value:
+          type: boolean
+          description: User response to the tariff applicability question
+          example: true
+        data_type:
           type: string
-          example: gen_lse_734
-          description: The ID of the Genability [load serving entity](https://developer.genability.com/api-reference/tariff-api/load-serving-entity/) prefixed with `gen_lse_`. Must be provided if searching for tariffs by Genability `lse_id`/`zip_code`.
-        applicability_answers:
-          type: array
-          description: Site or customer-specific answers to applicability questions to determine tariff eligibility.
-          items:
-            $ref: '#/components/schemas/TariffApplicabilityAnswerSchema'
-          example:
-          - question_id: EV
-            value: true
-            data_type: YES_NO
-          - question_id: SOLAR
-            value: true
-            data_type: YES_NO
-          - question_id: ELECTRIC_HEAT
-            value: false
-            data_type: YES_NO
-          - question_id: ELECTRIC_WATER
-            value: false
-            data_type: YES_NO
-          - question_id: HEAT_PUMP
-            value: false
-            data_type: YES_NO
-          - question_id: SENIOR_CITIZEN
-            value: false
-            data_type: YES_NO
-          - question_id: LOW_INCOME
-            value: false
-            data_type: YES_NO
-          - question_id: CA_CARE_CUSTOMER
-            value: false
-            data_type: YES_NO
-          - question_id: CA_FERA
-            value: false
-            data_type: YES_NO
+          description: Type of answer expected to be returned for this tariff applicability question
+          example: YES_NO
       additionalProperties: false
     TouSeason:
       title: TouSeason
@@ -1774,6 +1641,20 @@ components:
       required:
       - seasonFromMonth
       - seasonToMonth
+    MostRecentTariff:
+      allOf:
+      - $ref: '#/components/schemas/Tariff'
+      - description: The most recent Tariff seen on this utility account.
+        required:
+        - tariff_as_of_date
+        properties:
+          tariff_as_of_date:
+            type:
+            - string
+            - 'null'
+            format: date
+            description: The statement date of the utility statement that reported use of this tariff.
+            example: '2021-03-01'
     TariffScenarioCostResponse:
       description: Parameters for a rooftop solar system
       properties:
@@ -1792,30 +1673,142 @@ components:
           description: The end date of the calculated simulation. If using `baseline_load=TYPICALS`, this will be the current time.
           example: '2022-02-03'
       additionalProperties: false
-    TimeOfUse:
-      title: TimeOfUse
-      type: object
+    EvChargePlan:
+      description: Specifies a time window where the EV is at home and available for charging.
+      required:
+      - start_day_of_week
+      - start_time
+      - end_day_of_week
+      - end_time
+      - expected_consumption_kwh
       properties:
-        season:
-          title: Season
-          description: Season to which this TOU schedule applies.
-          allOf:
-          - $ref: '#/components/schemas/TouSeason'
-        touPeriods:
-          title: Touperiods
-          description: Set of TOU periods defining the schedule.
+        start_day_of_week:
+          type: integer
+          description: Day of the week the available charging block begins. ISO format -- 1 is Monday, 7 is Sunday.
+          example: 1
+        start_time:
+          type: string
+          description: Time when the EV is available to begin charging. For example, when the driver comes home in the evening.
+          example: '15:00:00'
+        end_day_of_week:
+          type: integer
+          description: Day of the week the available charging block ends. ISO format -- 1 is Monday, 7 is Sunday.
+          example: 2
+        end_time:
+          type: string
+          description: Time when the EV is no longer available for charging. For example, when the driver leaves for their morning commute.
+          example: 06:00:00
+        expected_consumption_kwh:
+          type: number
+          description: Expected kwh consumption until the next EvChargePlan residential charging event.
+          example: 15
+      additionalProperties: false
+    TariffScenarioDeviceRemovedEvChargingParams:
+      description: Parameters for charging level and EV operation schedule
+      properties:
+        device:
+          type: string
+          description: The `REMOVED_EV_CHARGING` parameter is used to remove (disaggregate) simulated existing EV load, eg to simulate effects of adding smart charging by removing effects of basic charging.
+          example: REMOVED_EV_CHARGING
+          enum:
+          - REMOVED_EV_CHARGING
+        charging_availability:
+          type: array
+          description: Schedule of when the car is at home and able to be charged. `BASIC` charging will simulate a charging schedule assuming charging starts at the specified window start times (for example, at 18:00 when the driver comes home). `SMART` charging will simulate a charging schedule using our Calculate Smart Charging Schedule endpoint logic to charge during the cheapest hours on this tariff in the provided windows.
+          items:
+            $ref: '#/components/schemas/EvChargePlan'
+        charging_power_kw:
+          type: number
+          example: 1.8
+          description: This helps to determine the EVSE (electric vehicle supply equipment) level. 0.0 indicates no charging at home. 1.8kW or 2.4kW chargers are typical power levels for wall outlets (Level 1). 7.2kW or 9.6kW are typical charging powers for a Level 2 charger.
+        operation_schedule:
+          type: string
+          enum:
+          - BASIC
+          - SMART
+          example: SMART
+          description: An operation schedule of `BASIC` charging will simulate a charging schedule assuming charging starts at the specified window start times (for example, at 18:00 when the driver comes home). `SMART` charging will simulate a charging schedule using our Calculate Smart Charging Schedule endpoint logic to charge during the cheapest hours on this tariff in the provided windows.
+      additionalProperties: false
+    TariffApplicabilityQuestionSchema:
+      required:
+      - id
+      - user_question
+      - answer_data_type
+      properties:
+        id:
+          type: string
+          description: String identifier for the applicability question
+          example: LOW_INCOME
+        user_question:
+          type: string
+          description: The user question corresponding to this tariff applicability
+          example: Do you qualify for your utility's low income assistance program?
+        user_question_details:
+          description: The user question details corresponding to this tariff applicability
+          example: Contact your utility for specific qualifications, but common criteria include Supplemental Security Income, Temporary Assistance to Needy Persons/Families, Safety Net Assistance, Food Stamps, or receiving a Home Energy Assistance Program grant in the preceding 12 months.
+          type:
+          - string
+          - 'null'
+        answer_data_type:
+          type: string
+          description: Type of answer expected to be returned for this tariff applicability question
+          example: YES_NO
+      additionalProperties: false
+    ChargeCostRequestBodyParams:
+      required:
+      - start_time
+      - energy_usage_kwh
+      properties:
+        utility_account_id:
+          description: (Beta - due to limited coverage) The unique ID of the utility account that this calculation is being run against. Either a `utility_account_id` or `main_tariff_id` is required for a valid request.
+          type: integer
+        main_tariff_id:
+          type: string
+          description: The Genability 'masterTariffId' unique identifier for this tariff. See [Genability documentation](https://developer.genability.com/api-reference/tariff-api/tariff/) for details. Either a `utility_account_id` or `main_tariff_id` is required for a valid request.
+          example: gen_mtid_3331108
+        start_time:
+          description: 'ISO8601 timestamp of when the charge begins. Note that the timestamp will be normalized down to the start of latest charge block resolution.
+
+            For example, if the `charge_block_resolution` is `1h` and the charging session starts at `2021-06-24T14:59:59Z`, the `start_time` used to calculate the curve''s cost will be normalized to `2021-06-24T14:00:00Z`. If the `charge_block_resolution` is `15m`, the `start_time` would be normalized to `2021-06-24T14:45:00Z`.
+
+            This normalization technique eliminates ambiguity around charging that occurs across time-of-use on/mid/off-peak window boundaries.
+
+            '
+          type: string
+          format: date-time
+          example: '2021-03-18T22:00:00-07:00'
+        charge_block_resolution:
+          description: The duration of the charge blocks provided in the `energy_usage_kwh` param.
+          type: string
+          enum:
+          - 5m
+          - 10m
+          - 15m
+          - 30m
+          - 1h
+          default: 1h
+        energy_usage_kwh:
+          description: The load curve being priced. An array of charge blocks with each block representing the kWh of power consumed or to be consumed in that block.
           type: array
           items:
-            $ref: '#/components/schemas/TouPeriod'
+            type: number
+          example:
+          - 0
+          - 0
+          - 7.2
+          - 0
+          - 7.2
+          - 2.9
+      additionalProperties: false
+    UtilityAccountNotFoundError:
       required:
-      - touPeriods
-  headers:
-    ArcVersion:
-      description: The Arcadia-Version for the response
-      schema:
-        type: string
-      example: '2022-10-13'
-      required: true
+      - error
+      properties:
+        error:
+          type: string
+          enum:
+          - Couldn't find UtilityAccount
+      additionalProperties: false
   parameters:
     arcVersionInHeaderParam:
       name: Arcadia-Version
@@ -1826,6 +1819,13 @@ components:
       schema:
         type: string
         default: '2022-10-13'
+  headers:
+    ArcVersion:
+      description: The Arcadia-Version for the response
+      schema:
+        type: string
+      example: '2022-10-13'
+      required: true
   securitySchemes:
     bearerAuth:
       type: http

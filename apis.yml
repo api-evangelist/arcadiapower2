@@ -13,7 +13,16 @@ x-tier-reason: enrichment pass 2026-09-25 (modular-v1; was harvest)
 specificationVersion: '0.20'
 created: '2026-09-25'
 modified: '2026-09-25'
+x-docs-platform: readme
+x-docs-platform-confidence: high
+x-docs-platform-checked: 2026-10-03
 tags:
+- Energy
+- Software-as-a-Service
+- Enterprise
+- Sustainability
+- Data
+tags_raw:
 - Energy
 - SaaS
 - Enterprise
@@ -25,6 +34,9 @@ maintainers:
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: CapabilityMap
+  url: capabilities/arcadiapower2-capability-edges.yml
+  name: Arcadiapower2 Business Capability Map
 - type: Vendors
   url: vendors/arcadiapower2-vendors.yml
 - type: AgenticAccess
@@ -90,6 +102,8 @@ apis:
   humanURL: https://docs.arcadia.com/
   baseURL: https://api.arcadia.com
   tags:
+  - Authentication
+  tags_raw:
   - Auth
   properties:
   - type: OpenAPI
@@ -201,6 +215,8 @@ apis:
   humanURL: https://docs.arcadia.com/
   baseURL: https://api.arcadia.com
   tags:
+  - User
+  tags_raw:
   - Users
   properties:
   - type: OpenAPI
@@ -312,6 +328,8 @@ apis:
   humanURL: https://docs.arcadia.com/
   baseURL: https://api.arcadia.com
   tags:
+  - Webhook
+  tags_raw:
   - Webhooks
   properties:
   - type: OpenAPI

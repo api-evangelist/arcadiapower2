@@ -385,6 +385,31 @@ paths:
                 - $ref: '#/components/schemas/SandboxBundleEnrollmentError'
                 - $ref: '#/components/schemas/InvalidResourceError'
 components:
+  headers:
+    ArcVersion:
+      description: The Arcadia-Version for the response
+      schema:
+        type: string
+      example: '2022-10-13'
+      required: true
+    RateLimitReset:
+      description: The time in which you can retry a request. Given in epoch time.
+      schema:
+        type: integer
+      example: 1690895650
+      required: true
+    RateLimitLimit:
+      description: The number of requests that can be made to the API in the RateLimit Period
+      schema:
+        type: integer
+      example: 200
+      required: true
+    RateLimitPeriod:
+      description: The number of seconds your application has to perform the number of requests specified by RateLimit Limit
+      schema:
+        type: integer
+      example: 10
+      required: true
   schemas:
     UtilityRemittanceItem:
       required:
@@ -443,6 +468,114 @@ components:
           type: boolean
           example: 'false'
       additionalProperties: false
+    UtilityRemittanceEnrollError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - The utility_remittance feature is not available for this UtilityAccount.
+              - The utility_remittance feature is not ready yet. Please refer to UtilityAccount#FeatureAvailability for updates.
+              - No Utility Accounts to enroll for this Utility Credential.
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+            details:
+              type:
+              - object
+              - 'null'
+      additionalProperties: false
+    UtilityRemittanceItemCreateError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - Utility Remittance Item must be scheduled at least one day from now
+              - Utility Statement has already been scheduled for remittance
+              - A Utility Remittance Item cannot be created for a Utility Account not enrolled in Utility Remittance
+              - 'Invalid parameter: scheduled_at must be provided as an ISO date format and be a valid date.'
+              - Utility Remittance Item amount_cents must be greater than 0
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+            details:
+              type:
+              - object
+              - 'null'
+      additionalProperties: false
+    IneligibilityReasonEnum:
+      type: string
+      enum:
+      - 2fa
+      - ebill_ineligible_incorrect_credentials
+      - ebill_ineligible_third_party
+      - gas_only
+      - inactive_utility_account
+      - incomplete_utility_account
+      - missing_payment_method
+      - past_due
+      - payment_arrangement
+      - sdg&e_paperless_gas_account
+      - sibling_account_ineligible
+      - solar_non_approved_utility
+      - enrolled_in_mutually_exclusive_bundle_feature
+    SandboxBundleEnrollmentError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - No Utility Accounts to accept for this Utility Credential.
+              - No Utility Accounts to reject for this Utility Credential.
+              - No Utility Accounts to remove for this Utility Credential.
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+            details:
+              type:
+              - object
+              - 'null'
+      additionalProperties: false
+    BundleUtilityRemittanceItemCreateRequestBodyParams:
+      properties:
+        scheduled_at:
+          description: You can specify a date for remittance using `scheduled_at`. Note that `scheduled_at` must be a date in the future. If the date you specify falls on a weekend or a banking holiday, remittance will be scheduled for the next business day. If `scheduled_at` is omitted, remittance will be scheduled for the next business day.
+          type: string
+          format: date
+          example: '2021-07-28'
+        amount_cents:
+          description: You can specify how much to remit for this Utility Statement using `amount_cents`. In most cases, this should correspond to the `utility_charge` on a Utility Statement.  If `amount_cents` is omitted, the Utility Remittance Item will be created using the `utility_charge` on the specified Utility Statement. At this time, `amount_cents` cannot exceed 3000000 cents ($30,000). Note that overpaying or underpaying the amount on a Utility Statement comes with risk. This field should be used with caution.
+          type: integer
+          example: '8000'
+      additionalProperties: false
     UnpermittedParametersError:
       required:
       - error
@@ -485,6 +618,71 @@ components:
           - 12345
           - 67890
       additionalProperties: false
+    SandboxBundleRemoveReasonError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - Unsupported reason parameter provided.
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+      additionalProperties: false
+    UtilityStatementNotFoundError:
+      required:
+      - error
+      properties:
+        error:
+          type: string
+          enum:
+          - Couldn't find UtilityStatement
+      additionalProperties: false
+    ForbiddenError:
+      required:
+      - error
+      properties:
+        error:
+          enum:
+          - Access denied
+      additionalProperties: false
+    BundleEnrollmentsArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/BundleEnrollment'
+    BundleUnenrollError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - No Utility Accounts to unenroll for this Utility Credential.
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+            details:
+              type:
+              - object
+              - 'null'
+      additionalProperties: false
     InvalidResourceError:
       required:
       - error
@@ -524,33 +722,38 @@ components:
                   - integer
                   - string
       additionalProperties: false
-    ForbiddenError:
+    BundleEnrollmentInvalidUtilityAccountIdsError:
       required:
       - error
       properties:
         error:
-          enum:
-          - Access denied
-      additionalProperties: false
-    ThrottledError:
-      required:
-      - error
-      properties:
-        error:
-          type: string
-          pattern: '^Rate limit exceeded. Try again at '
-      additionalProperties: false
-    IneligibilityReason:
-      required:
-      - resolvable
-      - reason
-      properties:
-        resolvable:
-          type: boolean
-          description: If `true`, signifies that corrective action can be taken to resolve this Ineligibility Reason. If `false`, this Ineligibility Reason cannot be resolved
-          example: false
-        reason:
-          $ref: '#/components/schemas/IneligibilityReasonEnum'
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+              enum:
+              - Request included utility_account_ids not valid for the specified Utility Credential
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+            details:
+              anyOf:
+              - type: object
+                required:
+                - utility_credential_id
+                - excess_utility_account_ids
+                properties:
+                  utility_credential_id:
+                    type: integer
+                  excess_utility_account_ids:
+                    type: array
+                    items:
+                      type: integer
       additionalProperties: false
     BundleEnrollmentMissingUtilityAccountIdsError:
       required:
@@ -584,82 +787,6 @@ components:
                     type: array
                     items:
                       type: integer
-      additionalProperties: false
-    BundleUtilityRemittanceItemCreateRequestBodyParams:
-      properties:
-        scheduled_at:
-          description: You can specify a date for remittance using `scheduled_at`. Note that `scheduled_at` must be a date in the future. If the date you specify falls on a weekend or a banking holiday, remittance will be scheduled for the next business day. If `scheduled_at` is omitted, remittance will be scheduled for the next business day.
-          type: string
-          format: date
-          example: '2021-07-28'
-        amount_cents:
-          description: You can specify how much to remit for this Utility Statement using `amount_cents`. In most cases, this should correspond to the `utility_charge` on a Utility Statement.  If `amount_cents` is omitted, the Utility Remittance Item will be created using the `utility_charge` on the specified Utility Statement. At this time, `amount_cents` cannot exceed 3000000 cents ($30,000). Note that overpaying or underpaying the amount on a Utility Statement comes with risk. This field should be used with caution.
-          type: integer
-          example: '8000'
-      additionalProperties: false
-    BundleUnenrollError:
-      required:
-      - error
-      properties:
-        error:
-          type: object
-          required:
-          - description
-          - type
-          - details
-          properties:
-            description:
-              type: string
-              enum:
-              - No Utility Accounts to unenroll for this Utility Credential.
-            type:
-              type: string
-              enum:
-              - BAD_REQUEST
-            details:
-              type:
-              - object
-              - 'null'
-      additionalProperties: false
-    SandboxBundleRejectReasonsError:
-      required:
-      - error
-      properties:
-        error:
-          type: object
-          required:
-          - description
-          - type
-          - details
-          properties:
-            description:
-              type: string
-              enum:
-              - One or more unsupported reasons provided.
-            type:
-              type: string
-              enum:
-              - BAD_REQUEST
-      additionalProperties: false
-    SandboxBundleRemoveReasonError:
-      required:
-      - error
-      properties:
-        error:
-          type: object
-          required:
-          - description
-          - type
-          - details
-          properties:
-            description:
-              type: string
-              enum:
-              - Unsupported reason parameter provided.
-            type:
-              type: string
-              enum:
-              - BAD_REQUEST
       additionalProperties: false
     BundleEnrollment:
       required:
@@ -730,23 +857,19 @@ components:
           type: boolean
           example: false
       additionalProperties: false
-    IneligibilityReasonEnum:
-      type: string
-      enum:
-      - 2fa
-      - ebill_ineligible_incorrect_credentials
-      - ebill_ineligible_third_party
-      - gas_only
-      - inactive_utility_account
-      - incomplete_utility_account
-      - missing_payment_method
-      - past_due
-      - payment_arrangement
-      - sdg&e_paperless_gas_account
-      - sibling_account_ineligible
-      - solar_non_approved_utility
-      - enrolled_in_mutually_exclusive_bundle_feature
-    SandboxBundleEnrollmentError:
+    IneligibilityReason:
+      required:
+      - resolvable
+      - reason
+      properties:
+        resolvable:
+          type: boolean
+          description: If `true`, signifies that corrective action can be taken to resolve this Ineligibility Reason. If `false`, this Ineligibility Reason cannot be resolved
+          example: false
+        reason:
+          $ref: '#/components/schemas/IneligibilityReasonEnum'
+      additionalProperties: false
+    SandboxBundleRejectReasonsError:
       required:
       - error
       properties:
@@ -760,121 +883,29 @@ components:
             description:
               type: string
               enum:
-              - No Utility Accounts to accept for this Utility Credential.
-              - No Utility Accounts to reject for this Utility Credential.
-              - No Utility Accounts to remove for this Utility Credential.
+              - One or more unsupported reasons provided.
             type:
               type: string
               enum:
               - BAD_REQUEST
-            details:
-              type:
-              - object
-              - 'null'
       additionalProperties: false
-    BundleEnrollmentInvalidUtilityAccountIdsError:
-      required:
-      - error
-      properties:
-        error:
-          type: object
-          required:
-          - description
-          - type
-          - details
-          properties:
-            description:
-              type: string
-              enum:
-              - Request included utility_account_ids not valid for the specified Utility Credential
-            type:
-              type: string
-              enum:
-              - BAD_REQUEST
-            details:
-              anyOf:
-              - type: object
-                required:
-                - utility_credential_id
-                - excess_utility_account_ids
-                properties:
-                  utility_credential_id:
-                    type: integer
-                  excess_utility_account_ids:
-                    type: array
-                    items:
-                      type: integer
-      additionalProperties: false
-    UtilityRemittanceEnrollError:
-      required:
-      - error
-      properties:
-        error:
-          type: object
-          required:
-          - description
-          - type
-          - details
-          properties:
-            description:
-              type: string
-              enum:
-              - The utility_remittance feature is not available for this UtilityAccount.
-              - The utility_remittance feature is not ready yet. Please refer to UtilityAccount#FeatureAvailability for updates.
-              - No Utility Accounts to enroll for this Utility Credential.
-            type:
-              type: string
-              enum:
-              - BAD_REQUEST
-            details:
-              type:
-              - object
-              - 'null'
-      additionalProperties: false
-    BundleEnrollmentsArray:
-      type: array
-      items:
-        $ref: '#/components/schemas/BundleEnrollment'
-    UtilityRemittanceItemCreateError:
-      required:
-      - error
-      properties:
-        error:
-          type: object
-          required:
-          - description
-          - type
-          - details
-          properties:
-            description:
-              type: string
-              enum:
-              - Utility Remittance Item must be scheduled at least one day from now
-              - Utility Statement has already been scheduled for remittance
-              - A Utility Remittance Item cannot be created for a Utility Account not enrolled in Utility Remittance
-              - 'Invalid parameter: scheduled_at must be provided as an ISO date format and be a valid date.'
-              - Utility Remittance Item amount_cents must be greater than 0
-            type:
-              type: string
-              enum:
-              - BAD_REQUEST
-            details:
-              type:
-              - object
-              - 'null'
-      additionalProperties: false
-    UtilityStatementNotFoundError:
+    ThrottledError:
       required:
       - error
       properties:
         error:
           type: string
-          enum:
-          - Couldn't find UtilityStatement
+          pattern: '^Rate limit exceeded. Try again at '
       additionalProperties: false
   parameters:
     utilityAccountIdInPathParam:
       name: utility_account_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    utilityStatementIdInPathParam:
+      name: utility_statement_id
       in: path
       required: true
       schema:
@@ -900,37 +931,6 @@ components:
       required: true
       schema:
         type: integer
-    utilityStatementIdInPathParam:
-      name: utility_statement_id
-      in: path
-      required: true
-      schema:
-        type: integer
-  headers:
-    RateLimitPeriod:
-      description: The number of seconds your application has to perform the number of requests specified by RateLimit Limit
-      schema:
-        type: integer
-      example: 10
-      required: true
-    RateLimitReset:
-      description: The time in which you can retry a request. Given in epoch time.
-      schema:
-        type: integer
-      example: 1690895650
-      required: true
-    RateLimitLimit:
-      description: The number of requests that can be made to the API in the RateLimit Period
-      schema:
-        type: integer
-      example: 200
-      required: true
-    ArcVersion:
-      description: The Arcadia-Version for the response
-      schema:
-        type: string
-      example: '2022-10-13'
-      required: true
   securitySchemes:
     bearerAuth:
       type: http

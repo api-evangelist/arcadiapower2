@@ -108,6 +108,64 @@ paths:
               schema:
                 $ref: '#/components/schemas/DeleteUserError'
 components:
+  parameters:
+    paginationOrderParam:
+      in: query
+      name: order
+      required: false
+      description: Used to specify the order in which records should be returned. Currently ordered by `updated_at` timestamp.
+      schema:
+        type: string
+        enum:
+        - asc
+        - desc
+        default: desc
+    paginationUpdatedBeforeParam:
+      in: query
+      name: updated_before
+      required: false
+      description: ISO8601 datetime, used to traverse paginated responses. Use of this parameter is mutually exclusive with `updated_after`.
+      schema:
+        type: string
+        format: date-time
+    paginationLimitParam:
+      in: query
+      name: limit
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
+    clientUserIdInPathParam:
+      name: client_user_id
+      in: path
+      required: true
+      schema:
+        type: string
+    paginationUpdatedAfterParam:
+      in: query
+      name: updated_after
+      required: false
+      description: ISO8601 datetime, used to traverse paginated responses. Use of this parameter is mutually exclusive with `updated_before`.
+      schema:
+        type: string
+        format: date-time
+    arcVersionInHeaderParam:
+      name: Arcadia-Version
+      in: header
+      example: '2022-10-13'
+      description: The Arcadia-Version for the request
+      required: true
+      schema:
+        type: string
+        default: '2022-10-13'
+  headers:
+    ArcVersion:
+      description: The Arcadia-Version for the response
+      schema:
+        type: string
+      example: '2022-10-13'
+      required: true
   schemas:
     FeatureAvailability:
       required:
@@ -127,30 +185,6 @@ components:
           $ref: '#/components/schemas/Availability'
         utility_remittance:
           $ref: '#/components/schemas/Availability'
-      additionalProperties: false
-    DeleteUserError:
-      required:
-      - error
-      properties:
-        error:
-          type: object
-          required:
-          - description
-          - type
-          - details
-          properties:
-            description:
-              type: string
-              enum:
-              - Cannot delete a User who is pending_enrollment, enrolled, or pending unenrollment in a Bundle Product
-            type:
-              type: string
-              enum:
-              - BAD_REQUEST
-            details:
-              type:
-              - object
-              - 'null'
       additionalProperties: false
     PaginatedUsers:
       required:
@@ -188,79 +222,71 @@ components:
           enum:
           - Couldn't find User
       additionalProperties: false
-    Tariff:
-      description: Information about a tariff.
+    UtilityMeter:
       required:
-      - main_tariff_id
-      - tariff_code
-      - tariff_name
-      - utility_name
-      properties:
-        main_tariff_id:
-          type: string
-          description: The Genability 'masterTariffId' unique identifier for this tariff. See [Genability documentation](https://developer.genability.com/api-reference/tariff-api/tariff/) for details.
-          example: gen_mtid_3331108
-        property_inputs:
-          description: Properties applied to this tariff which may affect the calculated cost of electricity.
-          type: array
-          items:
-            type: object
-            required:
-            - id
-            - value
-            properties:
-              id:
-                type: string
-                example: territoryId
-              value:
-                type:
-                - boolean
-                - number
-                - string
-                example: 3
-        supplier_name:
-          description: The name of the retail electricity supplier or the community choice aggregator. If there is no retail electricity supplier or community choice aggregator, this field is null.
-          example: East Bay Community Energy
-          type:
-          - string
-          - 'null'
-        tariff_code:
-          type: string
-          description: Abbreviation code of the tariff used for this calculation.
-          example: EV-2A-TOU
-        tariff_name:
-          type: string
-          description: Full name of the tariff used for this calculation.
-          example: Residential - Time of Use - Plug-In Electric Vehicle 2
-        utility_name:
-          type: string
-          description: Name of the utility associated with this tariff
-          example: Pacific Gas & Electric
-    User:
-      required:
+      - id
       - client_user_id
+      - utility_credential_id
+      - utility_account_id
+      - meter_number
+      - service_type
       - created_at
-      - utility_credentials
+      - updated_at
+      - sandboxed
       properties:
+        id:
+          type: integer
+          example: 12345
         client_user_id:
           type: string
-          example: fff57dc7-3a2b-4395-8a62-e3712d46dafl
+          example: fff57dc7-3a2b-4395-8a62-e3486d46dabe
+        utility_credential_id:
+          type: integer
+          example: 54321
+        utility_account_id:
+          type: integer
+          example: 65432
+        meter_number:
+          type: string
+          example: 12300000045 67
+        service_type:
+          type: string
+          enum:
+          - electric
+          - gas
+          - water
         created_at:
           type: string
           format: date-time
-        utility_credentials:
-          type: array
-          items:
-            allOf:
-            - $ref: '#/components/schemas/UtilityCredential'
-            - type: object
-              required:
-              - utility_accounts
-              properties:
-                utility_accounts:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/UtilityAccount'
+        updated_at:
+          type: string
+          format: date-time
+        sandboxed:
+          type: boolean
+          example: false
+      additionalProperties: false
+    UserDataExceedsLimitsError:
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - description
+          - type
+          - details
+          properties:
+            description:
+              type: string
+            type:
+              type: string
+              enum:
+              - BAD_REQUEST
+            details:
+              type:
+              - object
+              - 'null'
+      additionalProperties: false
     UtilityAccount:
       required:
       - id
@@ -391,6 +417,99 @@ components:
           type: boolean
           example: false
       additionalProperties: false
+    User:
+      required:
+      - client_user_id
+      - created_at
+      - utility_credentials
+      properties:
+        client_user_id:
+          type: string
+          example: fff57dc7-3a2b-4395-8a62-e3712d46dafl
+        created_at:
+          type: string
+          format: date-time
+        utility_credentials:
+          type: array
+          items:
+            allOf:
+            - $ref: '#/components/schemas/UtilityCredential'
+            - type: object
+              required:
+              - utility_accounts
+              properties:
+                utility_accounts:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/UtilityAccount'
+    Availability:
+      type: string
+      enum:
+      - AVAILABLE
+      - NOT_AVAILABLE
+      - NOT_READY
+    MostRecentTariff:
+      allOf:
+      - $ref: '#/components/schemas/Tariff'
+      - description: The most recent Tariff seen on this utility account.
+        required:
+        - tariff_as_of_date
+        properties:
+          tariff_as_of_date:
+            type:
+            - string
+            - 'null'
+            format: date
+            description: The statement date of the utility statement that reported use of this tariff.
+            example: '2021-03-01'
+    Tariff:
+      description: Information about a tariff.
+      required:
+      - main_tariff_id
+      - tariff_code
+      - tariff_name
+      - utility_name
+      properties:
+        main_tariff_id:
+          type: string
+          description: The Genability 'masterTariffId' unique identifier for this tariff. See [Genability documentation](https://developer.genability.com/api-reference/tariff-api/tariff/) for details.
+          example: gen_mtid_3331108
+        property_inputs:
+          description: Properties applied to this tariff which may affect the calculated cost of electricity.
+          type: array
+          items:
+            type: object
+            required:
+            - id
+            - value
+            properties:
+              id:
+                type: string
+                example: territoryId
+              value:
+                type:
+                - boolean
+                - number
+                - string
+                example: 3
+        supplier_name:
+          description: The name of the retail electricity supplier or the community choice aggregator. If there is no retail electricity supplier or community choice aggregator, this field is null.
+          example: East Bay Community Energy
+          type:
+          - string
+          - 'null'
+        tariff_code:
+          type: string
+          description: Abbreviation code of the tariff used for this calculation.
+          example: EV-2A-TOU
+        tariff_name:
+          type: string
+          description: Full name of the tariff used for this calculation.
+          example: Residential - Time of Use - Plug-In Electric Vehicle 2
+        utility_name:
+          type: string
+          description: Name of the utility associated with this tariff
+          example: Pacific Gas & Electric
     UtilityCredential:
       required:
       - created_at
@@ -466,70 +585,7 @@ components:
           type: boolean
           example: false
           description: Indicates if the utility credential was created using a designated test username and password.
-    MostRecentTariff:
-      allOf:
-      - $ref: '#/components/schemas/Tariff'
-      - description: The most recent Tariff seen on this utility account.
-        required:
-        - tariff_as_of_date
-        properties:
-          tariff_as_of_date:
-            type:
-            - string
-            - 'null'
-            format: date
-            description: The statement date of the utility statement that reported use of this tariff.
-            example: '2021-03-01'
-    UtilityMeter:
-      required:
-      - id
-      - client_user_id
-      - utility_credential_id
-      - utility_account_id
-      - meter_number
-      - service_type
-      - created_at
-      - updated_at
-      - sandboxed
-      properties:
-        id:
-          type: integer
-          example: 12345
-        client_user_id:
-          type: string
-          example: fff57dc7-3a2b-4395-8a62-e3486d46dabe
-        utility_credential_id:
-          type: integer
-          example: 54321
-        utility_account_id:
-          type: integer
-          example: 65432
-        meter_number:
-          type: string
-          example: 12300000045 67
-        service_type:
-          type: string
-          enum:
-          - electric
-          - gas
-          - water
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-        sandboxed:
-          type: boolean
-          example: false
-      additionalProperties: false
-    Availability:
-      type: string
-      enum:
-      - AVAILABLE
-      - NOT_AVAILABLE
-      - NOT_READY
-    UserDataExceedsLimitsError:
+    DeleteUserError:
       required:
       - error
       properties:
@@ -542,6 +598,8 @@ components:
           properties:
             description:
               type: string
+              enum:
+              - Cannot delete a User who is pending_enrollment, enrolled, or pending unenrollment in a Bundle Product
             type:
               type: string
               enum:
@@ -551,64 +609,6 @@ components:
               - object
               - 'null'
       additionalProperties: false
-  parameters:
-    paginationUpdatedBeforeParam:
-      in: query
-      name: updated_before
-      required: false
-      description: ISO8601 datetime, used to traverse paginated responses. Use of this parameter is mutually exclusive with `updated_after`.
-      schema:
-        type: string
-        format: date-time
-    paginationOrderParam:
-      in: query
-      name: order
-      required: false
-      description: Used to specify the order in which records should be returned. Currently ordered by `updated_at` timestamp.
-      schema:
-        type: string
-        enum:
-        - asc
-        - desc
-        default: desc
-    paginationLimitParam:
-      in: query
-      name: limit
-      required: false
-      schema:
-        type: integer
-        minimum: 1
-        default: 10
-    clientUserIdInPathParam:
-      name: client_user_id
-      in: path
-      required: true
-      schema:
-        type: string
-    arcVersionInHeaderParam:
-      name: Arcadia-Version
-      in: header
-      example: '2022-10-13'
-      description: The Arcadia-Version for the request
-      required: true
-      schema:
-        type: string
-        default: '2022-10-13'
-    paginationUpdatedAfterParam:
-      in: query
-      name: updated_after
-      required: false
-      description: ISO8601 datetime, used to traverse paginated responses. Use of this parameter is mutually exclusive with `updated_before`.
-      schema:
-        type: string
-        format: date-time
-  headers:
-    ArcVersion:
-      description: The Arcadia-Version for the response
-      schema:
-        type: string
-      example: '2022-10-13'
-      required: true
   securitySchemes:
     bearerAuth:
       type: http

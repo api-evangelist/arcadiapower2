@@ -138,6 +138,208 @@ webhooks:
               $ref: '#/components/schemas/TestWebhookEvent'
 components:
   schemas:
+    UtilityCredential:
+      required:
+      - created_at
+      - id
+      - updated_at
+      - client_user_id
+      - username
+      - utility_name
+      - utility_long_name
+      - verification_status
+      - accounts_load_in_progress
+      - verification_updated_at
+      - sandboxed
+      - uses_test_scenario
+      properties:
+        id:
+          type: integer
+          example: 12345
+        client_user_id:
+          type: string
+          example: fff57dc7-3a2b-4395-8a62-e3486d46dabe
+        utility_name:
+          type: string
+          example: AEP SWEPCO
+          description: The list of supported Arcadia utilities can be found [here](https://arc.arcadia.com/coverage?first=25&page=1).
+        utility_long_name:
+          type: string
+          example: AEP SWEPCO AR
+          description: Provides greater detail than `utility_name`. The list of supported Arcadia utilities can be found [here](https://arc.arcadia.com/coverage?first=25&page=1).
+        username:
+          type:
+          - string
+          - 'null'
+          example: great_customer
+        verification_status:
+          type: string
+          enum:
+          - pending
+          - verified
+          - rejected
+          - error
+          description: 'The verification status of the Utility Credential.
+
+
+            * `pending`: Credential verification is pending
+
+            * `verified`: The credentials were found to be correct
+
+            * `rejected`: The credentials were found to be incorrect
+
+            * `error`: There was an error attempting to verify the credentials. This status _may_ be transient, as Arcadia will continue to retry verification in the background.
+
+            '
+        accounts_load_in_progress:
+          type: boolean
+          example: false
+          description: 'Indicates if Arcadia is in the process of verifying a utility credential or loading associated utility accounts. The combination of `verification_status: verified` and `account_load_in_progress: false` will indicate that utility accounts are available in the API. Alternatively, the `utility_accounts_discovered` webhook will alert you when utility accounts are available in the API.'
+        verification_updated_at:
+          format: date-time
+          type:
+          - string
+          - 'null'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        sandboxed:
+          type: boolean
+          example: false
+        uses_test_scenario:
+          type: boolean
+          example: false
+          description: Indicates if the utility credential was created using a designated test username and password.
+    UtilityCredentialVerificationErrorWebhookEvent:
+      required:
+      - type
+      - created_at
+      - data
+      properties:
+        type:
+          type: string
+          enum:
+          - utility_credential_verification_error
+        created_at:
+          type: string
+          format: date-time
+        data:
+          $ref: '#/components/schemas/UtilityCredential'
+      additionalProperties: false
+    UtilityCredentialRejectedWebhookEvent:
+      required:
+      - type
+      - created_at
+      - data
+      properties:
+        type:
+          type: string
+          enum:
+          - utility_credential_rejected
+        created_at:
+          type: string
+          format: date-time
+        data:
+          $ref: '#/components/schemas/UtilityCredential'
+      additionalProperties: false
+    Availability:
+      type: string
+      enum:
+      - AVAILABLE
+      - NOT_AVAILABLE
+      - NOT_READY
+    NewUtilityStatementAvailableWebhookEvent:
+      required:
+      - type
+      - created_at
+      - data
+      properties:
+        type:
+          type: string
+          enum:
+          - new_utility_statement_available
+        created_at:
+          type: string
+          format: date-time
+        data:
+          $ref: '#/components/schemas/UtilityStatement'
+      additionalProperties: false
+    UtilityMeter:
+      required:
+      - id
+      - client_user_id
+      - utility_credential_id
+      - utility_account_id
+      - meter_number
+      - service_type
+      - created_at
+      - updated_at
+      - sandboxed
+      properties:
+        id:
+          type: integer
+          example: 12345
+        client_user_id:
+          type: string
+          example: fff57dc7-3a2b-4395-8a62-e3486d46dabe
+        utility_credential_id:
+          type: integer
+          example: 54321
+        utility_account_id:
+          type: integer
+          example: 65432
+        meter_number:
+          type: string
+          example: 12300000045 67
+        service_type:
+          type: string
+          enum:
+          - electric
+          - gas
+          - water
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        sandboxed:
+          type: boolean
+          example: false
+      additionalProperties: false
+    MostRecentTariff:
+      allOf:
+      - $ref: '#/components/schemas/Tariff'
+      - description: The most recent Tariff seen on this utility account.
+        required:
+        - tariff_as_of_date
+        properties:
+          tariff_as_of_date:
+            type:
+            - string
+            - 'null'
+            format: date
+            description: The statement date of the utility statement that reported use of this tariff.
+            example: '2021-03-01'
+    UtilityCredentialRevokedWebhookEvent:
+      required:
+      - type
+      - created_at
+      - data
+      properties:
+        type:
+          type: string
+          enum:
+          - utility_credential_revoked
+        created_at:
+          type: string
+          format: date-time
+        data:
+          $ref: '#/components/schemas/UtilityCredential'
+      additionalProperties: false
     FeatureAvailability:
       required:
       - charge_cost
@@ -156,102 +358,6 @@ components:
           $ref: '#/components/schemas/Availability'
         utility_remittance:
           $ref: '#/components/schemas/Availability'
-      additionalProperties: false
-    NewUtilityStatementAvailableWebhookEvent:
-      required:
-      - type
-      - created_at
-      - data
-      properties:
-        type:
-          type: string
-          enum:
-          - new_utility_statement_available
-        created_at:
-          type: string
-          format: date-time
-        data:
-          $ref: '#/components/schemas/UtilityStatement'
-      additionalProperties: false
-    Tariff:
-      description: Information about a tariff.
-      required:
-      - main_tariff_id
-      - tariff_code
-      - tariff_name
-      - utility_name
-      properties:
-        main_tariff_id:
-          type: string
-          description: The Genability 'masterTariffId' unique identifier for this tariff. See [Genability documentation](https://developer.genability.com/api-reference/tariff-api/tariff/) for details.
-          example: gen_mtid_3331108
-        property_inputs:
-          description: Properties applied to this tariff which may affect the calculated cost of electricity.
-          type: array
-          items:
-            type: object
-            required:
-            - id
-            - value
-            properties:
-              id:
-                type: string
-                example: territoryId
-              value:
-                type:
-                - boolean
-                - number
-                - string
-                example: 3
-        supplier_name:
-          description: The name of the retail electricity supplier or the community choice aggregator. If there is no retail electricity supplier or community choice aggregator, this field is null.
-          example: East Bay Community Energy
-          type:
-          - string
-          - 'null'
-        tariff_code:
-          type: string
-          description: Abbreviation code of the tariff used for this calculation.
-          example: EV-2A-TOU
-        tariff_name:
-          type: string
-          description: Full name of the tariff used for this calculation.
-          example: Residential - Time of Use - Plug-In Electric Vehicle 2
-        utility_name:
-          type: string
-          description: Name of the utility associated with this tariff
-          example: Pacific Gas & Electric
-    UtilityCredentialRejectedWebhookEvent:
-      required:
-      - type
-      - created_at
-      - data
-      properties:
-        type:
-          type: string
-          enum:
-          - utility_credential_rejected
-        created_at:
-          type: string
-          format: date-time
-        data:
-          $ref: '#/components/schemas/UtilityCredential'
-      additionalProperties: false
-    UtilityCredentialRevokedWebhookEvent:
-      required:
-      - type
-      - created_at
-      - data
-      properties:
-        type:
-          type: string
-          enum:
-          - utility_credential_revoked
-        created_at:
-          type: string
-          format: date-time
-        data:
-          $ref: '#/components/schemas/UtilityCredential'
       additionalProperties: false
     UtilityStatement:
       required:
@@ -633,62 +739,66 @@ components:
                   conflicting_utility_statment_id:
                     type: integer
       additionalProperties: false
-    MostRecentTariff:
-      allOf:
-      - $ref: '#/components/schemas/Tariff'
-      - description: The most recent Tariff seen on this utility account.
-        required:
-        - tariff_as_of_date
-        properties:
-          tariff_as_of_date:
-            type:
-            - string
-            - 'null'
-            format: date
-            description: The statement date of the utility statement that reported use of this tariff.
-            example: '2021-03-01'
-    UtilityMeter:
+    Tariff:
+      description: Information about a tariff.
       required:
-      - id
-      - client_user_id
-      - utility_credential_id
-      - utility_account_id
-      - meter_number
-      - service_type
-      - created_at
-      - updated_at
-      - sandboxed
+      - main_tariff_id
+      - tariff_code
+      - tariff_name
+      - utility_name
       properties:
-        id:
-          type: integer
-          example: 12345
-        client_user_id:
+        main_tariff_id:
           type: string
-          example: fff57dc7-3a2b-4395-8a62-e3486d46dabe
-        utility_credential_id:
-          type: integer
-          example: 54321
-        utility_account_id:
-          type: integer
-          example: 65432
-        meter_number:
+          description: The Genability 'masterTariffId' unique identifier for this tariff. See [Genability documentation](https://developer.genability.com/api-reference/tariff-api/tariff/) for details.
+          example: gen_mtid_3331108
+        property_inputs:
+          description: Properties applied to this tariff which may affect the calculated cost of electricity.
+          type: array
+          items:
+            type: object
+            required:
+            - id
+            - value
+            properties:
+              id:
+                type: string
+                example: territoryId
+              value:
+                type:
+                - boolean
+                - number
+                - string
+                example: 3
+        supplier_name:
+          description: The name of the retail electricity supplier or the community choice aggregator. If there is no retail electricity supplier or community choice aggregator, this field is null.
+          example: East Bay Community Energy
+          type:
+          - string
+          - 'null'
+        tariff_code:
           type: string
-          example: 12300000045 67
-        service_type:
+          description: Abbreviation code of the tariff used for this calculation.
+          example: EV-2A-TOU
+        tariff_name:
+          type: string
+          description: Full name of the tariff used for this calculation.
+          example: Residential - Time of Use - Plug-In Electric Vehicle 2
+        utility_name:
+          type: string
+          description: Name of the utility associated with this tariff
+          example: Pacific Gas & Electric
+    TestWebhookEvent:
+      required:
+      - type
+      - created_at
+      properties:
+        type:
           type: string
           enum:
-          - electric
-          - gas
-          - water
+          - test
         created_at:
           type: string
           format: date-time
-        updated_at:
-          type: string
-          format: date-time
-        sandboxed:
-          type: boolean
-          example: false
       additionalProperties: false
     UtilityAccountUpdatedWebhookEvent:
       required:
@@ -706,7 +816,7 @@ components:
         data:
           $ref: '#/components/schemas/UtilityAccount'
       additionalProperties: false
-    UtilityAccountsDiscoveredWebhookEvent:
+    UtilityAccountsDiscoveryErrorWebhookEvent:
       required:
       - type
       - created_at
@@ -715,7 +825,39 @@ components:
         type:
           type: string
           enum:
-          - utility_accounts_discovered
+          - utility_accounts_discovery_error
+        created_at:
+          type: string
+          format: date-time
+        data:
+          $ref: '#/components/schemas/UtilityCredential'
+      additionalProperties: false
+    UtilityCredentialVerifiedWebhookEvent:
+      required:
+      - type
+      - created_at
+      - data
+      properties:
+        type:
+          type: string
+          enum:
+          - utility_credential_verified
+        created_at:
+          type: string
+          format: date-time
+        data:
+          $ref: '#/components/schemas/UtilityCredential'
+      additionalProperties: false
+    HistoricalUtilityStatementsDiscoveredWebhookEvent:
+      required:
+      - type
+      - created_at
+      - data
+      properties:
+        type:
+          type: string
+          enum:
+          - historical_utility_statements_discovered
         created_at:
           type: string
           format: date-time
@@ -723,32 +865,19 @@ components:
           type: object
           required:
           - client_user_id
-          - utility_credential_id
-          - utility_accounts
+          - utility_account_id
+          - utility_statements
           properties:
             client_user_id:
               type: string
               example: fff57dc7-3a2b-4395-8a62-e3486d46dabe
-            utility_credential_id:
+            utility_account_id:
               type: integer
               example: 1234
-            utility_accounts:
+            utility_statements:
               type: array
               items:
-                $ref: '#/components/schemas/UtilityAccount'
-      additionalProperties: false
-    TestWebhookEvent:
-      required:
-      - type
-      - created_at
-      properties:
-        type:
-          type: string
-          enum:
-          - test
-        created_at:
-          type: string
-          format: date-time
+                $ref: '#/components/schemas/UtilityStatement'
       additionalProperties: false
     UtilityAccount:
       required:
@@ -880,7 +1009,7 @@ components:
           type: boolean
           example: false
       additionalProperties: false
-    UtilityCredentialVerificationErrorWebhookEvent:
+    UtilityAccountsDiscoveredWebhookEvent:
       required:
       - type
       - created_at
@@ -889,29 +1018,7 @@ components:
         type:
           type: string
           enum:
-          - utility_credential_verification_error
-        created_at:
-          type: string
-          format: date-time
-        data:
-          $ref: '#/components/schemas/UtilityCredential'
-      additionalProperties: false
-    Availability:
-      type: string
-      enum:
-      - AVAILABLE
-      - NOT_AVAILABLE
-      - NOT_READY
-    HistoricalUtilityStatementsDiscoveredWebhookEvent:
-      required:
-      - type
-      - created_at
-      - data
-      properties:
-        type:
-          type: string
-          enum:
-          - historical_utility_statements_discovered
+          - utility_accounts_discovered
         created_at:
           type: string
           format: date-time
@@ -919,127 +1026,20 @@ components:
           type: object
           required:
           - client_user_id
-          - utility_account_id
-          - utility_statements
+          - utility_credential_id
+          - utility_accounts
           properties:
             client_user_id:
               type: string
               example: fff57dc7-3a2b-4395-8a62-e3486d46dabe
-            utility_account_id:
+            utility_credential_id:
               type: integer
               example: 1234
-            utility_statements:
+            utility_accounts:
               type: array
               items:
-                $ref: '#/components/schemas/UtilityStatement'
+                $ref: '#/components/schemas/UtilityAccount'
       additionalProperties: false
-    UtilityCredentialVerifiedWebhookEvent:
-      required:
-      - type
-      - created_at
-      - data
-      properties:
-        type:
-          type: string
-          enum:
-          - utility_credential_verified
-        created_at:
-          type: string
-          format: date-time
-        data:
-          $ref: '#/components/schemas/UtilityCredential'
-      additionalProperties: false
-    UtilityAccountsDiscoveryErrorWebhookEvent:
-      required:
-      - type
-      - created_at
-      - data
-      properties:
-        type:
-          type: string
-          enum:
-          - utility_accounts_discovery_error
-        created_at:
-          type: string
-          format: date-time
-        data:
-          $ref: '#/components/schemas/UtilityCredential'
-      additionalProperties: false
-    UtilityCredential:
-      required:
-      - created_at
-      - id
-      - updated_at
-      - client_user_id
-      - username
-      - utility_name
-      - utility_long_name
-      - verification_status
-      - accounts_load_in_progress
-      - verification_updated_at
-      - sandboxed
-      - uses_test_scenario
-      properties:
-        id:
-          type: integer
-          example: 12345
-        client_user_id:
-          type: string
-          example: fff57dc7-3a2b-4395-8a62-e3486d46dabe
-        utility_name:
-          type: string
-          example: AEP SWEPCO
-          description: The list of supported Arcadia utilities can be found [here](https://arc.arcadia.com/coverage?first=25&page=1).
-        utility_long_name:
-          type: string
-          example: AEP SWEPCO AR
-          description: Provides greater detail than `utility_name`. The list of supported Arcadia utilities can be found [here](https://arc.arcadia.com/coverage?first=25&page=1).
-        username:
-          type:
-          - string
-          - 'null'
-          example: great_customer
-        verification_status:
-          type: string
-          enum:
-          - pending
-          - verified
-          - rejected
-          - error
-          description: 'The verification status of the Utility Credential.
-
-
-            * `pending`: Credential verification is pending
-
-            * `verified`: The credentials were found to be correct
-
-            * `rejected`: The credentials were found to be incorrect
-
-            * `error`: There was an error attempting to verify the credentials. This status _may_ be transient, as Arcadia will continue to retry verification in the background.
-
-            '
-        accounts_load_in_progress:
-          type: boolean
-          example: false
-          description: 'Indicates if Arcadia is in the process of verifying a utility credential or loading associated utility accounts. The combination of `verification_status: verified` and `account_load_in_progress: false` will indicate that utility accounts are available in the API. Alternatively, the `utility_accounts_discovered` webhook will alert you when utility accounts are available in the API.'
-        verification_updated_at:
-          format: date-time
-          type:
-          - string
-          - 'null'
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-        sandboxed:
-          type: boolean
-          example: false
-        uses_test_scenario:
-          type: boolean
-          example: false
-          description: Indicates if the utility credential was created using a designated test username and password.
   securitySchemes:
     bearerAuth:
       type: http

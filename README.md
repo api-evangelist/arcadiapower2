@@ -64,5 +64,144 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Arcadiapower2 is a company surfaced via the API Evangelist harvest backlog (source: secondary-market) and added to the network as a stub for full-pipeline profiling.
-- https://equityzen.com/company/arcadiapower2
+Arcadiapower2, operating under the brand Arcadia, provides an energy intelligence platform that unifies utility data, AI‑driven analytics, and advisory services to help enterprises manage energy costs, mitigate risk, and achieve sustainability goals. The platform offers tools for utility bill payment, procurement, carbon management, and detailed reporting, serving thousands of customers across the United States and supporting a significant portion of Fortune 500 enterprises.
+
+**Areas:** Energy · Software-as-a-Service · Enterprise · Sustainability · Data
+
+## Arcadiapower2 on APIs.io
+
+Everything profiled for Arcadiapower2 is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/arcadiapower2/](https://apis.io/providers/arcadiapower2/)** — or go straight to one of the APIs or properties below.
+
+### APIs (11)
+
+- [Arcadiapower2 Auth API](https://apis.io/apis/arcadiapower2/arcadiapower2-auth-api/) — The Auth API from Arcadiapower2 — 4 operation(s) for auth.
+- [Arcadiapower2 Bundle (Beta) API](https://apis.io/apis/arcadiapower2/arcadiapower2-bundle-beta-api/) — The Bundle (Beta) API from Arcadiapower2 — 8 operation(s) for bundle (beta).
+- [Arcadiapower2 Bundle Webhook Events API](https://apis.io/apis/arcadiapower2/arcadiapower2-bundle-webhook-events-api/) — The Bundle Webhook Events API from Arcadiapower2 — 0 operation(s) for bundle webhook events.
+- [Arcadiapower2 Plug API](https://apis.io/apis/arcadiapower2/arcadiapower2-plug-api/) — The Plug API from Arcadiapower2 — 2 operation(s) for plug.
+- [Arcadiapower2 Spark API](https://apis.io/apis/arcadiapower2/arcadiapower2-spark-api/) — The Spark API from Arcadiapower2 — 8 operation(s) for spark.
+- [Arcadiapower2 Users API](https://apis.io/apis/arcadiapower2/arcadiapower2-users-api/) — The Users API from Arcadiapower2 — 2 operation(s) for users.
+- [Arcadiapower2 Utility Accounts API](https://apis.io/apis/arcadiapower2/arcadiapower2-utility-accounts-api/) — The Utility Accounts API from Arcadiapower2 — 2 operation(s) for utility accounts.
+- [Arcadiapower2 Utility Credentials API](https://apis.io/apis/arcadiapower2/arcadiapower2-utility-credentials-api/) — The Utility Credentials API from Arcadiapower2 — 3 operation(s) for utility credentials.
+- [Arcadiapower2 Utility Meters (Beta) API](https://apis.io/apis/arcadiapower2/arcadiapower2-utility-meters-beta-api/) — The Utility Meters (Beta) API from Arcadiapower2 — 2 operation(s) for utility meters (beta).
+- [Arcadiapower2 Webhook Events API](https://apis.io/apis/arcadiapower2/arcadiapower2-webhook-events-api/) — The Webhook Events API from Arcadiapower2 — 0 operation(s) for webhook events.
+- [Arcadiapower2 Webhooks API](https://apis.io/apis/arcadiapower2/arcadiapower2-webhooks-api/) — The Webhooks API from Arcadiapower2 — 7 operation(s) for webhooks.
+
+### Published properties
+
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
+
+#### AsyncAPI (1)
+
+Event-driven and webhook contracts.
+
+- [Arcadiapower2 Webhooks](https://apis.io/asyncapis/arcadiapower2/arcadiapower2-webhooks/)
+
+#### Agentic access (1)
+
+Which operations an agent can call, which act, and which need a human in the loop.
+
+- [Arcadiapower2 Agentic Access](https://apis.io/agentic-access/arcadiapower2/arcadiapower2-agentic-access/)
+
+#### JSON Schema (6)
+
+The data models the API reads and writes.
+
+- [StorageOptimizationSchedulesRequestParams](https://apis.io/schemas/arcadiapower2/arcadiapower2-storage-optimization-schedules-request-params/)
+- [StorageOptimizationSchedulesResponse](https://apis.io/schemas/arcadiapower2/arcadiapower2-storage-optimization-schedules-response/)
+- [TariffApplicabilityQuestionsResponse](https://apis.io/schemas/arcadiapower2/arcadiapower2-tariff-applicability-questions-response/)
+- [TariffScenarioCostRequestParams](https://apis.io/schemas/arcadiapower2/arcadiapower2-tariff-scenario-cost-request-params/)
+- [UtilityAccount](https://apis.io/schemas/arcadiapower2/arcadiapower2-utility-account/)
+- [UtilityStatement](https://apis.io/schemas/arcadiapower2/arcadiapower2-utility-statement/)
+
+#### JSON-LD (1)
+
+Linked-data contexts for the provider's vocabulary.
+
+- [Arcadiapower2 Context](https://apis.io/jsonld/arcadiapower2/arcadiapower2-context/)
+
+#### Governance rules (1)
+
+Spectral rulesets for the provider's contracts.
+
+- [Arcadiapower2 API Rules](https://apis.io/rules/arcadiapower2/arcadiapower2-rules/)
+
+#### Security (4)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Arcadiapower2 Authentication](https://apis.io/security/arcadiapower2/arcadiapower2-authentication/)
+- [Arcadiapower2 Domain Security](https://apis.io/security/arcadiapower2/arcadiapower2-domain-security/)
+- [Arcadiapower2 Trust Center](https://apis.io/security/arcadiapower2/arcadiapower2-trust-center/)
+- [Arcadiapower2 Vulnerability Disclosure](https://apis.io/security/arcadiapower2/arcadiapower2-vulnerability-disclosure/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Arcadiapower2 Rate Limits](https://apis.io/rate-limits/arcadiapower2/arcadiapower2-rate-limits/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://www.arcadia.com)
+- [Documentation](https://docs.arcadia.com/)
+- [Getting started](https://docs.arcadia.com/docs/dashboard-quick-start-guide)
+- [Blog](https://www.arcadia.com/blog)
+- [Security](https://www.arcadia.com/security)
+- [Compliance](https://www.arcadia.com/security)
+
+## API Evangelist rating
+
+**Kin Score 52.1** — developing · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 75.0 |
+| Contract quality | 71.7 |
+| Contract governance | 22.0 |
+| Operational transparency | 65.8 |
+| Developer ergonomics | 44.6 |
+| Access clarity | 28.9 |
+
+**Agent readiness 40.3** — agent-ready (gated down from agent-native)
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | derived (partial credit) |
+| Reversibility Documented | — |
+| MCP Server | — |
+| Auth Clarity | bearer (partial credit) |
+| Idempotency | — |
+| Error Semantics | verified |
+| OpenAPI Examples | partial |
+| Rate Limit Signal | verified |
+| Event Surface Described | yes |
+| Agent Skills | derived (partial credit) |
+| Well Known Catalog | yes |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+| Pagination Ratio | partial |
+| Operation Distinctiveness | distinct |
+
+**Regulatory alignment 23.0** — Energy & Utilities
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/arcadiapower2/](https://apis.io/providers/arcadiapower2/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Arcadiapower2: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/arcadiapower2/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
